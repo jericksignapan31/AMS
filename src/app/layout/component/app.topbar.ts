@@ -9,121 +9,107 @@ import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AssetService } from '../../pages/service/asset.service';
 import Swal from 'sweetalert2';
+import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
     imports: [RouterModule, CommonModule, StyleClassModule, DialogModule, ButtonModule, AppConfigurator],
     template: ` <div class="layout-topbar">
-        <div class="layout-topbar-logo-container">
-            <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
-                <i class="pi pi-bars"></i>
-            </button>
-            <a class="layout-topbar-logo">
-                <img src="assets/icons/icon-48x48.png" class=" w-8 h-8 " alt="logo" />
-                <span>LAMS</span>
-            </a>
-        </div>
-
-        <div class="layout-topbar-actions">
-            <div class="layout-config-menu">
-                <button type="button" class="layout-topbar-action" (click)="openQRScanner()" title="QR Code Scanner">
-                    <i class="pi pi-camera"></i>
+            <div class="layout-topbar-logo-container">
+                <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
+                    <i class="pi pi-bars"></i>
                 </button>
-                <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
-                    <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
+                <a class="layout-topbar-logo">
+                    <img src="assets/icons/icon-48x48.png" class=" w-8 h-8 " alt="logo" />
+                    <span>LAMS</span>
+                </a>
+            </div>
+
+            <div class="layout-topbar-actions">
+                <div class="layout-config-menu">
+                    <button type="button" class="layout-topbar-action" (click)="openQRScanner()" title="QR Code Scanner">
+                        <i class="pi pi-camera"></i>
+                    </button>
+                    <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
+                        <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
+                    </button>
+                    <div class="relative">
+                        <button
+                            class="layout-topbar-action layout-topbar-action-highlight"
+                            pStyleClass="@next"
+                            enterFromClass="hidden"
+                            enterActiveClass="animate-scalein"
+                            leaveToClass="hidden"
+                            leaveActiveClass="animate-fadeout"
+                            [hideOnOutsideClick]="true"
+                        >
+                            <i class="pi pi-palette"></i>
+                        </button>
+                        <app-configurator />
+                    </div>
+                </div>
+
+                <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
+                    <i class="pi pi-ellipsis-v"></i>
                 </button>
-                <div class="relative">
-                    <button
-                        class="layout-topbar-action layout-topbar-action-highlight"
-                        pStyleClass="@next"
-                        enterFromClass="hidden"
-                        enterActiveClass="animate-scalein"
-                        leaveToClass="hidden"
-                        leaveActiveClass="animate-fadeout"
-                        [hideOnOutsideClick]="true"
-                    >
-                        <i class="pi pi-palette"></i>
-                    </button>
-                    <app-configurator />
-                </div>
-            </div>
 
-            <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
-                <i class="pi pi-ellipsis-v"></i>
-            </button>
-
-            <div class="layout-topbar-menu hidden lg:block">
-                <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
+                <div class="layout-topbar-menu hidden lg:block">
+                    <div class="layout-topbar-menu-content">
+                        <button type="button" class="layout-topbar-action">
+                            <i class="pi pi-calendar"></i>
+                            <span>Calendar</span>
+                        </button>
+                        <button type="button" class="layout-topbar-action">
+                            <i class="pi pi-inbox"></i>
+                            <span>Messages</span>
+                        </button>
+                        <button type="button" class="layout-topbar-action">
+                            <i class="pi pi-user"></i>
+                            <span>Profile</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- QR Scanner Dialog -->
-    <p-dialog 
-        header="QR Code Scanner"
-        [(visible)]="showQRScanner"
-        [modal]="true"
-        [style]="{width: '50vw'}"
-        [draggable]="false"
-        [resizable]="false"
-        [closable]="true"
-        (onHide)="closeQRScanner()">
-        
-        <div class="flex flex-column align-items-center">
-            <div *ngIf="!hasPermission" class="text-center p-4">
-                <i class="pi pi-exclamation-triangle text-4xl text-orange-500 mb-3"></i>
-                <p class="text-lg mb-3">Camera access is required for QR scanning</p>
-                <p-button label="Grant Camera Access" (onClick)="requestCameraPermission()" />
-            </div>
+        <!-- QR Scanner Dialog -->
+        <p-dialog header="QR Code Scanner" [(visible)]="showQRScanner" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false" [closable]="true" (onHide)="closeQRScanner()">
+            <div class="flex flex-column align-items-center">
+                <div *ngIf="!hasPermission" class="text-center p-4">
+                    <i class="pi pi-exclamation-triangle text-4xl text-orange-500 mb-3"></i>
+                    <p class="text-lg mb-3">Camera access is required for QR scanning</p>
+                    <p-button label="Grant Camera Access" (onClick)="requestCameraPermission()" />
+                </div>
 
-            <div *ngIf="hasPermission && !scanResult" class="w-full text-center">
-                <video 
-                    #videoElement 
-                    class="w-full border-round mb-3" 
-                    style="max-width: 400px; height: 300px;"
-                    autoplay
-                    muted>
-                </video>
-                <p class="text-sm text-500 mb-3">Position the QR code within the camera frame</p>
-                <p-button label="Stop Scanning" severity="secondary" (onClick)="stopScanning()" />
-            </div>
+                <div *ngIf="hasPermission && !scanResult" class="w-full text-center">
+                    <video #videoElement class="w-full border-round mb-3" style="max-width: 400px; height: 300px;" autoplay muted></video>
+                    <p class="text-sm text-500 mb-3">Position the QR code within the camera frame</p>
+                    <p-button label="Stop Scanning" severity="secondary" (onClick)="stopScanning()" />
+                </div>
 
-            <div *ngIf="scanResult" class="text-center p-4">
-                <i class="pi pi-check-circle text-4xl text-green-500 mb-3"></i>
-                <p class="text-lg mb-2">QR Code Detected!</p>
-                <p class="text-sm text-500 mb-3">Result: {{ scanResult }}</p>
-                <div class="flex gap-2 justify-content-center">
-                    <p-button label="Search Asset" (onClick)="searchAsset()" />
-                    <p-button label="Scan Again" severity="secondary" (onClick)="scanAgain()" />
+                <div *ngIf="scanResult" class="text-center p-4">
+                    <i class="pi pi-check-circle text-4xl text-green-500 mb-3"></i>
+                    <p class="text-lg mb-2">QR Code Detected!</p>
+                    <p class="text-sm text-500 mb-3">Result: {{ scanResult }}</p>
+                    <div class="flex gap-2 justify-content-center">
+                        <p-button label="Search Asset" (onClick)="searchAsset()" />
+                        <p-button label="Scan Again" severity="secondary" (onClick)="scanAgain()" />
+                    </div>
+                </div>
+
+                <div *ngIf="errorMessage" class="text-center p-4">
+                    <i class="pi pi-times-circle text-4xl text-red-500 mb-3"></i>
+                    <p class="text-lg mb-2">Error</p>
+                    <p class="text-sm text-500 mb-3">{{ errorMessage }}</p>
+                    <p-button label="Try Again" (onClick)="tryAgain()" />
                 </div>
             </div>
-
-            <div *ngIf="errorMessage" class="text-center p-4">
-                <i class="pi pi-times-circle text-4xl text-red-500 mb-3"></i>
-                <p class="text-lg mb-2">Error</p>
-                <p class="text-sm text-500 mb-3">{{ errorMessage }}</p>
-                <p-button label="Try Again" (onClick)="tryAgain()" />
-            </div>
-        </div>
-    </p-dialog>`
+        </p-dialog>`
 })
 export class AppTopbar {
     items!: MenuItem[];
-    
+
     // QR Scanner properties
     @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
     showQRScanner = false;
@@ -132,6 +118,7 @@ export class AppTopbar {
     errorMessage: string | null = null;
     mediaStream: MediaStream | null = null;
     scanningInterval: any;
+    codeReader: BrowserMultiFormatReader | null = null;
 
     constructor(
         public layoutService: LayoutService,
@@ -164,16 +151,16 @@ export class AppTopbar {
 
     async requestCameraPermission() {
         try {
-            this.mediaStream = await navigator.mediaDevices.getUserMedia({ 
-                video: { 
+            this.mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: {
                     width: { ideal: 640 },
                     height: { ideal: 480 },
                     facingMode: 'environment' // Use back camera if available
-                } 
+                }
             });
             this.hasPermission = true;
             this.errorMessage = null;
-            
+
             // Start video stream after view is initialized
             setTimeout(() => {
                 if (this.videoElement && this.videoElement.nativeElement) {
@@ -188,51 +175,34 @@ export class AppTopbar {
         }
     }
 
-    startScanning() {
+    async startScanning() {
         if (this.scanningInterval) {
             clearInterval(this.scanningInterval);
         }
 
-        // Create canvas for QR code detection
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        
-        this.scanningInterval = setInterval(() => {
-            if (this.videoElement && this.videoElement.nativeElement && context) {
-                const video = this.videoElement.nativeElement;
-                if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    
-                    // Simple QR code detection simulation
-                    // In a real implementation, you would use a QR code library here
-                    this.detectQRCode(canvas);
-                }
-            }
-        }, 500);
-    }
+        if (!this.videoElement || !this.videoElement.nativeElement) {
+            return;
+        }
 
-    detectQRCode(canvas: HTMLCanvasElement) {
-        // This is a simplified QR detection
-        // In production, you would use a library like @zxing/library
-        const context = canvas.getContext('2d');
-        if (context) {
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            
-            // Simulate QR code detection
-            // For demo purposes, we'll randomly "detect" a QR code after some time
-            if (Math.random() < 0.1) { // 10% chance per scan
-                const mockQRCodes = [
-                    'QR001DELL2024',
-                    'QR002CHAIR2024', 
-                    'QR003PRINTER2024',
-                    'QR004TOYOTA2024',
-                    'QR005MACBOOK2024'
-                ];
-                const randomQR = mockQRCodes[Math.floor(Math.random() * mockQRCodes.length)];
-                this.onQRCodeDetected(randomQR);
-            }
+        this.codeReader = new BrowserMultiFormatReader();
+
+        try {
+            // Start continuous scanning
+            await this.codeReader.decodeFromVideoDevice(null, this.videoElement.nativeElement, (result, err) => {
+                if (result) {
+                    console.log('QR Code detected:', result.getText());
+                    this.onQRCodeDetected(result.getText());
+                    if (this.codeReader) {
+                        this.codeReader.reset(); // Stop scanning after first result
+                    }
+                }
+                if (err && !(err instanceof NotFoundException)) {
+                    console.error('QR scanning error:', err);
+                }
+            });
+        } catch (err) {
+            console.error('Failed to start QR scanning:', err);
+            this.errorMessage = 'Failed to start QR code scanning. Please try again.';
         }
     }
 
@@ -246,9 +216,14 @@ export class AppTopbar {
             clearInterval(this.scanningInterval);
             this.scanningInterval = null;
         }
-        
+
+        if (this.codeReader) {
+            this.codeReader.reset();
+            this.codeReader = null;
+        }
+
         if (this.mediaStream) {
-            this.mediaStream.getTracks().forEach(track => track.stop());
+            this.mediaStream.getTracks().forEach((track) => track.stop());
             this.mediaStream = null;
         }
     }
@@ -268,14 +243,11 @@ export class AppTopbar {
 
         try {
             const assets = await this.assetService.getAssets().toPromise();
-            const foundAsset = assets?.find(asset => 
-                asset.QrCode === this.scanResult || 
-                asset.PropertyNo === this.scanResult
-            );
+            const foundAsset = assets?.find((asset) => asset.QrCode === this.scanResult || asset.PropertyNo === this.scanResult);
 
             if (foundAsset) {
                 this.closeQRScanner();
-                
+
                 // Show success message with asset details
                 Swal.fire({
                     title: 'Asset Found!',

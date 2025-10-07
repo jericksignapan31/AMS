@@ -22,6 +22,8 @@
         "@angular/router": "^20",
         "@primeuix/themes": "^1.2.1",
         "@tailwindcss/postcss": "^4.1.11",
+        "@zxing/browser": "^0.1.5",
+        "@zxing/library": "^0.21.3",
         "chart.js": "4.4.2",
         "json-server": "^1.0.0-beta.3",
         "primeclt": "^0.1.5",
