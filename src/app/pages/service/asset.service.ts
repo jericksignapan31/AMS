@@ -23,7 +23,7 @@ export interface Asset {
     providedIn: 'root'
 })
 export class AssetService {
-    private apiUrl = 'http://localhost:3000/assets';
+    private apiUrl = 'http://localhost:3001/assets';
 
     constructor(private http: HttpClient) {}
 

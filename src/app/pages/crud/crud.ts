@@ -26,7 +26,7 @@ interface Column {
     customExportHeader?: string;
 }
 
- interface ExportColumn {
+interface ExportColumn {
     title: string;
     dataKey: string;
 }
@@ -34,7 +34,25 @@ interface Column {
 @Component({
     selector: 'app-crud',
     standalone: true,
-    imports: [CommonModule, TableModule, FormsModule, ButtonModule, RippleModule, ToastModule, ToolbarModule, InputTextModule, TextareaModule, SelectModule, DialogModule, TagModule, InputIconModule, IconFieldModule, ConfirmDialogModule, FileUploadModule, TooltipModule],
+    imports: [
+        CommonModule,
+        TableModule,
+        FormsModule,
+        ButtonModule,
+        RippleModule,
+        ToastModule,
+        ToolbarModule,
+        InputTextModule,
+        TextareaModule,
+        SelectModule,
+        DialogModule,
+        TagModule,
+        InputIconModule,
+        IconFieldModule,
+        ConfirmDialogModule,
+        FileUploadModule,
+        TooltipModule
+    ],
     template: `
         <p-toast />
 
@@ -125,13 +143,7 @@ interface Column {
                     </td>
                     <td>{{ asset.DateAcquired }}</td>
                     <td>
-                        <img 
-                            *ngIf="asset.QrCode" 
-                            [src]="asset.QrCode" 
-                            alt="QR Code" 
-                            class="w-8 h-8 rounded border cursor-pointer hover:opacity-75 transition-opacity" 
-                            (click)="viewQrCode(asset.QrCode)"
-                            pTooltip="Click to view QR Code" />
+                        <img *ngIf="asset.QrCode" [src]="asset.QrCode" alt="QR Code" class="w-8 h-8 rounded border cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
                         <span *ngIf="!asset.QrCode" class="text-muted-color text-sm">No QR Code</span>
                     </td>
                     <td>
@@ -197,31 +209,10 @@ interface Column {
                     </div>
                     <div class="col-span-12">
                         <label for="qrCode" class="block font-bold mb-2">QR Code Image</label>
-                        <p-fileupload 
-                            mode="basic" 
-                            name="qrCode" 
-                            accept="image/*" 
-                            [maxFileSize]="1000000" 
-                            (onSelect)="onQrCodeSelect($event)"
-                            chooseLabel="Choose QR Code Image"
-                            [auto]="true">
-                        </p-fileupload>
+                        <p-fileupload mode="basic" name="qrCode" accept="image/*" [maxFileSize]="1000000" (onSelect)="onQrCodeSelect($event)" chooseLabel="Choose QR Code Image" [auto]="true"> </p-fileupload>
                         <div *ngIf="asset.QrCode" class="mt-3">
-                            <img 
-                                [src]="asset.QrCode" 
-                                alt="QR Code" 
-                                class="max-w-32 max-h-32 border rounded cursor-pointer hover:opacity-75 transition-opacity" 
-                                (click)="viewQrCode(asset.QrCode)"
-                                pTooltip="Click to view QR Code" />
-                            <p-button 
-                                icon="pi pi-times" 
-                                severity="danger" 
-                                size="small" 
-                                [rounded]="true" 
-                                class="ml-2" 
-                                (click)="removeQrCode()" 
-                                pTooltip="Remove QR Code">
-                            </p-button>
+                            <img [src]="asset.QrCode" alt="QR Code" class="max-w-32 max-h-32 border rounded cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
+                            <p-button icon="pi pi-times" severity="danger" size="small" [rounded]="true" class="ml-2" (click)="removeQrCode()" pTooltip="Remove QR Code"> </p-button>
                         </div>
                     </div>
                 </div>
@@ -239,7 +230,7 @@ interface Column {
                     <img [src]="selectedQrCode" alt="QR Code" class="max-w-full h-auto border rounded shadow-lg" />
                 </div>
             </ng-template>
-            
+
             <ng-template #footer>
                 <p-button label="Close" icon="pi pi-times" (click)="closeQrCodeViewer()" />
                 <p-button label="Download" icon="pi pi-download" severity="secondary" (click)="downloadQrCode()" />
@@ -512,7 +503,7 @@ export class Crud implements OnInit {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             Swal.fire({
                 icon: 'success',
                 title: 'Downloaded!',
