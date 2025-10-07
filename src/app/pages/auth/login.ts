@@ -1,17 +1,21 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
+import { MessageModule } from 'primeng/message';
+import { HttpClientModule } from '@angular/common/http';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import { AuthService } from '../service/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, HttpClientModule, AppFloatingConfigurator],
     template: `
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
@@ -38,7 +42,19 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                 </div>
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
                             </div>
-                            <p-button label="Sign In" styleClass="w-full" routerLink="/app"></p-button>
+                            
+                            <p-button 
+                                label="Sign In" 
+                                styleClass="w-full" 
+                                [loading]="isLoading"
+                                (onClick)="onLogin()">
+                            </p-button>
+                            
+                            <div class="mt-4 text-center text-sm text-muted-color">
+                                <strong>Demo Accounts:</strong><br>
+                                admin@lams.com / admin123<br>
+                                user@lams.com / user123
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -48,8 +64,61 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
 })
 export class Login {
     email: string = '';
-
     password: string = '';
-
     checked: boolean = false;
+    isLoading: boolean = false;
+
+    constructor(
+        private authService: AuthService,
+        private router: Router
+    ) {}
+
+    onLogin(): void {
+        if (!this.email || !this.password) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Please enter both email and password',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        this.isLoading = true;
+
+        this.authService.login(this.email, this.password).subscribe({
+            next: (response) => {
+                this.isLoading = false;
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Login Successful!',
+                        text: `Welcome back, ${response.user?.name || 'User'}!`,
+                        timer: 2000,
+                        showConfirmButton: false,
+                        confirmButtonColor: '#10B981'
+                    }).then(() => {
+                        this.router.navigate(['/app']);
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: response.message || 'Invalid email or password',
+                        confirmButtonColor: '#EF4444'
+                    });
+                }
+            },
+            error: (error) => {
+                this.isLoading = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Connection Error',
+                    text: 'Unable to connect to the server. Please try again.',
+                    confirmButtonColor: '#EF4444'
+                });
+                console.error('Login error:', error);
+            }
+        });
+    }
 }
