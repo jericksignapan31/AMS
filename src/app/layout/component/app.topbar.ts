@@ -8,6 +8,8 @@ import { ButtonModule } from 'primeng/button';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AssetService } from '../../pages/service/asset.service';
+import { InstallPromptService } from '../../pages/service/install-prompt.service';
+import { PwaService } from '../../pages/service/pwa.service';
 import Swal from 'sweetalert2';
 import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
 
@@ -28,6 +30,9 @@ import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
 
             <div class="layout-topbar-actions">
                 <div class="layout-config-menu">
+                    <button type="button" class="layout-topbar-action" (click)="installPWA()" title="Install App" *ngIf="canInstallPWA">
+                        <i class="pi pi-download"></i>
+                    </button>
                     <button type="button" class="layout-topbar-action" (click)="openQRScanner()" title="QR Code Scanner">
                         <i class="pi pi-camera"></i>
                     </button>
@@ -120,11 +125,21 @@ export class AppTopbar {
     scanningInterval: any;
     codeReader: BrowserMultiFormatReader | null = null;
 
+    // PWA properties
+    canInstallPWA = false;
+
     constructor(
         public layoutService: LayoutService,
         private router: Router,
-        private assetService: AssetService
-    ) {}
+        private assetService: AssetService,
+        private installPromptService: InstallPromptService,
+        private pwaService: PwaService
+    ) {
+        // Subscribe to PWA install availability
+        this.installPromptService.isInstallable.subscribe((canInstall) => {
+            this.canInstallPWA = canInstall;
+        });
+    }
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
@@ -284,6 +299,30 @@ export class AppTopbar {
                 title: 'Search Error',
                 text: 'Failed to search for asset. Please try again.',
                 icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+    // PWA Methods
+    installPWA() {
+        if (this.installPromptService.canInstall()) {
+            this.installPromptService.promptInstall().then((installed) => {
+                if (installed) {
+                    Swal.fire({
+                        title: 'Installation Started!',
+                        text: 'LAMS is being installed on your device.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Already Installed',
+                text: 'LAMS is already installed or installation is not available on this device.',
+                icon: 'info',
                 confirmButtonText: 'OK'
             });
         }

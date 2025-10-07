@@ -42,19 +42,8 @@ import Swal from 'sweetalert2';
                                 </div>
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
                             </div>
-                            
-                            <p-button 
-                                label="Sign In" 
-                                styleClass="w-full" 
-                                [loading]="isLoading"
-                                (onClick)="onLogin()">
-                            </p-button>
-                            
-                            <div class="mt-4 text-center text-sm text-muted-color">
-                                <strong>Demo Accounts:</strong><br>
-                                admin@lams.com / admin123<br>
-                                user@lams.com / user123
-                            </div>
+
+                            <p-button label="Sign In" styleClass="w-full" [loading]="isLoading" (onClick)="onLogin()"> </p-button>
                         </div>
                     </div>
                 </div>

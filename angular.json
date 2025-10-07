@@ -25,10 +25,15 @@
                         ],
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
-                       "assets": [
-  "src/favicon.ico",
-  "src/assets"
-],
+                        "assets": [
+                            "src/favicon.ico",
+                            "src/assets",
+                            {
+                                "glob": "**/*",
+                                "input": "public",
+                                "output": "/"
+                            }
+                        ],
                         "styles": [
                             "src/assets/styles.scss"
                         ],
@@ -36,7 +41,8 @@
                     },
                     "configurations": {
                         "production": {
-                            "outputHashing": "all"
+                            "outputHashing": "all",
+                            "serviceWorker": "ngsw-config.json"
                         },
                         "development": {
                             "optimization": false,
