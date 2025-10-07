@@ -22,7 +22,7 @@ export class AppMenu {
         this.model = [
             {
                 label: 'Home',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home' }]
+                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/app/dashboard'] }]
             },
             // {
             //     label: 'UI Components',
@@ -76,9 +76,9 @@ export class AppMenu {
                     //     ]
                     // },
                     {
-                        label: 'Crud',
+                        label: 'Assets',
                         icon: 'pi pi-fw pi-pencil',
-                        routerLink: ['/pages/crud']
+                        routerLink: ['/app/crud']
                     }
                     // {
                     //     label: 'Not Found',
