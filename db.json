@@ -174,61 +174,61 @@
     {
       "color_id": "clr001",
       "ColorCode": "#28a745",
-      "Description": "Green - Active and in use",
+      "Description": "Green ",
       "id": "f975"
     },
     {
       "color_id": "clr002",
       "ColorCode": "#6c757d",
-      "Description": "Gray - Inactive/Not in use",
+      "Description": "Gray ",
       "id": "244d"
     },
     {
       "color_id": "clr003",
       "ColorCode": "#ffc107",
-      "Description": "Yellow - Under maintenance",
+      "Description": "Yellow",
       "id": "76c3"
     },
     {
       "color_id": "clr004",
       "ColorCode": "#dc3545",
-      "Description": "Red - Retired from use",
+      "Description": "Red",
       "id": "5327"
     },
     {
       "color_id": "clr005",
       "ColorCode": "#007bff",
-      "Description": "Blue - New/Recently acquired",
+      "Description": "Blue ",
       "id": "1956"
     },
     {
       "color_id": "clr006",
       "ColorCode": "#6f42c1",
-      "Description": "Purple - High priority",
+      "Description": "Purple",
       "id": "ff2c"
     },
     {
       "color_id": "clr007",
       "ColorCode": "#fd7e14",
-      "Description": "Orange - Needs attention",
+      "Description": "Orange",
       "id": "1b64"
     },
     {
       "color_id": "clr008",
       "ColorCode": "#20c997",
-      "Description": "Teal - Certified/Approved",
+      "Description": "Teal",
       "id": "1e64"
     },
     {
       "color_id": "clr009",
       "ColorCode": "#e83e8c",
-      "Description": "Pink - Special category",
+      "Description": "Pink",
       "id": "0a5b"
     },
     {
       "color_id": "clr010",
       "ColorCode": "#343a40",
-      "Description": "Dark - Deprecated",
+      "Description": "Dark ",
       "id": "4678"
     }
   ],
