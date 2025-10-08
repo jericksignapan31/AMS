@@ -76,6 +76,21 @@
       "Status_id": "ACTIVE",
       "Active": "Y",
       "id": "da16"
+    },
+    {
+      "id": "046d",
+      "PropertyNo": "asdas",
+      "Category": "Hardware",
+      "AssetName": "asdas",
+      "FoundCluster": "asdasd",
+      "Location_id": "b9b4",
+      "Program_id": "21aa",
+      "Supplier_id": "63b4",
+      "Purpose": "asdsad",
+      "IssuedTo": "asdsa",
+      "DateAcquired": "2025-10-08",
+      "Status_id": "a128",
+      "Active": "Y"
     }
   ],
   "locations": [
@@ -289,6 +304,21 @@
       "width": 0.04,
       "InvNo": "1122",
       "material": "metal",
+      "DateAcquired": "2025-10-08"
+    },
+    {
+      "id": "2e52",
+      "PropertyNo": "asd",
+      "color_id": "clr002",
+      "Quantity": 2,
+      "UoM": "sadsa",
+      "Description": "asdsa",
+      "brand_id": "brd002",
+      "height": "231",
+      "package": "asdsa",
+      "width": "123",
+      "material": "asd",
+      "InvNo": "asd",
       "DateAcquired": "2025-10-08"
     }
   ]

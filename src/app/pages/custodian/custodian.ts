@@ -61,7 +61,7 @@ interface ExportColumn {
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
                 <p-button label="New Asset" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
-                <p-button severity="secondary" label="Delete Selected" icon="pi pi-trash" outlined (onClick)="deleteSelectedAssets()" [disabled]="!selectedAssets || !selectedAssets.length" />
+                <p-button severity="secondary" label="Delete Selected" icon="pi pi-trash" outlined (onClick)="deleteSelectedInvCustlips()" [disabled]="!selectedInvCustlips || !selectedInvCustlips.length" />
             </ng-template>
 
             <ng-template #end>
@@ -71,14 +71,14 @@ interface ExportColumn {
 
         <p-table
             #dt
-            [value]="assets()"
+            [value]="invCustlips()"
             [rows]="10"
             [columns]="cols"
             [paginator]="true"
             [globalFilterFields]="['PropertyNo', 'AssetName', 'Category', 'Status_id']"
             responsiveLayout="stack"
             breakpoint="960px"
-            [(selection)]="selectedAssets"
+            [(selection)]="selectedInvCustlips"
             [rowHover]="true"
             dataKey="id"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assets"
@@ -138,108 +138,97 @@ interface ExportColumn {
                         <p-tableCheckbox [value]="asset" />
                     </td>
                     <td style="width:14%; min-width:10rem;">
-                        <span class="p-column-title"></span>
-                        {{ asset.PropertyNo }}
+                        <span class="p-column-title">Property No</span>
+                        {{ invCustlip.PropertyNo }}
                     </td>
                     <td style="width:14%; min-width:15rem;">
-                        <span class="p-column-title"></span>
-                        {{ asset.AssetName }}
+                        <span class="p-column-title">Description</span>
+                        {{ invCustlip.Description }}
+                    </td>
+                    <td style="width:12%; min-width:8rem;">
+                        <span class="p-column-title">Quantity</span>
+                        {{ invCustlip.Quantity }}
+                    </td>
+                    <td style="width:10%; min-width:8rem;">
+                        <span class="p-column-title">UoM</span>
+                        {{ invCustlip.UoM }}
+                    </td>
+                    <td style="width:12%; min-width:10rem;">
+                        <span class="p-column-title">Brand</span>
+                        {{ getBrandName(invCustlip.brand_id) }}
+                    </td>
+                    <td style="width:12%; min-width:10rem;">
+                        <span class="p-column-title">Color</span>
+                        {{ getColorName(invCustlip.color_id) }}
                     </td>
                     <td style="width:14%; min-width:10rem;">
-                        <span class="p-column-title"></span>
-                        {{ asset.Category }}
-                    </td>
-                    <td style="width:14%; min-width:12rem;">
-                        <span class="p-column-title"></span>
-                        {{ asset.FoundCluster }}
-                    </td>
-                    <td style="width:14%; min-width:12rem;">
-                        <span class="p-column-title"></span>
-                        {{ asset.IssuedTo }}
-                    </td>
-                    <td style="width:14%; min-width:10rem;">
-                        <span class="p-column-title"></span>
-                        <p-tag [value]="asset.Status_id" [severity]="getStatusSeverity(asset.Status_id)" />
-                    </td>
-                    <td style="width:14%; min-width:10rem;">
-                        <span class="p-column-title"></span>
-                        {{ asset.DateAcquired }}
-                    </td>
-                    <td style="width:14%; min-width:8rem;">
-                        <span class="p-column-title"></span>
-                        <img *ngIf="asset.QrCode" [src]="asset.QrCode" alt="QR Code" class="w-8 h-8 rounded border cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
-                        <span *ngIf="!asset.QrCode" class="text-muted-color text-sm"></span>
+                        <span class="p-column-title">Date Acquired</span>
+                        {{ invCustlip.DateAcquired }}
                     </td>
                     <td>
                         <div class="flex align-items-center gap-2">
-                            <p-button icon="pi pi-plus" severity="success" [rounded]="true" [outlined]="true" (click)="openInvCustlipDialog(asset)" pTooltip="Add New InvCustlip" />
-                            <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" (click)="editAsset(asset)" pTooltip="Edit Asset" />
-                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteAsset(asset)" pTooltip="Delete Asset" />
+                            <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" (click)="editInvCustlip(invCustlip)" pTooltip="Edit InvCustlip" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteInvCustlip(invCustlip)" pTooltip="Delete InvCustlip" />
                         </div>
                     </td>
                 </tr>
             </ng-template>
         </p-table>
 
-        <p-dialog [(visible)]="assetDialog" [style]="{ width: '800px' }" header="Asset Details" [modal]="true">
+        <p-dialog [(visible)]="invCustlipDialog" [style]="{ width: '800px' }" header="InvCustlip Details" [modal]="true">
             <ng-template #content>
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-6">
                         <label for="propertyNo" class="block font-bold mb-2">Property No</label>
-                        <input type="text" pInputText id="propertyNo" [(ngModel)]="asset.PropertyNo" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !asset.PropertyNo">Property No is required.</small>
+                        <input type="text" pInputText id="propertyNo" [(ngModel)]="invCustlip.PropertyNo" required autofocus fluid />
+                        <small class="text-red-500" *ngIf="submitted && !invCustlip.PropertyNo">Property No is required.</small>
                     </div>
                     <div class="col-span-6">
-                        <label for="category" class="block font-bold mb-2">Category</label>
-                        <p-select [(ngModel)]="asset.Category" inputId="category" [options]="categories" optionLabel="label" optionValue="value" placeholder="Select Category" fluid />
-                    </div>
-                    <div class="col-span-12">
-                        <label for="assetName" class="block font-bold mb-2">Asset Name</label>
-                        <input type="text" pInputText id="assetName" [(ngModel)]="asset.AssetName" required fluid />
-                        <small class="text-red-500" *ngIf="submitted && !asset.AssetName">Asset Name is required.</small>
+                        <label for="quantity" class="block font-bold mb-2">Quantity</label>
+                        <input type="number" pInputText id="quantity" [(ngModel)]="invCustlip.Quantity" required fluid />
+                        <small class="text-red-500" *ngIf="submitted && !invCustlip.Quantity">Quantity is required.</small>
                     </div>
                     <div class="col-span-6">
-                        <label for="foundCluster" class="block font-bold mb-2">Found Cluster</label>
-                        <input type="text" pInputText id="foundCluster" [(ngModel)]="asset.FoundCluster" fluid />
+                        <label for="uom" class="block font-bold mb-2">Unit of Measure</label>
+                        <input type="text" pInputText id="uom" [(ngModel)]="invCustlip.UoM" required fluid />
+                        <small class="text-red-500" *ngIf="submitted && !invCustlip.UoM">Unit of Measure is required.</small>
                     </div>
                     <div class="col-span-6">
-                        <label for="locationId" class="block font-bold mb-2">Location</label>
-                        <p-select id="locationId" [(ngModel)]="asset.Location_id" [options]="locations" optionLabel="LocationName" optionValue="id" placeholder="Select a location" fluid> </p-select>
+                        <label for="brandId" class="block font-bold mb-2">Brand</label>
+                        <p-select id="brandId" [(ngModel)]="invCustlip.brand_id" [options]="brands" optionLabel="BrandName" optionValue="brand_id" placeholder="Select a brand" fluid />
                     </div>
                     <div class="col-span-6">
-                        <label for="supplierId" class="block font-bold mb-2">Supplier</label>
-                        <p-select id="supplierId" [(ngModel)]="asset.Supplier_id" [options]="suppliers" optionLabel="SupplierName" optionValue="id" placeholder="Select a supplier" fluid> </p-select>
-                    </div>
-                    <div class="col-span-6">
-                        <label for="programId" class="block font-bold mb-2">Program</label>
-                        <p-select id="programId" [(ngModel)]="asset.Program_id" [options]="programs" optionLabel="ProgramName" optionValue="id" placeholder="Select a program" fluid> </p-select>
-                    </div>
-                    <div class="col-span-12">
-                        <label for="purpose" class="block font-bold mb-2">Purpose</label>
-                        <textarea id="purpose" pTextarea [(ngModel)]="asset.Purpose" rows="3" fluid></textarea>
+                        <label for="colorId" class="block font-bold mb-2">Color</label>
+                        <p-select id="colorId" [(ngModel)]="invCustlip.color_id" [options]="colors" optionLabel="Description" optionValue="color_id" placeholder="Select a color" fluid />
                     </div>
                     <div class="col-span-6">
                         <label for="dateAcquired" class="block font-bold mb-2">Date Acquired</label>
-                        <input type="date" pInputText id="dateAcquired" [(ngModel)]="asset.DateAcquired" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="issuedTo" class="block font-bold mb-2">Issued To</label>
-                        <input type="text" pInputText id="issuedTo" [(ngModel)]="asset.IssuedTo" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="status" class="block font-bold mb-2">Status</label>
-                        <p-select [(ngModel)]="asset.Status_id" inputId="status" [options]="statusOptions" optionLabel="StatusName" optionValue="id" placeholder="Select Status" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="active" class="block font-bold mb-2">Active</label>
-                        <p-select [(ngModel)]="asset.Active" inputId="active" [options]="activeOptions" optionLabel="label" optionValue="value" placeholder="Select" fluid />
+                        <input type="date" pInputText id="dateAcquired" [(ngModel)]="invCustlip.DateAcquired" fluid />
                     </div>
                     <div class="col-span-12">
-                        <label for="qrCode" class="block font-bold mb-2">QR Code Image</label>
-                        <p-fileupload mode="basic" name="qrCode" accept="image/*" [maxFileSize]="1000000" (onSelect)="onQrCodeSelect($event)" chooseLabel="Choose QR Code Image" [auto]="true"> </p-fileupload>
-                        <div *ngIf="asset.QrCode" class="mt-3">
-                            <img [src]="asset.QrCode" alt="QR Code" class="max-w-32 max-h-32 border rounded cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
-                            <p-button icon="pi pi-times" severity="danger" size="small" [rounded]="true" class="ml-2" (click)="removeQrCode()" pTooltip="Remove QR Code"> </p-button>
+                        <label for="description" class="block font-bold mb-2">Description</label>
+                        <textarea id="description" pTextarea [(ngModel)]="invCustlip.Description" rows="3" required fluid></textarea>
+                        <small class="text-red-500" *ngIf="submitted && !invCustlip.Description">Description is required.</small>
+                    </div>
+                    <div class="col-span-12">
+                        <label for="specs" class="block font-bold mb-2">Specifications</label>
+                        <div class="grid grid-cols-12 gap-2 mb-4 border p-4 rounded">
+                            <div class="col-span-6">
+                                <label for="height" class="block font-bold mb-2">Height</label>
+                                <input type="text" pInputText id="height" [(ngModel)]="invCustlip.height" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="width" class="block font-bold mb-2">Width</label>
+                                <input type="text" pInputText id="width" [(ngModel)]="invCustlip.width" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="package" class="block font-bold mb-2">Package</label>
+                                <input type="text" pInputText id="package" [(ngModel)]="invCustlip.package" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="material" class="block font-bold mb-2">Material</label>
+                                <input type="text" pInputText id="material" [(ngModel)]="invCustlip.material" fluid />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -247,20 +236,7 @@ interface ExportColumn {
 
             <ng-template #footer>
                 <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveAsset()" />
-            </ng-template>
-        </p-dialog>
-
-        <p-dialog [(visible)]="qrCodeViewerDialog" [style]="{ width: '500px' }" header="QR Code Viewer" [modal]="true">
-            <ng-template #content>
-                <div class="text-center">
-                    <img [src]="selectedQrCode" alt="QR Code" class="max-w-full h-auto border rounded shadow-lg" />
-                </div>
-            </ng-template>
-
-            <ng-template #footer>
-                <p-button label="Close" icon="pi pi-times" (click)="closeQrCodeViewer()" />
-                <p-button label="Download" icon="pi pi-download" severity="secondary" (click)="downloadQrCode()" />
+                <p-button label="Save" icon="pi pi-check" (click)="saveInvCustlip()" />
             </ng-template>
         </p-dialog>
 
@@ -270,17 +246,17 @@ interface ExportColumn {
                     <div class="col-span-6">
                         <label for="propertyNoInv" class="block font-bold mb-2">Property No</label>
                         <input type="text" pInputText id="propertyNoInv" [(ngModel)]="invCustlip.PropertyNo" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.PropertyNo">Property No is required.</small>
+                        <small class="text-red-500" *ngIf="submitted && !invCustlip.PropertyNo">Property No is required.</small>
                     </div>
                     <div class="col-span-6">
                         <label for="quantity" class="block font-bold mb-2">Quantity</label>
                         <input type="number" pInputText id="quantity" [(ngModel)]="invCustlip.Quantity" required fluid />
-                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.Quantity">Quantity is required.</small>
+                        <small class="text-red-500" *ngIf="submitted && !invCustlip.Quantity">Quantity is required.</small>
                     </div>
                     <div class="col-span-6">
                         <label for="uom" class="block font-bold mb-2">Unit of Measure</label>
                         <input type="text" pInputText id="uom" [(ngModel)]="invCustlip.UoM" required fluid />
-                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.UoM">Unit of Measure is required.</small>
+                        <small class="text-red-500" *ngIf="submitted && !invCustlip.UoM">Unit of Measure is required.</small>
                     </div>
                     <div class="col-span-6">
                         <label for="colorId" class="block font-bold mb-2">Color</label>
@@ -289,7 +265,7 @@ interface ExportColumn {
                     <div class="col-span-12">
                         <label for="description" class="block font-bold mb-2">Description</label>
                         <textarea id="description" pTextarea [(ngModel)]="invCustlip.Description" rows="3" fluid required></textarea>
-                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.Description">Description is required.</small>
+                        <small class="text-red-500" *ngIf="submitted && !invCustlip.Description">Description is required.</small>
                     </div>
                     <div class="col-span-6">
                         <label for="brandId" class="block font-bold mb-2">Brand</label>
@@ -323,7 +299,7 @@ interface ExportColumn {
             </ng-template>
 
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideInvCustlipDialog()" />
+                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
                 <p-button label="Save" icon="pi pi-check" (click)="saveInvCustlip()" />
             </ng-template>
         </p-dialog>
@@ -333,30 +309,21 @@ interface ExportColumn {
     providers: [MessageService, AssetService, ConfirmationService]
 })
 export class CustodianComponent implements OnInit {
-    assetDialog: boolean = false;
-    qrCodeViewerDialog: boolean = false;
     invCustlipDialog: boolean = false;
 
-    assets = signal<Asset[]>([]);
+    invCustlips = signal<InvCustlip[]>([]);
 
-    asset: Asset = {};
     invCustlip: InvCustlip = {};
-    selectedQrCode: string = '';
 
-    selectedAssets: Asset[] | null = null;
+    selectedInvCustlips: InvCustlip[] | null = null;
 
     submitted: boolean = false;
-    submittedInv: boolean = false;
 
     statuses: any[] = [];
     categories: any[] = [];
     activeOptions: any[] = [];
 
     // Reference data for dropdowns
-    locations: Location[] = [];
-    suppliers: Supplier[] = [];
-    programs: Program[] = [];
-    statusOptions: Status[] = [];
     colors: Color[] = [];
     brands: Brand[] = [];
 
@@ -377,21 +344,34 @@ export class CustodianComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.loadAssets();
-        this.initializeDropdowns();
+        this.loadInvCustlips();
+        this.loadReferenceData();
+
+        this.cols = [
+            { field: 'PropertyNo', header: 'Property No' },
+            { field: 'InvNo', header: 'Invoice No' },
+            { field: 'Description', header: 'Description' },
+            { field: 'Quantity', header: 'Quantity' },
+            { field: 'UoM', header: 'Unit' },
+            { field: 'brand_id', header: 'Brand' },
+            { field: 'color_id', header: 'Color' },
+            { field: 'DateAcquired', header: 'Date Acquired' }
+        ];
+
+        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
     }
 
-    loadAssets() {
-        this.assetService.getAssets().subscribe({
+    loadInvCustlips() {
+        this.assetService.getInvCustlips().subscribe({
             next: (data) => {
-                this.assets.set(data);
+                this.invCustlips.set(data);
             },
             error: (error) => {
-                console.error('Error loading assets:', error);
+                console.error('Error loading InvCustlips:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Failed to load assets. Please try again.',
+                    text: 'Failed to load InvCustlips. Please try again.',
                     confirmButtonColor: '#EF4444'
                 });
             }
@@ -424,11 +404,12 @@ export class CustodianComponent implements OnInit {
 
         this.cols = [
             { field: 'PropertyNo', header: 'Property No' },
-            { field: 'AssetName', header: 'Asset Name' },
-            { field: 'Category', header: 'Category' },
-            { field: 'FoundCluster', header: 'Found Cluster' },
-            { field: 'IssuedTo', header: 'Issued To' },
-            { field: 'Status_id', header: 'Status' },
+            { field: 'InvNo', header: 'Invoice No' },
+            { field: 'Description', header: 'Description' },
+            { field: 'Quantity', header: 'Quantity' },
+            { field: 'UoM', header: 'Unit' },
+            { field: 'brand_id', header: 'Brand' },
+            { field: 'color_id', header: 'Color' },
             { field: 'DateAcquired', header: 'Date Acquired' }
         ];
 
@@ -436,46 +417,6 @@ export class CustodianComponent implements OnInit {
     }
 
     loadReferenceData() {
-        // Load locations
-        this.assetService.getLocations().subscribe({
-            next: (data) => {
-                this.locations = data;
-            },
-            error: (error) => {
-                console.error('Error loading locations:', error);
-            }
-        });
-
-        // Load suppliers
-        this.assetService.getSuppliers().subscribe({
-            next: (data) => {
-                this.suppliers = data;
-            },
-            error: (error) => {
-                console.error('Error loading suppliers:', error);
-            }
-        });
-
-        // Load programs
-        this.assetService.getPrograms().subscribe({
-            next: (data) => {
-                this.programs = data;
-            },
-            error: (error) => {
-                console.error('Error loading programs:', error);
-            }
-        });
-
-        // Load statuses from API
-        this.assetService.getStatuses().subscribe({
-            next: (data) => {
-                this.statusOptions = data;
-            },
-            error: (error) => {
-                console.error('Error loading statuses:', error);
-            }
-        });
-
         // Load colors
         this.assetService.getColors().subscribe({
             next: (data) => {
@@ -502,44 +443,49 @@ export class CustodianComponent implements OnInit {
     }
 
     openNew() {
-        this.asset = {};
+        this.invCustlip = {
+            specs: {}
+        };
         this.submitted = false;
-        this.assetDialog = true;
+        this.invCustlipDialog = true;
     }
 
-    editAsset(asset: Asset) {
-        this.asset = { ...asset };
-        this.assetDialog = true;
+    editInvCustlip(invCustlip: InvCustlip) {
+        this.invCustlip = { ...invCustlip };
+        if (!this.invCustlip.specs) {
+            this.invCustlip.specs = {};
+        }
+        this.invCustlipDialog = true;
     }
 
-    deleteSelectedAssets() {
-        if (!this.selectedAssets || this.selectedAssets.length === 0) return;
+    deleteSelectedInvCustlips() {
+        if (!this.selectedInvCustlips || this.selectedInvCustlips.length === 0) return;
 
         this.confirmationService.confirm({
-            message: 'Are you sure you want to delete the selected assets?',
+            message: 'Are you sure you want to delete the selected InvCustlips?',
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                const deletePromises = this.selectedAssets!.map((asset) => this.assetService.deleteAsset(asset.id!).toPromise());
+                const deletePromises = this.selectedInvCustlips!.map((item) => this.assetService.deleteInvCustlip(item.inv_custlip_id!).toPromise());
 
                 Promise.all(deletePromises)
                     .then(() => {
-                        this.loadAssets();
-                        this.selectedAssets = null;
+                        this.loadInvCustlips();
+                        this.selectedInvCustlips = null;
                         Swal.fire({
                             icon: 'success',
                             title: 'Success!',
-                            text: 'Assets deleted successfully',
+                            text: 'InvCustlips deleted successfully',
                             timer: 2000,
                             showConfirmButton: false
                         });
                     })
                     .catch((error) => {
-                        console.error('Error deleting assets:', error);
+                        console.error('Error deleting InvCustlips:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Failed to delete assets. Please try again.',
+                            text: 'Failed to delete InvCustlips. Please try again.',
                             confirmButtonColor: '#EF4444'
                         });
                     });
@@ -548,34 +494,34 @@ export class CustodianComponent implements OnInit {
     }
 
     hideDialog() {
-        this.assetDialog = false;
+        this.invCustlipDialog = false;
         this.submitted = false;
     }
 
-    deleteAsset(asset: Asset) {
+    deleteInvCustlip(invCustlip: InvCustlip) {
         this.confirmationService.confirm({
-            message: 'Are you sure you want to delete ' + asset.AssetName + '?',
+            message: 'Are you sure you want to delete ' + invCustlip.Description + '?',
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.assetService.deleteAsset(asset.id!).subscribe({
+                this.assetService.deleteInvCustlip(invCustlip.inv_custlip_id!).subscribe({
                     next: () => {
-                        this.loadAssets();
-                        this.asset = {};
+                        this.loadInvCustlips();
+                        this.invCustlip = { specs: {} };
                         Swal.fire({
                             icon: 'success',
                             title: 'Success!',
-                            text: 'Asset deleted successfully',
+                            text: 'InvCustlip deleted successfully',
                             timer: 2000,
                             showConfirmButton: false
                         });
                     },
                     error: (error) => {
-                        console.error('Error deleting asset:', error);
+                        console.error('Error deleting InvCustlip:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Failed to delete asset. Please try again.',
+                            text: 'Failed to delete InvCustlip. Please try again.',
                             confirmButtonColor: '#EF4444'
                         });
                     }
@@ -588,6 +534,18 @@ export class CustodianComponent implements OnInit {
         const prefix = 'PROP';
         const timestamp = new Date().getTime().toString().slice(-6);
         return prefix + timestamp;
+    }
+
+    getBrandName(brandId?: string | number): string {
+        if (!brandId) return '';
+        const brand = this.brands.find((b: Brand) => b.brand_id === String(brandId));
+        return brand?.BrandName || '';
+    }
+
+    getColorName(colorId?: string | number): string {
+        if (!colorId) return '';
+        const color = this.colors.find((c: Color) => c.color_id === String(colorId));
+        return color?.Description || '';
     }
 
     generateQrCode(): string {
@@ -611,156 +569,32 @@ export class CustodianComponent implements OnInit {
         }
     }
 
-    onQrCodeSelect(event: any) {
-        const file = event.files[0];
-        if (file) {
-            // Check if file is an image
-            if (!file.type.startsWith('image/')) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid File Type',
-                    text: 'Please select an image file for QR Code.',
-                    confirmButtonColor: '#EF4444'
-                });
-                return;
-            }
-
-            // Check file size (max 1MB)
-            if (file.size > 1000000) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'File Too Large',
-                    text: 'QR Code image must be less than 1MB.',
-                    confirmButtonColor: '#EF4444'
-                });
-                return;
-            }
-
-            // Convert to base64
-            const reader = new FileReader();
-            reader.onload = (e: any) => {
-                this.asset.QrCode = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    removeQrCode() {
-        this.asset.QrCode = '';
-    }
-
-    viewQrCode(qrCodeData: string) {
-        if (qrCodeData) {
-            this.selectedQrCode = qrCodeData;
-            this.qrCodeViewerDialog = true;
-        }
-    }
-
-    closeQrCodeViewer() {
-        this.qrCodeViewerDialog = false;
-        this.selectedQrCode = '';
-    }
-
-    downloadQrCode() {
-        if (this.selectedQrCode) {
-            // Create a temporary anchor element to trigger download
-            const link = document.createElement('a');
-            link.href = this.selectedQrCode;
-            link.download = `qr-code-${new Date().getTime()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Downloaded!',
-                text: 'QR Code image has been downloaded.',
-                timer: 2000,
-                showConfirmButton: false
-            });
-        }
-    }
-
-    saveAsset() {
+    saveInvCustlip() {
         this.submitted = true;
 
-        if (!this.asset.PropertyNo?.trim() || !this.asset.AssetName?.trim()) {
+        if (!this.invCustlip.PropertyNo?.trim() || !this.invCustlip.Description?.trim()) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Missing Information',
-                text: 'Property No and Asset Name are required fields.',
+                text: 'Property No and Description are required fields.',
                 confirmButtonColor: '#3B82F6'
             });
             return;
         }
 
-        // Generate PropertyNo if creating new asset
-        if (!this.asset.id) {
-            this.asset.PropertyNo = this.generatePropertyNo();
-        }
-
-        const saveOperation = this.asset.id ? this.assetService.updateAsset(this.asset.id, this.asset) : this.assetService.createAsset(this.asset);
-
-        saveOperation.subscribe({
-            next: () => {
-                this.loadAssets();
-                this.assetDialog = false;
-                this.asset = {};
-                this.submitted = false;
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: this.asset.id ? 'Asset updated successfully' : 'Asset created successfully',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            },
-            error: (error) => {
-                console.error('Error saving asset:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to save asset. Please try again.',
-                    confirmButtonColor: '#EF4444'
-                });
-            }
-        });
-    }
-
-    openInvCustlipDialog(asset: Asset) {
-        this.invCustlip = {
-            PropertyNo: asset.PropertyNo
-        };
-        this.submittedInv = false;
-        this.invCustlipDialog = true;
-    }
-
-    hideInvCustlipDialog() {
-        this.invCustlipDialog = false;
-        this.submittedInv = false;
-    }
-
-    saveInvCustlip() {
-        this.submittedInv = true;
-
-        if (!this.invCustlip.PropertyNo?.trim() || !this.invCustlip.Description?.trim() || !this.invCustlip.Quantity || !this.invCustlip.UoM?.trim()) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Missing Information',
-                text: 'Property No, Description, Quantity, and Unit of Measure are required fields.',
-                confirmButtonColor: '#3B82F6'
-            });
-            return;
+        // Generate PropertyNo if creating new record
+        if (!this.invCustlip.inv_custlip_id) {
+            this.invCustlip.PropertyNo = this.generatePropertyNo();
         }
 
         const saveOperation = this.invCustlip.inv_custlip_id ? this.assetService.updateInvCustlip(this.invCustlip.inv_custlip_id, this.invCustlip) : this.assetService.createInvCustlip(this.invCustlip);
 
         saveOperation.subscribe({
             next: () => {
+                this.loadInvCustlips();
                 this.invCustlipDialog = false;
-                this.invCustlip = {};
-                this.submittedInv = false;
+                this.invCustlip = { specs: {} };
+                this.submitted = false;
 
                 Swal.fire({
                     icon: 'success',

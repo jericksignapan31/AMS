@@ -17,6 +17,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { TooltipModule } from 'primeng/tooltip';
+
 import { Asset, AssetService, Location, Supplier, Program, Status, InvCustlip, Color, Brand } from '../service/asset.service';
 import Swal from 'sweetalert2';
 
@@ -84,7 +85,7 @@ interface ExportColumn {
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
-                    <h5 class="m-0">Asset</h5>
+                    <h5 class="m-0">assets Management</h5>
                     <p-iconfield>
                         <p-inputicon styleClass="pi pi-search" />
                         <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search assets..." />
@@ -157,73 +158,190 @@ interface ExportColumn {
             </ng-template>
         </p-table>
 
-        <p-dialog [(visible)]="assetDialog" [style]="{ width: '800px' }" header="Asset Details" [modal]="true">
+        <!-- Stepper Dialog for New Asset Creation -->
+        <p-dialog [(visible)]="stepperDialog" [style]="{ width: '900px' }" header="Create New Asset & InvCustlip" [modal]="true" [closable]="false">
             <ng-template #content>
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-6">
-                        <label for="propertyNo" class="block font-bold mb-2">Property No</label>
-                        <input type="text" pInputText id="propertyNo" [(ngModel)]="asset.PropertyNo" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !asset.PropertyNo">Property No is required.</small>
+                <!-- Custom Stepper Header -->
+                <div class="flex justify-content-center mb-4">
+                    <div class="flex align-items-center">
+                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 0, 'surface-200 text-600': currentStep < 0 }">1</div>
+                        <div class="w-6rem h-2px" [ngClass]="{ 'bg-primary': currentStep >= 1, 'surface-200': currentStep < 1 }"></div>
+                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 1, 'surface-200 text-600': currentStep < 1 }">2</div>
+                        <div class="w-6rem h-2px" [ngClass]="{ 'bg-primary': currentStep >= 2, 'surface-200': currentStep < 2 }"></div>
+                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 2, 'surface-200 text-600': currentStep < 2 }">3</div>
                     </div>
-                    <div class="col-span-6">
-                        <label for="category" class="block font-bold mb-2">Category</label>
-                        <p-select [(ngModel)]="asset.Category" inputId="category" [options]="categories" optionLabel="label" optionValue="value" placeholder="Select Category" fluid />
+                </div>
+
+                <!-- Step Content -->
+                <div [ngSwitch]="currentStep">
+                    <!-- Step 1: Asset Details -->
+                    <div *ngSwitchCase="0" class="step-content">
+                        <div class="grid grid-cols-12 gap-4 mt-4">
+                            <div class="col-span-6">
+                                <label for="stepperPropertyNo" class="block font-bold mb-2">Property No</label>
+                                <input type="text" pInputText id="stepperPropertyNo" [(ngModel)]="stepperData.asset.PropertyNo" required autofocus fluid />
+                                <small class="text-red-500" *ngIf="submitted && !stepperData.asset.PropertyNo">Property No is required.</small>
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperCategory" class="block font-bold mb-2">Category</label>
+                                <p-select [(ngModel)]="stepperData.asset.Category" inputId="stepperCategory" [options]="categories" optionLabel="label" optionValue="value" placeholder="Select Category" fluid />
+                            </div>
+                            <div class="col-span-12">
+                                <label for="stepperAssetName" class="block font-bold mb-2">Asset Name</label>
+                                <input type="text" pInputText id="stepperAssetName" [(ngModel)]="stepperData.asset.AssetName" required fluid />
+                                <small class="text-red-500" *ngIf="submitted && !stepperData.asset.AssetName">Asset Name is required.</small>
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperFoundCluster" class="block font-bold mb-2">Found Cluster</label>
+                                <input type="text" pInputText id="stepperFoundCluster" [(ngModel)]="stepperData.asset.FoundCluster" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperLocationId" class="block font-bold mb-2">Location</label>
+                                <p-select id="stepperLocationId" [(ngModel)]="stepperData.asset.Location_id" [options]="locations" optionLabel="LocationName" optionValue="id" placeholder="Select a location" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperSupplierId" class="block font-bold mb-2">Supplier</label>
+                                <p-select id="stepperSupplierId" [(ngModel)]="stepperData.asset.Supplier_id" [options]="suppliers" optionLabel="SupplierName" optionValue="id" placeholder="Select a supplier" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperProgramId" class="block font-bold mb-2">Program</label>
+                                <p-select id="stepperProgramId" [(ngModel)]="stepperData.asset.Program_id" [options]="programs" optionLabel="ProgramName" optionValue="id" placeholder="Select a program" fluid />
+                            </div>
+                            <div class="col-span-12">
+                                <label for="stepperPurpose" class="block font-bold mb-2">Purpose</label>
+                                <textarea id="stepperPurpose" pTextarea [(ngModel)]="stepperData.asset.Purpose" rows="3" fluid></textarea>
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperDateAcquired" class="block font-bold mb-2">Date Acquired</label>
+                                <input type="date" pInputText id="stepperDateAcquired" [(ngModel)]="stepperData.asset.DateAcquired" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperIssuedTo" class="block font-bold mb-2">Issued To</label>
+                                <input type="text" pInputText id="stepperIssuedTo" [(ngModel)]="stepperData.asset.IssuedTo" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperStatus" class="block font-bold mb-2">Status</label>
+                                <p-select [(ngModel)]="stepperData.asset.Status_id" inputId="stepperStatus" [options]="statusOptions" optionLabel="StatusName" optionValue="id" placeholder="Select Status" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperActive" class="block font-bold mb-2">Active</label>
+                                <p-select [(ngModel)]="stepperData.asset.Active" inputId="stepperActive" [options]="activeOptions" optionLabel="label" optionValue="value" placeholder="Select" fluid />
+                            </div>
+                        </div>
+                        <div class="flex pt-6 justify-end">
+                            <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextStep()" />
+                        </div>
                     </div>
-                    <div class="col-span-12">
-                        <label for="assetName" class="block font-bold mb-2">Asset Name</label>
-                        <input type="text" pInputText id="assetName" [(ngModel)]="asset.AssetName" required fluid />
-                        <small class="text-red-500" *ngIf="submitted && !asset.AssetName">Asset Name is required.</small>
+
+                    <!-- Step 2: InvCustlip Details -->
+                    <div *ngSwitchCase="1" class="step-content">
+                        <div class="grid grid-cols-12 gap-4 mt-4">
+                            <div class="col-span-6">
+                                <label for="stepperInvPropertyNo" class="block font-bold mb-2">Property No</label>
+                                <input type="text" pInputText id="stepperInvPropertyNo" [(ngModel)]="stepperData.invCustlip.PropertyNo" required fluid />
+                                <small class="text-red-500" *ngIf="submittedInv && !stepperData.invCustlip.PropertyNo">Property No is required.</small>
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperQuantity" class="block font-bold mb-2">Quantity</label>
+                                <input type="number" pInputText id="stepperQuantity" [(ngModel)]="stepperData.invCustlip.Quantity" required fluid />
+                                <small class="text-red-500" *ngIf="submittedInv && !stepperData.invCustlip.Quantity">Quantity is required.</small>
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperUom" class="block font-bold mb-2">Unit of Measure</label>
+                                <input type="text" pInputText id="stepperUom" [(ngModel)]="stepperData.invCustlip.UoM" required fluid />
+                                <small class="text-red-500" *ngIf="submittedInv && !stepperData.invCustlip.UoM">Unit of Measure is required.</small>
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperColorId" class="block font-bold mb-2">Color</label>
+                                <p-select id="stepperColorId" [(ngModel)]="stepperData.invCustlip.color_id" [options]="colors" optionLabel="Description" optionValue="color_id" placeholder="Select a color" fluid />
+                            </div>
+                            <div class="col-span-12">
+                                <label for="stepperDescription" class="block font-bold mb-2">Description</label>
+                                <textarea id="stepperDescription" pTextarea [(ngModel)]="stepperData.invCustlip.Description" rows="3" required fluid></textarea>
+                                <small class="text-red-500" *ngIf="submittedInv && !stepperData.invCustlip.Description">Description is required.</small>
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperBrandId" class="block font-bold mb-2">Brand</label>
+                                <p-select id="stepperBrandId" [(ngModel)]="stepperData.invCustlip.brand_id" [options]="brands" optionLabel="BrandName" optionValue="brand_id" placeholder="Select a brand" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperHeight" class="block font-bold mb-2">Height</label>
+                                <input type="text" pInputText id="stepperHeight" [(ngModel)]="stepperData.invCustlip.height" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperWidth" class="block font-bold mb-2">Width</label>
+                                <input type="text" pInputText id="stepperWidth" [(ngModel)]="stepperData.invCustlip.width" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperPackage" class="block font-bold mb-2">Package</label>
+                                <input type="text" pInputText id="stepperPackage" [(ngModel)]="stepperData.invCustlip.package" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperMaterial" class="block font-bold mb-2">Material</label>
+                                <input type="text" pInputText id="stepperMaterial" [(ngModel)]="stepperData.invCustlip.material" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperInvNo" class="block font-bold mb-2">Inventory No</label>
+                                <input type="text" pInputText id="stepperInvNo" [(ngModel)]="stepperData.invCustlip.InvNo" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="stepperInvDateAcquired" class="block font-bold mb-2">Date Acquired</label>
+                                <input type="date" pInputText id="stepperInvDateAcquired" [(ngModel)]="stepperData.invCustlip.DateAcquired" fluid />
+                            </div>
+                        </div>
+                        <div class="flex pt-6 justify-between">
+                            <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="previousStep()" />
+                            <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextStep()" />
+                        </div>
                     </div>
-                    <div class="col-span-6">
-                        <label for="foundCluster" class="block font-bold mb-2">Found Cluster</label>
-                        <input type="text" pInputText id="foundCluster" [(ngModel)]="asset.FoundCluster" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="locationId" class="block font-bold mb-2">Location</label>
-                        <p-select id="locationId" [(ngModel)]="asset.Location_id" [options]="locations" optionLabel="LocationName" optionValue="id" placeholder="Select a location" fluid> </p-select>
-                    </div>
-                    <div class="col-span-6">
-                        <label for="supplierId" class="block font-bold mb-2">Supplier</label>
-                        <p-select id="supplierId" [(ngModel)]="asset.Supplier_id" [options]="suppliers" optionLabel="SupplierName" optionValue="id" placeholder="Select a supplier" fluid> </p-select>
-                    </div>
-                    <div class="col-span-6">
-                        <label for="programId" class="block font-bold mb-2">Program</label>
-                        <p-select id="programId" [(ngModel)]="asset.Program_id" [options]="programs" optionLabel="ProgramName" optionValue="id" placeholder="Select a program" fluid> </p-select>
-                    </div>
-                    <div class="col-span-12">
-                        <label for="purpose" class="block font-bold mb-2">Purpose</label>
-                        <textarea id="purpose" pTextarea [(ngModel)]="asset.Purpose" rows="3" fluid></textarea>
-                    </div>
-                    <div class="col-span-6">
-                        <label for="dateAcquired" class="block font-bold mb-2">Date Acquired</label>
-                        <input type="date" pInputText id="dateAcquired" [(ngModel)]="asset.DateAcquired" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="issuedTo" class="block font-bold mb-2">Issued To</label>
-                        <input type="text" pInputText id="issuedTo" [(ngModel)]="asset.IssuedTo" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="status" class="block font-bold mb-2">Status</label>
-                        <p-select [(ngModel)]="asset.Status_id" inputId="status" [options]="statusOptions" optionLabel="StatusName" optionValue="id" placeholder="Select Status" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="active" class="block font-bold mb-2">Active</label>
-                        <p-select [(ngModel)]="asset.Active" inputId="active" [options]="activeOptions" optionLabel="label" optionValue="value" placeholder="Select" fluid />
-                    </div>
-                    <div class="col-span-12">
-                        <label for="qrCode" class="block font-bold mb-2">QR Code Image</label>
-                        <p-fileupload mode="basic" name="qrCode" accept="image/*" [maxFileSize]="1000000" (onSelect)="onQrCodeSelect($event)" chooseLabel="Choose QR Code Image" [auto]="true"> </p-fileupload>
-                        <div *ngIf="asset.QrCode" class="mt-3">
-                            <img [src]="asset.QrCode" alt="QR Code" class="max-w-32 max-h-32 border rounded cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
-                            <p-button icon="pi pi-times" severity="danger" size="small" [rounded]="true" class="ml-2" (click)="removeQrCode()" pTooltip="Remove QR Code"> </p-button>
+
+                    <!-- Step 3: Review -->
+                    <div *ngSwitchCase="2" class="step-content">
+                        <div class="mt-4">
+                            <h3 class="text-xl font-bold mb-4">Review Your Information</h3>
+
+                            <!-- Asset Review -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold mb-3 text-primary">Asset Details</h4>
+                                <div class="grid grid-cols-12 gap-2 text-sm">
+                                    <div class="col-span-6"><strong>Property No:</strong> {{ stepperData.asset.PropertyNo }}</div>
+                                    <div class="col-span-6"><strong>Category:</strong> {{ stepperData.asset.Category }}</div>
+                                    <div class="col-span-6"><strong>Asset Name:</strong> {{ stepperData.asset.AssetName }}</div>
+                                    <div class="col-span-6"><strong>Found Cluster:</strong> {{ stepperData.asset.FoundCluster }}</div>
+                                    <div class="col-span-6"><strong>Date Acquired:</strong> {{ stepperData.asset.DateAcquired }}</div>
+                                    <div class="col-span-6"><strong>Issued To:</strong> {{ stepperData.asset.IssuedTo }}</div>
+                                    <div class="col-span-12"><strong>Purpose:</strong> {{ stepperData.asset.Purpose }}</div>
+                                </div>
+                            </div>
+
+                            <!-- InvCustlip Review -->
+                            <div class="mb-4">
+                                <h4 class="text-lg font-semibold mb-3 text-primary">InvCustlip Details</h4>
+                                <div class="grid grid-cols-12 gap-2 text-sm">
+                                    <div class="col-span-6"><strong>Property No:</strong> {{ stepperData.invCustlip.PropertyNo }}</div>
+                                    <div class="col-span-6"><strong>Quantity:</strong> {{ stepperData.invCustlip.Quantity }}</div>
+                                    <div class="col-span-6"><strong>Unit of Measure:</strong> {{ stepperData.invCustlip.UoM }}</div>
+                                    <div class="col-span-6"><strong>Brand:</strong> {{ getBrandName(stepperData.invCustlip.brand_id) }}</div>
+                                    <div class="col-span-6"><strong>Color:</strong> {{ getColorName(stepperData.invCustlip.color_id) }}</div>
+                                    <div class="col-span-6"><strong>Height:</strong> {{ stepperData.invCustlip.height }}</div>
+                                    <div class="col-span-6"><strong>Width:</strong> {{ stepperData.invCustlip.width }}</div>
+                                    <div class="col-span-6"><strong>Package:</strong> {{ stepperData.invCustlip.package }}</div>
+                                    <div class="col-span-6"><strong>Material:</strong> {{ stepperData.invCustlip.material }}</div>
+                                    <div class="col-span-6"><strong>Inventory No:</strong> {{ stepperData.invCustlip.InvNo }}</div>
+                                    <div class="col-span-12"><strong>Description:</strong> {{ stepperData.invCustlip.Description }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex pt-6 justify-between">
+                            <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="previousStep()" />
+                            <p-button label="Submit" icon="pi pi-check" (onClick)="submitStepper()" />
                         </div>
                     </div>
                 </div>
             </ng-template>
 
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveAsset()" />
+                <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (click)="closeStepper()" />
             </ng-template>
         </p-dialog>
 
@@ -312,6 +430,7 @@ export class Crud implements OnInit {
     assetDialog: boolean = false;
     qrCodeViewerDialog: boolean = false;
     invCustlipDialog: boolean = false;
+    stepperDialog: boolean = false;
 
     assets = signal<Asset[]>([]);
 
@@ -323,6 +442,13 @@ export class Crud implements OnInit {
 
     submitted: boolean = false;
     submittedInv: boolean = false;
+
+    // Stepper properties
+    currentStep: number = 0;
+    stepperData = {
+        asset: {} as Asset,
+        invCustlip: {} as InvCustlip
+    };
 
     statuses: any[] = [];
     categories: any[] = [];
@@ -383,11 +509,8 @@ export class Crud implements OnInit {
         ];
 
         this.categories = [
-            { label: 'IT Equipment', value: 'IT Equipment' },
-            { label: 'Furniture', value: 'Furniture' },
-            { label: 'Vehicle', value: 'Vehicle' },
-            { label: 'Office Supplies', value: 'Office Supplies' },
-            { label: 'Tools', value: 'Tools' }
+            { label: 'Software', value: 'Software' },
+            { label: 'Hardware', value: 'Hardware' }
         ];
 
         this.activeOptions = [
@@ -478,9 +601,14 @@ export class Crud implements OnInit {
     }
 
     openNew() {
-        this.asset = {};
+        this.stepperData = {
+            asset: {},
+            invCustlip: {}
+        };
+        this.currentStep = 0;
         this.submitted = false;
-        this.assetDialog = true;
+        this.submittedInv = false;
+        this.stepperDialog = true;
     }
 
     editAsset(asset: Asset) {
@@ -752,6 +880,124 @@ export class Crud implements OnInit {
                     icon: 'error',
                     title: 'Error',
                     text: 'Failed to save InvCustlip. Please try again.',
+                    confirmButtonColor: '#EF4444'
+                });
+            }
+        });
+    }
+
+    // Navigation methods for stepper
+    nextStep() {
+        if (this.currentStep < 2) {
+            this.currentStep++;
+        }
+    }
+
+    previousStep() {
+        if (this.currentStep > 0) {
+            this.currentStep--;
+        }
+    }
+
+    onTabChange(event: any) {
+        this.currentStep = event.index;
+    }
+
+    // Helper methods for stepper
+    getBrandName(brandId?: string | number): string {
+        if (!brandId) return '';
+        const brand = this.brands.find((b: Brand) => b.brand_id === String(brandId));
+        return brand?.BrandName || '';
+    }
+
+    getColorName(colorId?: string | number): string {
+        if (!colorId) return '';
+        const color = this.colors.find((c: Color) => c.color_id === String(colorId));
+        return color?.Description || '';
+    }
+
+    closeStepper() {
+        this.stepperDialog = false;
+        this.currentStep = 0;
+        this.stepperData = {
+            asset: {},
+            invCustlip: {}
+        };
+        this.submitted = false;
+        this.submittedInv = false;
+    }
+
+    submitStepper() {
+        // Validate both forms
+        this.submitted = true;
+        this.submittedInv = true;
+
+        // Check asset validation
+        if (!this.stepperData.asset.PropertyNo?.trim() || !this.stepperData.asset.AssetName?.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Asset Information',
+                text: 'Asset Property No and Asset Name are required fields.',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        // Check InvCustlip validation
+        if (!this.stepperData.invCustlip.PropertyNo?.trim() || !this.stepperData.invCustlip.Description?.trim() || !this.stepperData.invCustlip.Quantity || !this.stepperData.invCustlip.UoM?.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing InvCustlip Information',
+                text: 'InvCustlip Property No, Description, Quantity, and Unit of Measure are required fields.',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        // Generate PropertyNo if not provided
+        if (!this.stepperData.asset.PropertyNo) {
+            this.stepperData.asset.PropertyNo = this.generatePropertyNo();
+        }
+
+        // Save Asset first, then InvCustlip
+        this.assetService.createAsset(this.stepperData.asset).subscribe({
+            next: (assetResponse) => {
+                console.log('Asset created successfully', assetResponse);
+
+                // Now save InvCustlip
+                this.assetService.createInvCustlip(this.stepperData.invCustlip).subscribe({
+                    next: (invCustlipResponse) => {
+                        console.log('InvCustlip created successfully', invCustlipResponse);
+
+                        // Reload assets and close stepper
+                        this.loadAssets();
+                        this.closeStepper();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Asset and InvCustlip created successfully',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: (error) => {
+                        console.error('Error creating InvCustlip:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Asset was created but failed to create InvCustlip. Please try again.',
+                            confirmButtonColor: '#EF4444'
+                        });
+                    }
+                });
+            },
+            error: (error) => {
+                console.error('Error creating asset:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to create asset. Please try again.',
                     confirmButtonColor: '#EF4444'
                 });
             }

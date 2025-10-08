@@ -84,6 +84,11 @@ export class AppMenu {
                         label: 'Custodian',
                         icon: 'pi pi-fw pi-users',
                         routerLink: ['/app/custodian']
+                    },
+                     {
+                        label: 'Custodian',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/app/custodian']
                     }
                     // {
                     //     label: 'Not Found',
