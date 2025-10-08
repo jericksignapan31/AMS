@@ -219,6 +219,7 @@ interface ExportColumn {
                                 <label for="stepperIssuedTo" class="block font-bold mb-2">Issued To</label>
                                 <input type="text" pInputText id="stepperIssuedTo" [(ngModel)]="stepperData.asset.IssuedTo" fluid />
                             </div>
+
                             <div class="col-span-6">
                                 <label for="stepperStatus" class="block font-bold mb-2">Status</label>
                                 <p-select [(ngModel)]="stepperData.asset.Status_id" inputId="stepperStatus" [options]="statusOptions" optionLabel="StatusName" optionValue="id" placeholder="Select Status" fluid />
@@ -228,8 +229,14 @@ interface ExportColumn {
                                 <p-select [(ngModel)]="stepperData.asset.Active" inputId="stepperActive" [options]="activeOptions" optionLabel="label" optionValue="value" placeholder="Select" fluid />
                             </div>
                         </div>
-                        <div class="flex pt-6 justify-end">
-                            <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextStep()" />
+
+                        <div class="col-span-12">
+                            <label class="block font-bold mb-2">QR Code</label>
+                            <p-fileUpload mode="basic" name="qrcode[]" accept="image/*" [maxFileSize]="1000000" chooseLabel="Choose QR Code Image" (onSelect)="onQrCodeSelect($event)" [auto]="true" />
+                            <div *ngIf="stepperData.asset.QrCode" class="mt-3">
+                                <img [src]="stepperData.asset.QrCode" alt="QR Code Preview" class="w-24 h-24 border rounded" />
+                                <p-button icon="pi pi-times" severity="danger" size="small" class="ml-2" (onClick)="removeQrCode()" pTooltip="Remove QR Code" />
+                            </div>
                         </div>
                     </div>
 
@@ -284,10 +291,6 @@ interface ExportColumn {
                                 <input type="date" pInputText id="stepperInvDateAcquired" [(ngModel)]="stepperData.invCustlip.DateAcquired" fluid />
                             </div>
                         </div>
-                        <div class="flex pt-6 justify-between">
-                            <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="previousStep()" />
-                            <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextStep()" />
-                        </div>
                     </div>
 
                     <!-- Step 3: Review -->
@@ -306,6 +309,12 @@ interface ExportColumn {
                                     <div class="col-span-6"><strong>Date Acquired:</strong> {{ stepperData.asset.DateAcquired }}</div>
                                     <div class="col-span-6"><strong>Issued To:</strong> {{ stepperData.asset.IssuedTo }}</div>
                                     <div class="col-span-12"><strong>Purpose:</strong> {{ stepperData.asset.Purpose }}</div>
+                                    <div class="col-span-12" *ngIf="stepperData.asset.QrCode">
+                                        <strong>QR Code:</strong>
+                                        <div class="mt-2">
+                                            <img [src]="stepperData.asset.QrCode" alt="QR Code" class="w-20 h-20 border rounded" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -326,16 +335,19 @@ interface ExportColumn {
                                 </div>
                             </div>
                         </div>
-                        <div class="flex pt-6 justify-between">
-                            <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="previousStep()" />
-                            <p-button label="Submit" icon="pi pi-check" (onClick)="submitStepper()" />
-                        </div>
                     </div>
                 </div>
             </ng-template>
 
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (click)="closeStepper()" />
+                <div class="flex justify-between w-full">
+                    <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (click)="closeStepper()" />
+                    <div class="flex gap-2">
+                        <p-button *ngIf="currentStep > 0" label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="previousStep()" />
+                        <p-button *ngIf="currentStep < 2" label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextStep()" />
+                        <p-button *ngIf="currentStep === 2" label="Submit" icon="pi pi-check" (onClick)="submitStepper()" />
+                    </div>
+                </div>
             </ng-template>
         </p-dialog>
 
@@ -732,14 +744,23 @@ export class Crud implements OnInit {
             // Convert to base64
             const reader = new FileReader();
             reader.onload = (e: any) => {
-                this.asset.QrCode = e.target.result;
+                // Set QR code for both regular asset form and stepper
+                if (this.stepperDialog) {
+                    this.stepperData.asset.QrCode = e.target.result;
+                } else {
+                    this.asset.QrCode = e.target.result;
+                }
             };
             reader.readAsDataURL(file);
         }
     }
 
     removeQrCode() {
-        this.asset.QrCode = '';
+        if (this.stepperDialog) {
+            this.stepperData.asset.QrCode = '';
+        } else {
+            this.asset.QrCode = '';
+        }
     }
 
     viewQrCode(qrCodeData: string) {
