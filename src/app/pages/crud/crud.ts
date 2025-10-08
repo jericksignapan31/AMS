@@ -164,11 +164,11 @@ interface ExportColumn {
                 <!-- Custom Stepper Header -->
                 <div class="flex justify-content-center mb-4">
                     <div class="flex align-items-center">
-                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 0, 'surface-200 text-600': currentStep < 0 }">1</div>
+                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 0, 'surface-200 text-600': currentStep < 0 }"></div>
                         <div class="w-6rem h-2px" [ngClass]="{ 'bg-primary': currentStep >= 1, 'surface-200': currentStep < 1 }"></div>
-                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 1, 'surface-200 text-600': currentStep < 1 }">2</div>
+                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 1, 'surface-200 text-600': currentStep < 1 }"></div>
                         <div class="w-6rem h-2px" [ngClass]="{ 'bg-primary': currentStep >= 2, 'surface-200': currentStep < 2 }"></div>
-                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 2, 'surface-200 text-600': currentStep < 2 }">3</div>
+                        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle" [ngClass]="{ 'bg-primary text-white': currentStep >= 2, 'surface-200 text-600': currentStep < 2 }"></div>
                     </div>
                 </div>
 
