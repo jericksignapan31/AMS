@@ -79,6 +79,11 @@ export class AppMenu {
                         label: 'Assets',
                         icon: 'pi pi-fw pi-pencil',
                         routerLink: ['/app/crud']
+                    },
+                    {
+                        label: 'Custodian',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/app/custodian']
                     }
                     // {
                     //     label: 'Not Found',

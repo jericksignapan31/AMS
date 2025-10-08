@@ -43,6 +43,38 @@ export interface Status {
     Description?: string;
 }
 
+export interface InvCustlip {
+    inv_custlip_id?: string;
+    PropertyNo?: string;
+    Quantity?: string;
+    UoM?: string;
+    Description?: string;
+    brand_id?: string;
+    specs?: {
+        CPU?: string;
+        RAM?: string;
+        Storage?: string;
+    };
+    color_id?: string;
+    height?: string;
+    width?: string;
+    package?: string;
+    material?: string;
+    InvNo?: string;
+    DateAcquired?: string;
+}
+
+export interface Color {
+    color_id?: string;
+    ColorCode?: string;
+    Description?: string;
+}
+
+export interface Brand {
+    brand_id?: string;
+    BrandName?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -87,5 +119,35 @@ export class AssetService {
 
     getStatuses(): Observable<Status[]> {
         return this.http.get<Status[]>(`${this.baseApiUrl}/statuses`);
+    }
+
+    // InvCustlips methods
+    getInvCustlips(): Observable<InvCustlip[]> {
+        return this.http.get<InvCustlip[]>(`${this.baseApiUrl}/InvCustlips`);
+    }
+
+    getInvCustlip(id: string): Observable<InvCustlip> {
+        return this.http.get<InvCustlip>(`${this.baseApiUrl}/InvCustlips/${id}`);
+    }
+
+    createInvCustlip(invCustlip: InvCustlip): Observable<InvCustlip> {
+        return this.http.post<InvCustlip>(`${this.baseApiUrl}/InvCustlips`, invCustlip);
+    }
+
+    updateInvCustlip(id: string, invCustlip: InvCustlip): Observable<InvCustlip> {
+        return this.http.put<InvCustlip>(`${this.baseApiUrl}/InvCustlips/${id}`, invCustlip);
+    }
+
+    deleteInvCustlip(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseApiUrl}/InvCustlips/${id}`);
+    }
+
+    // Colors and Brands methods
+    getColors(): Observable<Color[]> {
+        return this.http.get<Color[]>(`${this.baseApiUrl}/colors`);
+    }
+
+    getBrands(): Observable<Brand[]> {
+        return this.http.get<Brand[]>(`${this.baseApiUrl}/brands`);
     }
 }

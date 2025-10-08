@@ -5,21 +5,24 @@
       "email": "admin@lams.com",
       "password": "admin123",
       "name": "Admin User",
-      "role": "admin"
+      "role": "admin",
+      "id": "413a"
     },
     {
       "user_id": "2",
       "email": "user@lams.com",
       "password": "user123",
       "name": "Regular User",
-      "role": "user"
+      "role": "user",
+      "id": "f182"
     },
     {
       "user_id": "3",
       "email": "test@lams.com",
       "password": "test123",
       "name": "Test User",
-      "role": "user"
+      "role": "user",
+      "id": "5b6f"
     }
   ],
   "assets": [
@@ -37,7 +40,8 @@
       "IssuedTo": "Admin Office",
       "Status_id": "ACTIVE",
       "Active": "Y",
-      "QrCode": "QR003PRINTER2024"
+      "QrCode": "QR003PRINTER2024",
+      "id": "6db5"
     },
     {
       "assets_id": "ad83",
@@ -53,7 +57,8 @@
       "IssuedTo": "sdf",
       "Active": "Y",
       "Status_id": "ACTIVE",
-      "QrCode": "QRTWQ8GD1324"
+      "QrCode": "QRTWQ8GD1324",
+      "id": "5b78"
     },
     {
       "assets_id": "e26e",
@@ -69,14 +74,16 @@
       "DateAcquired": "2025-10-15",
       "IssuedTo": "sdf",
       "Status_id": "ACTIVE",
-      "Active": "Y"
+      "Active": "Y",
+      "id": "da16"
     }
   ],
   "locations": [
     {
       "location_id": "LOC001",
       "LocationName": "Main Office",
-      "Description": "Primary location for administrative tasks and meetings."
+      "Description": "Primary location for administrative tasks and meetings.",
+      "id": "b9b4"
     },
     {
       "id": "LOC002",
@@ -86,7 +93,8 @@
     {
       "location_id": "LOC003",
       "LocationName": "Laboratory A",
-      "Description": "Main laboratory for conducting experiments and research."
+      "Description": "Main laboratory for conducting experiments and research.",
+      "id": "c2ff"
     }
   ],
   "suppliers": [
@@ -95,107 +103,162 @@
       "SupplierName": "Tech Supplies Co.",
       "Address": "123 Tech Lane, Tech City, TC 12345",
       "Email": "contact@techsupplies.com",
-      "contact": "(123) 456-7890"
+      "contact": "(123) 456-7890",
+      "id": "f66f"
     },
     {
       "supplier_id": "SUP002",
       "SupplierName": "Office Essentials Ltd.",
       "Address": "456 Office Blvd, Worktown, WT 67890",
       "Email": "info@officeessentials.com",
-      "contact": "(987) 654-3210"
+      "contact": "(987) 654-3210",
+      "id": "63b4"
     },
     {
       "supplier_id": "SUP003",
       "SupplierName": "Lab Equipment Inc.",
       "Address": "789 Lab St, Science City, SC 78901",
       "Email": "sales@labequipment.com",
-      "contact": "(555) 123-4567"
+      "contact": "(555) 123-4567",
+      "id": "70b3"
     },
     {
       "supplier_id": "SUP004",
       "SupplierName": "Furniture World",
       "Address": "321 Home Ave, Furnish Town, FT 54321",
-      "Email": "furnitureworld@example.com",                
-      "contact": "(444) 987-6543"
+      "Email": "furnitureworld@example.com",
+      "contact": "(444) 987-6543",
+      "id": "044a"
     }
   ],
   "programs": [
     {
       "program_id": "PROG001",
-      "ProgramName": "BSIT"
+      "ProgramName": "BSIT",
+      "id": "daba"
     },
     {
       "program_id": "PROG002",
-      "ProgramName": "BSTCM"
+      "ProgramName": "BSTCM",
+      "id": "21aa"
     },
     {
       "program_id": "PROG003",
-      "ProgramName": "BSEMT"
+      "ProgramName": "BSEMT",
+      "id": "3af0"
     }
   ],
   "statuses": [
     {
       "status_id": "Stat001",
-        "StatusName": "Scheduled"
+      "StatusName": "Scheduled",
+      "id": "a128"
     },
     {
       "status_id": "Stat002",
-      "StatusName": "In Progress"
+      "StatusName": "In Progress",
+      "id": "b634"
     },
     {
       "status_id": "Stat003",
-      "StatusName": "Completed"
+      "StatusName": "Completed",
+      "id": "0d97"
     },
     {
       "status_id": "Stat004",
-      "StatusName": "Overdue"
+      "StatusName": "Overdue",
+      "id": "7da5"
     }
   ],
-  "colors": [ 
+  "colors": [
     {
       "color_id": "clr001",
       "ColorCode": "#28a745",
-      "Description": "Indicates that the asset is active and in use."
+      "Description": "Green - Active and in use",
+      "id": "f975"
     },
     {
       "color_id": "clr002",
       "ColorCode": "#6c757d",
-      "Description": "Indicates that the asset is inactive and not in use."
+      "Description": "Gray - Inactive/Not in use",
+      "id": "244d"
     },
     {
       "color_id": "clr003",
       "ColorCode": "#ffc107",
-      "Description": "Indicates that the asset is under maintenance."
+      "Description": "Yellow - Under maintenance",
+      "id": "76c3"
     },
     {
       "color_id": "clr004",
       "ColorCode": "#dc3545",
-      "Description": "Indicates that the asset has been retired from use."
+      "Description": "Red - Retired from use",
+      "id": "5327"
+    },
+    {
+      "color_id": "clr005",
+      "ColorCode": "#007bff",
+      "Description": "Blue - New/Recently acquired",
+      "id": "1956"
+    },
+    {
+      "color_id": "clr006",
+      "ColorCode": "#6f42c1",
+      "Description": "Purple - High priority",
+      "id": "ff2c"
+    },
+    {
+      "color_id": "clr007",
+      "ColorCode": "#fd7e14",
+      "Description": "Orange - Needs attention",
+      "id": "1b64"
+    },
+    {
+      "color_id": "clr008",
+      "ColorCode": "#20c997",
+      "Description": "Teal - Certified/Approved",
+      "id": "1e64"
+    },
+    {
+      "color_id": "clr009",
+      "ColorCode": "#e83e8c",
+      "Description": "Pink - Special category",
+      "id": "0a5b"
+    },
+    {
+      "color_id": "clr010",
+      "ColorCode": "#343a40",
+      "Description": "Dark - Deprecated",
+      "id": "4678"
     }
   ],
-  "brands": [         
+  "brands": [
     {
       "brand_id": "brd001",
-      "BrandName": "Dell"
+      "BrandName": "Dell",
+      "id": "f91f"
     },
     {
       "brand_id": "brd002",
-      "BrandName": "HP"
+      "BrandName": "HP",
+      "id": "914e"
     },
     {
       "brand_id": "brd003",
-      "BrandName": "Apple"
+      "BrandName": "Apple",
+      "id": "843b"
     },
     {
       "brand_id": "brd004",
-      "BrandName": "Samsung"
+      "BrandName": "Samsung",
+      "id": "67c4"
     }
   ],
-  "InvCustlips": [         
+  "InvCustlips": [
     {
       "inv_custlip_id": "inv001",
       "PropertyNo": "PROP001",
-      "Quantity":"5",
+      "Quantity": "5",
       "UoM": "pieces",
       "Description": "Invoice",
       "brand_id": "brd001",
@@ -210,7 +273,23 @@
       "package": "Box",
       "material": "Plastic",
       "InvNo": "INV123456",
-      "DateAcquired": "2023-01-15"
-    } 
+      "DateAcquired": "2023-01-15",
+      "id": "0afb"
+    },
+    {
+      "id": "6d6a",
+      "PropertyNo": "PROP003",
+      "Quantity": 1,
+      "UoM": "2",
+      "color_id": "clr001",
+      "Description": "as",
+      "brand_id": "brd002",
+      "height": 12,
+      "package": "box",
+      "width": 0.04,
+      "InvNo": "1122",
+      "material": "metal",
+      "DateAcquired": "2025-10-08"
+    }
   ]
-}       
+}

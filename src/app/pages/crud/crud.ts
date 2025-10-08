@@ -17,7 +17,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { TooltipModule } from 'primeng/tooltip';
-import { Asset, AssetService, Location, Supplier, Program, Status } from '../service/asset.service';
+import { Asset, AssetService, Location, Supplier, Program, Status, InvCustlip, Color, Brand } from '../service/asset.service';
 import Swal from 'sweetalert2';
 
 interface Column {
@@ -147,8 +147,11 @@ interface ExportColumn {
                         <span *ngIf="!asset.QrCode" class="text-muted-color text-sm">No QR Code</span>
                     </td>
                     <td>
-                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editAsset(asset)" />
-                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteAsset(asset)" />
+                        <div class="flex align-items-center gap-2">
+                            <p-button icon="pi pi-plus" severity="success" [rounded]="true" [outlined]="true" (click)="openInvCustlipDialog(asset)" pTooltip="Add New InvCustlip" />
+                            <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" (click)="editAsset(asset)" pTooltip="Edit Asset" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteAsset(asset)" pTooltip="Delete Asset" />
+                        </div>
                     </td>
                 </tr>
             </ng-template>
@@ -237,6 +240,70 @@ interface ExportColumn {
             </ng-template>
         </p-dialog>
 
+        <p-dialog [(visible)]="invCustlipDialog" [style]="{ width: '800px' }" header="InvCustlip Details" [modal]="true">
+            <ng-template #content>
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="propertyNoInv" class="block font-bold mb-2">Property No</label>
+                        <input type="text" pInputText id="propertyNoInv" [(ngModel)]="invCustlip.PropertyNo" required autofocus fluid />
+                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.PropertyNo">Property No is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="quantity" class="block font-bold mb-2">Quantity</label>
+                        <input type="number" pInputText id="quantity" [(ngModel)]="invCustlip.Quantity" required fluid />
+                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.Quantity">Quantity is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="uom" class="block font-bold mb-2">Unit of Measure</label>
+                        <input type="text" pInputText id="uom" [(ngModel)]="invCustlip.UoM" required fluid />
+                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.UoM">Unit of Measure is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="colorId" class="block font-bold mb-2">Color</label>
+                        <p-select id="colorId" [(ngModel)]="invCustlip.color_id" [options]="colors" optionLabel="Description" optionValue="color_id" placeholder="Select a color" fluid> </p-select>
+                    </div>
+                    <div class="col-span-12">
+                        <label for="description" class="block font-bold mb-2">Description</label>
+                        <textarea id="description" pTextarea [(ngModel)]="invCustlip.Description" rows="3" fluid required></textarea>
+                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.Description">Description is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="brandId" class="block font-bold mb-2">Brand</label>
+                        <p-select id="brandId" [(ngModel)]="invCustlip.brand_id" [options]="brands" optionLabel="BrandName" optionValue="brand_id" placeholder="Select a brand" fluid> </p-select>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="height" class="block font-bold mb-2">Height</label>
+                        <input type="number" pInputText id="height" [(ngModel)]="invCustlip.height" step="0.01" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="width" class="block font-bold mb-2">Width</label>
+                        <input type="number" pInputText id="width" [(ngModel)]="invCustlip.width" step="0.01" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="package" class="block font-bold mb-2">Package</label>
+                        <input type="text" pInputText id="package" [(ngModel)]="invCustlip.package" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="material" class="block font-bold mb-2">Material</label>
+                        <input type="text" pInputText id="material" [(ngModel)]="invCustlip.material" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="invNo" class="block font-bold mb-2">Inventory No</label>
+                        <input type="text" pInputText id="invNo" [(ngModel)]="invCustlip.InvNo" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="dateAcquiredInv" class="block font-bold mb-2">Date Acquired</label>
+                        <input type="date" pInputText id="dateAcquiredInv" [(ngModel)]="invCustlip.DateAcquired" fluid />
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #footer>
+                <p-button label="Cancel" icon="pi pi-times" text (click)="hideInvCustlipDialog()" />
+                <p-button label="Save" icon="pi pi-check" (click)="saveInvCustlip()" />
+            </ng-template>
+        </p-dialog>
+
         <p-confirmdialog [style]="{ width: '450px' }" />
     `,
     providers: [MessageService, AssetService, ConfirmationService]
@@ -244,15 +311,18 @@ interface ExportColumn {
 export class Crud implements OnInit {
     assetDialog: boolean = false;
     qrCodeViewerDialog: boolean = false;
+    invCustlipDialog: boolean = false;
 
     assets = signal<Asset[]>([]);
 
     asset: Asset = {};
+    invCustlip: InvCustlip = {};
     selectedQrCode: string = '';
 
     selectedAssets: Asset[] | null = null;
 
     submitted: boolean = false;
+    submittedInv: boolean = false;
 
     statuses: any[] = [];
     categories: any[] = [];
@@ -263,6 +333,8 @@ export class Crud implements OnInit {
     suppliers: Supplier[] = [];
     programs: Program[] = [];
     statusOptions: Status[] = [];
+    colors: Color[] = [];
+    brands: Brand[] = [];
 
     @ViewChild('dt') dt!: Table;
 
@@ -377,6 +449,26 @@ export class Crud implements OnInit {
             },
             error: (error) => {
                 console.error('Error loading statuses:', error);
+            }
+        });
+
+        // Load colors
+        this.assetService.getColors().subscribe({
+            next: (data) => {
+                this.colors = data;
+            },
+            error: (error) => {
+                console.error('Error loading colors:', error);
+            }
+        });
+
+        // Load brands
+        this.assetService.getBrands().subscribe({
+            next: (data) => {
+                this.brands = data;
+            },
+            error: (error) => {
+                console.error('Error loading brands:', error);
             }
         });
     }
@@ -606,6 +698,60 @@ export class Crud implements OnInit {
                     icon: 'error',
                     title: 'Error',
                     text: 'Failed to save asset. Please try again.',
+                    confirmButtonColor: '#EF4444'
+                });
+            }
+        });
+    }
+
+    openInvCustlipDialog(asset: Asset) {
+        this.invCustlip = {
+            PropertyNo: asset.PropertyNo
+        };
+        this.submittedInv = false;
+        this.invCustlipDialog = true;
+    }
+
+    hideInvCustlipDialog() {
+        this.invCustlipDialog = false;
+        this.submittedInv = false;
+    }
+
+    saveInvCustlip() {
+        this.submittedInv = true;
+
+        if (!this.invCustlip.PropertyNo?.trim() || !this.invCustlip.Description?.trim() || !this.invCustlip.Quantity || !this.invCustlip.UoM?.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Property No, Description, Quantity, and Unit of Measure are required fields.',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        const saveOperation = this.invCustlip.inv_custlip_id ? this.assetService.updateInvCustlip(this.invCustlip.inv_custlip_id, this.invCustlip) : this.assetService.createInvCustlip(this.invCustlip);
+
+        saveOperation.subscribe({
+            next: () => {
+                this.invCustlipDialog = false;
+                this.invCustlip = {};
+                this.submittedInv = false;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: this.invCustlip.inv_custlip_id ? 'InvCustlip updated successfully' : 'InvCustlip created successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            },
+            error: (error) => {
+                console.error('Error saving InvCustlip:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to save InvCustlip. Please try again.',
                     confirmButtonColor: '#EF4444'
                 });
             }
