@@ -45,7 +45,6 @@ export interface Status {
 
 export interface InvCustlip {
     inv_custlip_id?: string;
-    PropertyNo?: string;
     Quantity?: string;
     UoM?: string;
     Description?: string;

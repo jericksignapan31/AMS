@@ -272,7 +272,6 @@
   "InvCustlips": [
     {
       "inv_custlip_id": "inv001",
-      "PropertyNo": "PROP001",
       "Quantity": "5",
       "UoM": "pieces",
       "Description": "Invoice",
@@ -293,7 +292,6 @@
     },
     {
       "id": "6d6a",
-      "PropertyNo": "PROP003",
       "Quantity": 1,
       "UoM": "2",
       "color_id": "clr001",
@@ -308,7 +306,6 @@
     },
     {
       "id": "2e52",
-      "PropertyNo": "asd",
       "color_id": "clr002",
       "Quantity": 2,
       "UoM": "sadsa",

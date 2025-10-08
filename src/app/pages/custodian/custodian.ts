@@ -75,7 +75,7 @@ interface ExportColumn {
             [rows]="10"
             [columns]="cols"
             [paginator]="true"
-            [globalFilterFields]="['PropertyNo', 'AssetName', 'Category', 'Status_id']"
+            [globalFilterFields]="['Description', 'InvNo', 'UoM']"
             responsiveLayout="stack"
             breakpoint="960px"
             [(selection)]="selectedInvCustlips"
@@ -100,46 +100,45 @@ interface ExportColumn {
                     <th style="width: 3rem">
                         <p-tableHeaderCheckbox />
                     </th>
-                    <th pSortableColumn="PropertyNo" style="min-width: 10rem">
-                        Property No
-                        <p-sortIcon field="PropertyNo" />
+                    <th pSortableColumn="InvNo" style="min-width: 10rem">
+                        Inventory No
+                        <p-sortIcon field="InvNo" />
                     </th>
-                    <th pSortableColumn="AssetName" style="min-width: 15rem">
-                        Asset Name
-                        <p-sortIcon field="AssetName" />
+                    <th pSortableColumn="Description" style="min-width: 15rem">
+                        Description
+                        <p-sortIcon field="Description" />
                     </th>
-                    <th pSortableColumn="Category" style="min-width: 10rem">
-                        Category
-                        <p-sortIcon field="Category" />
+                    <th pSortableColumn="Quantity" style="min-width: 10rem">
+                        Quantity
+                        <p-sortIcon field="Quantity" />
                     </th>
-                    <th pSortableColumn="FoundCluster" style="min-width: 12rem">
-                        Found Cluster
-                        <p-sortIcon field="FoundCluster" />
+                    <th pSortableColumn="UoM" style="min-width: 8rem">
+                        UoM
+                        <p-sortIcon field="UoM" />
                     </th>
-                    <th pSortableColumn="IssuedTo" style="min-width: 12rem">
-                        Issued To
-                        <p-sortIcon field="IssuedTo" />
+                    <th pSortableColumn="brand_id" style="min-width: 10rem">
+                        Brand
+                        <p-sortIcon field="brand_id" />
                     </th>
-                    <th pSortableColumn="Status_id" style="min-width: 10rem">
-                        Status
-                        <p-sortIcon field="Status_id" />
+                    <th pSortableColumn="color_id" style="min-width: 10rem">
+                        Color
+                        <p-sortIcon field="color_id" />
                     </th>
                     <th pSortableColumn="DateAcquired" style="min-width: 10rem">
                         Date Acquired
                         <p-sortIcon field="DateAcquired" />
                     </th>
-                    <th style="min-width: 8rem">QR Code</th>
                     <th style="min-width: 10rem">Actions</th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-asset>
+            <ng-template pTemplate="body" let-invCustlip>
                 <tr>
                     <td style="width: 3rem">
-                        <p-tableCheckbox [value]="asset" />
+                        <p-tableCheckbox [value]="invCustlip" />
                     </td>
-                    <td style="width:14%; min-width:10rem;">
-                        <span class="p-column-title">Property No</span>
-                        {{ invCustlip.PropertyNo }}
+                    <td style="width:12%; min-width:10rem;">
+                        <span class="p-column-title">Inventory No</span>
+                        {{ invCustlip.InvNo }}
                     </td>
                     <td style="width:14%; min-width:15rem;">
                         <span class="p-column-title">Description</span>
@@ -178,76 +177,6 @@ interface ExportColumn {
         <p-dialog [(visible)]="invCustlipDialog" [style]="{ width: '800px' }" header="InvCustlip Details" [modal]="true">
             <ng-template #content>
                 <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-6">
-                        <label for="propertyNo" class="block font-bold mb-2">Property No</label>
-                        <input type="text" pInputText id="propertyNo" [(ngModel)]="invCustlip.PropertyNo" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !invCustlip.PropertyNo">Property No is required.</small>
-                    </div>
-                    <div class="col-span-6">
-                        <label for="quantity" class="block font-bold mb-2">Quantity</label>
-                        <input type="number" pInputText id="quantity" [(ngModel)]="invCustlip.Quantity" required fluid />
-                        <small class="text-red-500" *ngIf="submitted && !invCustlip.Quantity">Quantity is required.</small>
-                    </div>
-                    <div class="col-span-6">
-                        <label for="uom" class="block font-bold mb-2">Unit of Measure</label>
-                        <input type="text" pInputText id="uom" [(ngModel)]="invCustlip.UoM" required fluid />
-                        <small class="text-red-500" *ngIf="submitted && !invCustlip.UoM">Unit of Measure is required.</small>
-                    </div>
-                    <div class="col-span-6">
-                        <label for="brandId" class="block font-bold mb-2">Brand</label>
-                        <p-select id="brandId" [(ngModel)]="invCustlip.brand_id" [options]="brands" optionLabel="BrandName" optionValue="brand_id" placeholder="Select a brand" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="colorId" class="block font-bold mb-2">Color</label>
-                        <p-select id="colorId" [(ngModel)]="invCustlip.color_id" [options]="colors" optionLabel="Description" optionValue="color_id" placeholder="Select a color" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="dateAcquired" class="block font-bold mb-2">Date Acquired</label>
-                        <input type="date" pInputText id="dateAcquired" [(ngModel)]="invCustlip.DateAcquired" fluid />
-                    </div>
-                    <div class="col-span-12">
-                        <label for="description" class="block font-bold mb-2">Description</label>
-                        <textarea id="description" pTextarea [(ngModel)]="invCustlip.Description" rows="3" required fluid></textarea>
-                        <small class="text-red-500" *ngIf="submitted && !invCustlip.Description">Description is required.</small>
-                    </div>
-                    <div class="col-span-12">
-                        <label for="specs" class="block font-bold mb-2">Specifications</label>
-                        <div class="grid grid-cols-12 gap-2 mb-4 border p-4 rounded">
-                            <div class="col-span-6">
-                                <label for="height" class="block font-bold mb-2">Height</label>
-                                <input type="text" pInputText id="height" [(ngModel)]="invCustlip.height" fluid />
-                            </div>
-                            <div class="col-span-6">
-                                <label for="width" class="block font-bold mb-2">Width</label>
-                                <input type="text" pInputText id="width" [(ngModel)]="invCustlip.width" fluid />
-                            </div>
-                            <div class="col-span-6">
-                                <label for="package" class="block font-bold mb-2">Package</label>
-                                <input type="text" pInputText id="package" [(ngModel)]="invCustlip.package" fluid />
-                            </div>
-                            <div class="col-span-6">
-                                <label for="material" class="block font-bold mb-2">Material</label>
-                                <input type="text" pInputText id="material" [(ngModel)]="invCustlip.material" fluid />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveInvCustlip()" />
-            </ng-template>
-        </p-dialog>
-
-        <p-dialog [(visible)]="invCustlipDialog" [style]="{ width: '800px' }" header="InvCustlip Details" [modal]="true">
-            <ng-template #content>
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-6">
-                        <label for="propertyNoInv" class="block font-bold mb-2">Property No</label>
-                        <input type="text" pInputText id="propertyNoInv" [(ngModel)]="invCustlip.PropertyNo" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !invCustlip.PropertyNo">Property No is required.</small>
-                    </div>
                     <div class="col-span-6">
                         <label for="quantity" class="block font-bold mb-2">Quantity</label>
                         <input type="number" pInputText id="quantity" [(ngModel)]="invCustlip.Quantity" required fluid />
@@ -348,7 +277,6 @@ export class CustodianComponent implements OnInit {
         this.loadReferenceData();
 
         this.cols = [
-            { field: 'PropertyNo', header: 'Property No' },
             { field: 'InvNo', header: 'Invoice No' },
             { field: 'Description', header: 'Description' },
             { field: 'Quantity', header: 'Quantity' },
@@ -403,7 +331,6 @@ export class CustodianComponent implements OnInit {
         this.loadReferenceData();
 
         this.cols = [
-            { field: 'PropertyNo', header: 'Property No' },
             { field: 'InvNo', header: 'Invoice No' },
             { field: 'Description', header: 'Description' },
             { field: 'Quantity', header: 'Quantity' },
@@ -572,19 +499,14 @@ export class CustodianComponent implements OnInit {
     saveInvCustlip() {
         this.submitted = true;
 
-        if (!this.invCustlip.PropertyNo?.trim() || !this.invCustlip.Description?.trim()) {
+        if (!this.invCustlip.Description?.trim()) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Missing Information',
-                text: 'Property No and Description are required fields.',
+                text: 'Description is required.',
                 confirmButtonColor: '#3B82F6'
             });
             return;
-        }
-
-        // Generate PropertyNo if creating new record
-        if (!this.invCustlip.inv_custlip_id) {
-            this.invCustlip.PropertyNo = this.generatePropertyNo();
         }
 
         const saveOperation = this.invCustlip.inv_custlip_id ? this.assetService.updateInvCustlip(this.invCustlip.inv_custlip_id, this.invCustlip) : this.assetService.createInvCustlip(this.invCustlip);

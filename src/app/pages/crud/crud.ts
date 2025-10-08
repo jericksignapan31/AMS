@@ -237,11 +237,6 @@ interface ExportColumn {
                     <div *ngSwitchCase="1" class="step-content">
                         <div class="grid grid-cols-12 gap-4 mt-4">
                             <div class="col-span-6">
-                                <label for="stepperInvPropertyNo" class="block font-bold mb-2">Property No</label>
-                                <input type="text" pInputText id="stepperInvPropertyNo" [(ngModel)]="stepperData.invCustlip.PropertyNo" required fluid />
-                                <small class="text-red-500" *ngIf="submittedInv && !stepperData.invCustlip.PropertyNo">Property No is required.</small>
-                            </div>
-                            <div class="col-span-6">
                                 <label for="stepperQuantity" class="block font-bold mb-2">Quantity</label>
                                 <input type="number" pInputText id="stepperQuantity" [(ngModel)]="stepperData.invCustlip.Quantity" required fluid />
                                 <small class="text-red-500" *ngIf="submittedInv && !stepperData.invCustlip.Quantity">Quantity is required.</small>
@@ -318,7 +313,6 @@ interface ExportColumn {
                             <div class="mb-4">
                                 <h4 class="text-lg font-semibold mb-3 text-primary">InvCustlip Details</h4>
                                 <div class="grid grid-cols-12 gap-2 text-sm">
-                                    <div class="col-span-6"><strong>Property No:</strong> {{ stepperData.invCustlip.PropertyNo }}</div>
                                     <div class="col-span-6"><strong>Quantity:</strong> {{ stepperData.invCustlip.Quantity }}</div>
                                     <div class="col-span-6"><strong>Unit of Measure:</strong> {{ stepperData.invCustlip.UoM }}</div>
                                     <div class="col-span-6"><strong>Brand:</strong> {{ getBrandName(stepperData.invCustlip.brand_id) }}</div>
@@ -361,11 +355,6 @@ interface ExportColumn {
         <p-dialog [(visible)]="invCustlipDialog" [style]="{ width: '800px' }" header="InvCustlip Details" [modal]="true">
             <ng-template #content>
                 <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-6">
-                        <label for="propertyNoInv" class="block font-bold mb-2">Property No</label>
-                        <input type="text" pInputText id="propertyNoInv" [(ngModel)]="invCustlip.PropertyNo" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.PropertyNo">Property No is required.</small>
-                    </div>
                     <div class="col-span-6">
                         <label for="quantity" class="block font-bold mb-2">Quantity</label>
                         <input type="number" pInputText id="quantity" [(ngModel)]="invCustlip.Quantity" required fluid />
@@ -833,9 +822,7 @@ export class Crud implements OnInit {
     }
 
     openInvCustlipDialog(asset: Asset) {
-        this.invCustlip = {
-            PropertyNo: asset.PropertyNo
-        };
+        this.invCustlip = {};
         this.submittedInv = false;
         this.invCustlipDialog = true;
     }
@@ -848,11 +835,11 @@ export class Crud implements OnInit {
     saveInvCustlip() {
         this.submittedInv = true;
 
-        if (!this.invCustlip.PropertyNo?.trim() || !this.invCustlip.Description?.trim() || !this.invCustlip.Quantity || !this.invCustlip.UoM?.trim()) {
+        if (!this.invCustlip.Description?.trim() || !this.invCustlip.Quantity || !this.invCustlip.UoM?.trim()) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Missing Information',
-                text: 'Property No, Description, Quantity, and Unit of Measure are required fields.',
+                text: 'Description, Quantity, and Unit of Measure are required fields.',
                 confirmButtonColor: '#3B82F6'
             });
             return;
@@ -944,11 +931,11 @@ export class Crud implements OnInit {
         }
 
         // Check InvCustlip validation
-        if (!this.stepperData.invCustlip.PropertyNo?.trim() || !this.stepperData.invCustlip.Description?.trim() || !this.stepperData.invCustlip.Quantity || !this.stepperData.invCustlip.UoM?.trim()) {
+        if (!this.stepperData.invCustlip.Description?.trim() || !this.stepperData.invCustlip.Quantity || !this.stepperData.invCustlip.UoM?.trim()) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Missing InvCustlip Information',
-                text: 'InvCustlip Property No, Description, Quantity, and Unit of Measure are required fields.',
+                text: 'InvCustlip Description, Quantity, and Unit of Measure are required fields.',
                 confirmButtonColor: '#3B82F6'
             });
             return;
