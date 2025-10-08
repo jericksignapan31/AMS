@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
@@ -18,8 +18,20 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { FormsModule } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { AssetService, InvCustlip, Color, Brand } from '../service/asset.service';
+import { AssetService, InvCustlip, Color, Brand, Asset, Program, Status, Supplier, Location } from '../service/asset.service';
 import Swal from 'sweetalert2';
+import { TooltipModule } from 'primeng/tooltip';
+
+interface Column {
+    field: string;
+    header: string;
+    customExportHeader?: string;
+}
+
+interface ExportColumn {
+    title: string;
+    dataKey: string;
+}
 
 @Component({
     selector: 'app-custodian',
@@ -27,459 +39,332 @@ import Swal from 'sweetalert2';
     imports: [
         CommonModule,
         TableModule,
-        FileUploadModule,
         FormsModule,
         ButtonModule,
         RippleModule,
         ToastModule,
         ToolbarModule,
-        ConfirmDialogModule,
         InputTextModule,
         TextareaModule,
-        InputNumberModule,
-        DialogModule,
         SelectModule,
-        DatePickerModule,
+        DialogModule,
         TagModule,
         InputIconModule,
-        IconFieldModule
-    ],
-    providers: [MessageService, ConfirmationService],
-    styles: [
-        `
-            .card {
-                background: var(--surface-card);
-                border: 1px solid var(--surface-border);
-                border-radius: var(--border-radius);
-                padding: 1.5rem;
-                margin-bottom: 1rem;
-                box-shadow:
-                    0 2px 1px -1px rgba(0, 0, 0, 0.2),
-                    0 1px 1px 0 rgba(0, 0, 0, 0.14),
-                    0 1px 3px 0 rgba(0, 0, 0, 0.12);
-            }
-
-            .card-header {
-                color: var(--primary-color);
-                margin-bottom: 1rem;
-                padding-bottom: 0.5rem;
-                border-bottom: 1px solid var(--surface-border);
-                display: flex;
-                align-items: center;
-            }
-
-            .field label {
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-color);
-                font-weight: 500;
-            }
-
-            .field label i {
-                color: var(--primary-color);
-            }
-
-            .p-inputtext,
-            .p-inputnumber,
-            .p-select,
-            .p-datepicker,
-            .p-inputtextarea {
-                width: 100%;
-            }
-
-            .color-preview {
-                border: 2px solid var(--surface-border);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-
-            .required-field::after {
-                content: ' *';
-                color: var(--red-500);
-            }
-
-            :host ::ng-deep .p-dialog .p-dialog-content {
-                padding: 1.5rem;
-                max-height: 70vh;
-                overflow-y: auto;
-            }
-
-            :host ::ng-deep .p-dialog-header {
-                background: var(--primary-color);
-                color: var(--primary-color-text);
-            }
-
-            :host ::ng-deep .p-dialog-footer {
-                border-top: 1px solid var(--surface-border);
-                padding: 1rem 1.5rem;
-                background: var(--surface-ground);
-            }
-
-            :host ::ng-deep .ng-invalid.ng-dirty {
-                border-color: var(--red-500);
-            }
-
-            :host ::ng-deep .p-error {
-                color: var(--red-500);
-                font-size: 0.875rem;
-            }
-
-            .section-divider {
-                border-top: 1px solid var(--surface-border);
-                margin: 2rem 0 1rem 0;
-            }
-        `
+        IconFieldModule,
+        ConfirmDialogModule,
+        FileUploadModule,
+        TooltipModule
     ],
     template: `
-        <div class="grid">
-            <div class="col-12">
-                <div class="card px-6 py-6">
-                    <p-toast></p-toast>
-                    <p-toolbar styleClass="mb-4 gap-2">
-                        <ng-template pTemplate="left">
-                            <p-button severity="success" label="New" icon="pi pi-plus" class="mr-2" (click)="openNew()"> </p-button>
-                            <p-button severity="danger" label="Delete" icon="pi pi-trash" (click)="deleteSelectedItems()" [disabled]="!selectedItems || !selectedItems.length"> </p-button>
-                        </ng-template>
+        <p-toast />
 
-                        <ng-template pTemplate="right">
-                            <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block"> </p-fileUpload>
-                            <p-button severity="help" label="Export" icon="pi pi-upload"> </p-button>
-                        </ng-template>
-                    </p-toolbar>
+        <p-toolbar styleClass="mb-6">
+            <ng-template #start>
+                <p-button label="New Asset" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+                <p-button severity="secondary" label="Delete Selected" icon="pi pi-trash" outlined (onClick)="deleteSelectedAssets()" [disabled]="!selectedAssets || !selectedAssets.length" />
+            </ng-template>
 
-                    <p-table
-                        #dt
-                        [value]="invCustlips"
-                        [columns]="cols"
-                        responsiveLayout="scroll"
-                        [rows]="10"
-                        [globalFilterFields]="['PropertyNo', 'Description', 'InvNo']"
-                        [paginator]="true"
-                        [rowsPerPageOptions]="[10, 20, 30]"
-                        [showCurrentPageReport]="true"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                        [(selection)]="selectedItems"
-                        selectionMode="multiple"
-                        [rowHover]="true"
-                        dataKey="inv_custlip_id"
-                    >
-                        <ng-template #caption>
-                            <div class="flex items-center justify-between">
-                                <h5 class="m-0">Custodian</h5>
-                                <p-iconfield>
-                                    <p-inputicon styleClass="pi pi-search" />
-                                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search ..." />
-                                </p-iconfield>
-                            </div>
-                        </ng-template>
+            <ng-template #end>
+                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+            </ng-template>
+        </p-toolbar>
 
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th style="width: 3rem">
-                                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                                </th>
-                                <th pSortableColumn="PropertyNo">Property No <p-sortIcon field="PropertyNo"></p-sortIcon></th>
-                                <th pSortableColumn="InvNo">Invoice No <p-sortIcon field="InvNo"></p-sortIcon></th>
-                                <th pSortableColumn="Description">Description <p-sortIcon field="Description"></p-sortIcon></th>
-                                <th pSortableColumn="Quantity">Quantity <p-sortIcon field="Quantity"></p-sortIcon></th>
-                                <th pSortableColumn="UoM">Unit <p-sortIcon field="UoM"></p-sortIcon></th>
-                                <th>Brand</th>
-                                <th>Color</th>
-                                <th pSortableColumn="DateAcquired">Date Acquired <p-sortIcon field="DateAcquired"></p-sortIcon></th>
-                                <th>Actions</th>
-                            </tr>
-                        </ng-template>
-
-                        <ng-template pTemplate="body" let-item>
-                            <tr>
-                                <td>
-                                    <p-tableCheckbox [value]="item"></p-tableCheckbox>
-                                </td>
-                                <td style="width:14%; min-width:10rem;">
-                                    <span class="p-column-title"></span>
-                                    {{ item.PropertyNo }}
-                                </td>
-                                <td style="width:14%; min-width:10rem;">
-                                    <span class="p-column-title"></span>
-                                    {{ item.InvNo }}
-                                </td>
-                                <td style="width:14%; min-width:10rem;">
-                                    <span class="p-column-title"></span>
-                                    {{ item.Description }}
-                                </td>
-                                <td style="width:14%; min-width:8rem;">
-                                    <span class="p-column-title"></span>
-                                    {{ item.Quantity }}
-                                </td>
-                                <td style="width:14%; min-width:8rem;">
-                                    <span class="p-column-title"></span>
-                                    {{ item.UoM }}
-                                </td>
-                                <td style="width:14%; min-width:10rem;">
-                                    <span class="p-column-title"></span>
-                                    {{ getBrandName(item.brand_id) }}
-                                </td>
-                                <td style="width:14%; min-width:10rem;">
-                                    <span class="p-column-title"></span>
-                                    <div class="flex align-items-center gap-2">
-                                        <div class="w-2rem h-2rem border-round" [style.background-color]="getColorCode(item.color_id)"></div>
-                                        {{ getColorDescription(item.color_id) }}
-                                    </div>
-                                </td>
-                                <td style="width:14%; min-width:10rem;">
-                                    <span class="p-column-title"></span>
-                                    {{ item.DateAcquired | date: 'shortDate' }}
-                                </td>
-                                <td>
-                                    <div class="flex gap-2">
-                                        <p-button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editItem(item)"> </p-button>
-                                        <p-button icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteItem(item)"> </p-button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
+        <p-table
+            #dt
+            [value]="assets()"
+            [rows]="10"
+            [columns]="cols"
+            [paginator]="true"
+            [globalFilterFields]="['PropertyNo', 'AssetName', 'Category', 'Status_id']"
+            responsiveLayout="stack"
+            breakpoint="960px"
+            [(selection)]="selectedAssets"
+            [rowHover]="true"
+            dataKey="id"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assets"
+            [showCurrentPageReport]="true"
+            [rowsPerPageOptions]="[10, 20, 30]"
+            styleClass="p-datatable-customers"
+        >
+            <ng-template #caption>
+                <div class="flex items-center justify-between">
+                    <h5 class="m-0">Custodian</h5>
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search assets..." />
+                    </p-iconfield>
                 </div>
-
-                <p-dialog [(visible)]="itemDialog" [style]="{ width: '900px' }" header="InvCustlip Details" [modal]="true" class="p-fluid" [maximizable]="true">
-                    <ng-template pTemplate="content">
-                        <div class="grid">
-                            <!-- Basic Information Section -->
-                            <div class="col-12">
-                                <div class="card">
-                                    <h5 class="card-header mb-3">
-                                        <i class="pi pi-info-circle mr-2"></i>
-                                        Basic Information
-                                    </h5>
-                                    <div class="grid">
-                                        <div class="col-12 md:col-6">
-                                            <div class="field">
-                                                <label for="propertyNo" class="font-semibold">
-                                                    <i class="pi pi-tag mr-1"></i>
-                                                    Property No *
-                                                </label>
-                                                <input type="text" pInputText id="propertyNo" [(ngModel)]="item.PropertyNo" required autofocus placeholder="Enter property number" [ngClass]="{ 'ng-invalid ng-dirty': submitted && !item.PropertyNo }" />
-                                                <small class="p-error" *ngIf="submitted && !item.PropertyNo"> Property No is required. </small>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-6">
-                                            <div class="field">
-                                                <label for="invNo" class="font-semibold">
-                                                    <i class="pi pi-file-o mr-1"></i>
-                                                    Invoice No
-                                                </label>
-                                                <input type="text" pInputText id="invNo" [(ngModel)]="item.InvNo" placeholder="Enter invoice number" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <div class="field">
-                                                <label for="description" class="font-semibold">
-                                                    <i class="pi pi-align-left mr-1"></i>
-                                                    Description
-                                                </label>
-                                                <textarea id="description" pInputTextarea [(ngModel)]="item.Description" rows="3" placeholder="Enter detailed description" [autoResize]="true"> </textarea>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-6">
-                                            <div class="field">
-                                                <label for="dateAcquired" class="font-semibold">
-                                                    <i class="pi pi-calendar mr-1"></i>
-                                                    Date Acquired
-                                                </label>
-                                                <p-datepicker [(ngModel)]="item.DateAcquired" dateFormat="yy-mm-dd" id="dateAcquired" placeholder="Select date" [showIcon]="true"> </p-datepicker>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Quantity & Brand Information -->
-                            <div class="col-12">
-                                <div class="card">
-                                    <h5 class="card-header mb-3">
-                                        <i class="pi pi-shopping-cart mr-2"></i>
-                                        Quantity & Brand
-                                    </h5>
-                                    <div class="grid">
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="quantity" class="font-semibold">
-                                                    <i class="pi pi-hashtag mr-1"></i>
-                                                    Quantity
-                                                </label>
-                                                <p-inputNumber id="quantity" [(ngModel)]="item.Quantity" mode="decimal" placeholder="0" [min]="0"> </p-inputNumber>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="uom" class="font-semibold">
-                                                    <i class="pi pi-calculator mr-1"></i>
-                                                    Unit of Measure
-                                                </label>
-                                                <input type="text" pInputText id="uom" [(ngModel)]="item.UoM" placeholder="e.g., pieces, units, kg" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="brand" class="font-semibold">
-                                                    <i class="pi pi-bookmark mr-1"></i>
-                                                    Brand
-                                                </label>
-                                                <p-select [options]="brands" [(ngModel)]="item.brand_id" optionLabel="BrandName" optionValue="brand_id" placeholder="Select a Brand" [showClear]="true"> </p-select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Visual & Physical Properties -->
-                            <div class="col-12">
-                                <div class="card">
-                                    <h5 class="card-header mb-3">
-                                        <i class="pi pi-palette mr-2"></i>
-                                        Visual & Physical Properties
-                                    </h5>
-                                    <div class="grid">
-                                        <div class="col-12 md:col-6">
-                                            <div class="field">
-                                                <label for="color" class="font-semibold">
-                                                    <i class="pi pi-circle-fill mr-1"></i>
-                                                    Color
-                                                </label>
-                                                <p-select [options]="colors" [(ngModel)]="item.color_id" optionLabel="Description" optionValue="color_id" placeholder="Select a Color" [showClear]="true">
-                                                    <ng-template pTemplate="selectedItem">
-                                                        <div class="flex align-items-center gap-2" *ngIf="item.color_id">
-                                                            <div class="w-2rem h-2rem border-2 border-round shadow-2" [style.background-color]="getColorCode(item.color_id)"></div>
-                                                            <span class="font-medium">{{ getColorDescription(item.color_id) }}</span>
-                                                        </div>
-                                                    </ng-template>
-                                                    <ng-template pTemplate="item" let-color>
-                                                        <div class="flex align-items-center gap-2 p-2">
-                                                            <div class="w-2rem h-2rem border-2 border-round shadow-1" [style.background-color]="color.ColorCode"></div>
-                                                            <span>{{ color.Description }}</span>
-                                                        </div>
-                                                    </ng-template>
-                                                </p-select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-6">
-                                            <div class="field">
-                                                <label for="material" class="font-semibold">
-                                                    <i class="pi pi-box mr-1"></i>
-                                                    Material
-                                                </label>
-                                                <input type="text" pInputText id="material" [(ngModel)]="item.material" placeholder="e.g., Plastic, Metal, Wood" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="height" class="font-semibold">
-                                                    <i class="pi pi-arrows-v mr-1"></i>
-                                                    Height
-                                                </label>
-                                                <input type="text" pInputText id="height" [(ngModel)]="item.height" placeholder="e.g., 15 inches" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="width" class="font-semibold">
-                                                    <i class="pi pi-arrows-h mr-1"></i>
-                                                    Width
-                                                </label>
-                                                <input type="text" pInputText id="width" [(ngModel)]="item.width" placeholder="e.g., 10 inches" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="package" class="font-semibold">
-                                                    <i class="pi pi-gift mr-1"></i>
-                                                    Package
-                                                </label>
-                                                <input type="text" pInputText id="package" [(ngModel)]="item.package" placeholder="e.g., Box, Envelope" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Technical Specifications -->
-                            <div class="col-12">
-                                <div class="card">
-                                    <h5 class="card-header mb-3">
-                                        <i class="pi pi-cog mr-2"></i>
-                                        Technical Specifications
-                                    </h5>
-                                    <div class="grid">
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="cpu" class="font-semibold">
-                                                    <i class="pi pi-microchip mr-1"></i>
-                                                    CPU
-                                                </label>
-                                                <input type="text" pInputText id="cpu" [(ngModel)]="item.specs!.CPU" placeholder="e.g., Intel i7, AMD Ryzen" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="ram" class="font-semibold">
-                                                    <i class="pi pi-server mr-1"></i>
-                                                    RAM
-                                                </label>
-                                                <input type="text" pInputText id="ram" [(ngModel)]="item.specs!.RAM" placeholder="e.g., 16GB, 32GB" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 md:col-4">
-                                            <div class="field">
-                                                <label for="storage" class="font-semibold">
-                                                    <i class="pi pi-database mr-1"></i>
-                                                    Storage
-                                                </label>
-                                                <input type="text" pInputText id="storage" [(ngModel)]="item.specs!.Storage" placeholder="e.g., 512GB SSD, 1TB HDD" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+            </ng-template>
+            <ng-template #header>
+                <tr>
+                    <th style="width: 3rem">
+                        <p-tableHeaderCheckbox />
+                    </th>
+                    <th pSortableColumn="PropertyNo" style="min-width: 10rem">
+                        Property No
+                        <p-sortIcon field="PropertyNo" />
+                    </th>
+                    <th pSortableColumn="AssetName" style="min-width: 15rem">
+                        Asset Name
+                        <p-sortIcon field="AssetName" />
+                    </th>
+                    <th pSortableColumn="Category" style="min-width: 10rem">
+                        Category
+                        <p-sortIcon field="Category" />
+                    </th>
+                    <th pSortableColumn="FoundCluster" style="min-width: 12rem">
+                        Found Cluster
+                        <p-sortIcon field="FoundCluster" />
+                    </th>
+                    <th pSortableColumn="IssuedTo" style="min-width: 12rem">
+                        Issued To
+                        <p-sortIcon field="IssuedTo" />
+                    </th>
+                    <th pSortableColumn="Status_id" style="min-width: 10rem">
+                        Status
+                        <p-sortIcon field="Status_id" />
+                    </th>
+                    <th pSortableColumn="DateAcquired" style="min-width: 10rem">
+                        Date Acquired
+                        <p-sortIcon field="DateAcquired" />
+                    </th>
+                    <th style="min-width: 8rem">QR Code</th>
+                    <th style="min-width: 10rem">Actions</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-asset>
+                <tr>
+                    <td style="width: 3rem">
+                        <p-tableCheckbox [value]="asset" />
+                    </td>
+                    <td style="width:14%; min-width:10rem;">
+                        <span class="p-column-title"></span>
+                        {{ asset.PropertyNo }}
+                    </td>
+                    <td style="width:14%; min-width:15rem;">
+                        <span class="p-column-title"></span>
+                        {{ asset.AssetName }}
+                    </td>
+                    <td style="width:14%; min-width:10rem;">
+                        <span class="p-column-title"></span>
+                        {{ asset.Category }}
+                    </td>
+                    <td style="width:14%; min-width:12rem;">
+                        <span class="p-column-title"></span>
+                        {{ asset.FoundCluster }}
+                    </td>
+                    <td style="width:14%; min-width:12rem;">
+                        <span class="p-column-title"></span>
+                        {{ asset.IssuedTo }}
+                    </td>
+                    <td style="width:14%; min-width:10rem;">
+                        <span class="p-column-title"></span>
+                        <p-tag [value]="asset.Status_id" [severity]="getStatusSeverity(asset.Status_id)" />
+                    </td>
+                    <td style="width:14%; min-width:10rem;">
+                        <span class="p-column-title"></span>
+                        {{ asset.DateAcquired }}
+                    </td>
+                    <td style="width:14%; min-width:8rem;">
+                        <span class="p-column-title"></span>
+                        <img *ngIf="asset.QrCode" [src]="asset.QrCode" alt="QR Code" class="w-8 h-8 rounded border cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
+                        <span *ngIf="!asset.QrCode" class="text-muted-color text-sm"></span>
+                    </td>
+                    <td>
+                        <div class="flex align-items-center gap-2">
+                            <p-button icon="pi pi-plus" severity="success" [rounded]="true" [outlined]="true" (click)="openInvCustlipDialog(asset)" pTooltip="Add New InvCustlip" />
+                            <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" (click)="editAsset(asset)" pTooltip="Edit Asset" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteAsset(asset)" pTooltip="Delete Asset" />
                         </div>
-                    </ng-template>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
 
-                    <ng-template pTemplate="footer">
-                        <div class="flex justify-content-end gap-2">
-                            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (click)="hideDialog()"> </p-button>
-                            <p-button [label]="saving ? 'Saving...' : 'Save'" [icon]="saving ? 'pi pi-spin pi-spinner' : 'pi pi-check'" severity="success" [disabled]="saving" (click)="saveItem()"> </p-button>
+        <p-dialog [(visible)]="assetDialog" [style]="{ width: '800px' }" header="Asset Details" [modal]="true">
+            <ng-template #content>
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="propertyNo" class="block font-bold mb-2">Property No</label>
+                        <input type="text" pInputText id="propertyNo" [(ngModel)]="asset.PropertyNo" required autofocus fluid />
+                        <small class="text-red-500" *ngIf="submitted && !asset.PropertyNo">Property No is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="category" class="block font-bold mb-2">Category</label>
+                        <p-select [(ngModel)]="asset.Category" inputId="category" [options]="categories" optionLabel="label" optionValue="value" placeholder="Select Category" fluid />
+                    </div>
+                    <div class="col-span-12">
+                        <label for="assetName" class="block font-bold mb-2">Asset Name</label>
+                        <input type="text" pInputText id="assetName" [(ngModel)]="asset.AssetName" required fluid />
+                        <small class="text-red-500" *ngIf="submitted && !asset.AssetName">Asset Name is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="foundCluster" class="block font-bold mb-2">Found Cluster</label>
+                        <input type="text" pInputText id="foundCluster" [(ngModel)]="asset.FoundCluster" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="locationId" class="block font-bold mb-2">Location</label>
+                        <p-select id="locationId" [(ngModel)]="asset.Location_id" [options]="locations" optionLabel="LocationName" optionValue="id" placeholder="Select a location" fluid> </p-select>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="supplierId" class="block font-bold mb-2">Supplier</label>
+                        <p-select id="supplierId" [(ngModel)]="asset.Supplier_id" [options]="suppliers" optionLabel="SupplierName" optionValue="id" placeholder="Select a supplier" fluid> </p-select>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="programId" class="block font-bold mb-2">Program</label>
+                        <p-select id="programId" [(ngModel)]="asset.Program_id" [options]="programs" optionLabel="ProgramName" optionValue="id" placeholder="Select a program" fluid> </p-select>
+                    </div>
+                    <div class="col-span-12">
+                        <label for="purpose" class="block font-bold mb-2">Purpose</label>
+                        <textarea id="purpose" pTextarea [(ngModel)]="asset.Purpose" rows="3" fluid></textarea>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="dateAcquired" class="block font-bold mb-2">Date Acquired</label>
+                        <input type="date" pInputText id="dateAcquired" [(ngModel)]="asset.DateAcquired" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="issuedTo" class="block font-bold mb-2">Issued To</label>
+                        <input type="text" pInputText id="issuedTo" [(ngModel)]="asset.IssuedTo" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="status" class="block font-bold mb-2">Status</label>
+                        <p-select [(ngModel)]="asset.Status_id" inputId="status" [options]="statusOptions" optionLabel="StatusName" optionValue="id" placeholder="Select Status" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="active" class="block font-bold mb-2">Active</label>
+                        <p-select [(ngModel)]="asset.Active" inputId="active" [options]="activeOptions" optionLabel="label" optionValue="value" placeholder="Select" fluid />
+                    </div>
+                    <div class="col-span-12">
+                        <label for="qrCode" class="block font-bold mb-2">QR Code Image</label>
+                        <p-fileupload mode="basic" name="qrCode" accept="image/*" [maxFileSize]="1000000" (onSelect)="onQrCodeSelect($event)" chooseLabel="Choose QR Code Image" [auto]="true"> </p-fileupload>
+                        <div *ngIf="asset.QrCode" class="mt-3">
+                            <img [src]="asset.QrCode" alt="QR Code" class="max-w-32 max-h-32 border rounded cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
+                            <p-button icon="pi pi-times" severity="danger" size="small" [rounded]="true" class="ml-2" (click)="removeQrCode()" pTooltip="Remove QR Code"> </p-button>
                         </div>
-                    </ng-template>
-                </p-dialog>
+                    </div>
+                </div>
+            </ng-template>
 
-                <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
-            </div>
-        </div>
-    `
+            <ng-template #footer>
+                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+                <p-button label="Save" icon="pi pi-check" (click)="saveAsset()" />
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="qrCodeViewerDialog" [style]="{ width: '500px' }" header="QR Code Viewer" [modal]="true">
+            <ng-template #content>
+                <div class="text-center">
+                    <img [src]="selectedQrCode" alt="QR Code" class="max-w-full h-auto border rounded shadow-lg" />
+                </div>
+            </ng-template>
+
+            <ng-template #footer>
+                <p-button label="Close" icon="pi pi-times" (click)="closeQrCodeViewer()" />
+                <p-button label="Download" icon="pi pi-download" severity="secondary" (click)="downloadQrCode()" />
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="invCustlipDialog" [style]="{ width: '800px' }" header="InvCustlip Details" [modal]="true">
+            <ng-template #content>
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="propertyNoInv" class="block font-bold mb-2">Property No</label>
+                        <input type="text" pInputText id="propertyNoInv" [(ngModel)]="invCustlip.PropertyNo" required autofocus fluid />
+                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.PropertyNo">Property No is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="quantity" class="block font-bold mb-2">Quantity</label>
+                        <input type="number" pInputText id="quantity" [(ngModel)]="invCustlip.Quantity" required fluid />
+                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.Quantity">Quantity is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="uom" class="block font-bold mb-2">Unit of Measure</label>
+                        <input type="text" pInputText id="uom" [(ngModel)]="invCustlip.UoM" required fluid />
+                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.UoM">Unit of Measure is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="colorId" class="block font-bold mb-2">Color</label>
+                        <p-select id="colorId" [(ngModel)]="invCustlip.color_id" [options]="colors" optionLabel="Description" optionValue="color_id" placeholder="Select a color" fluid> </p-select>
+                    </div>
+                    <div class="col-span-12">
+                        <label for="description" class="block font-bold mb-2">Description</label>
+                        <textarea id="description" pTextarea [(ngModel)]="invCustlip.Description" rows="3" fluid required></textarea>
+                        <small class="text-red-500" *ngIf="submittedInv && !invCustlip.Description">Description is required.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="brandId" class="block font-bold mb-2">Brand</label>
+                        <p-select id="brandId" [(ngModel)]="invCustlip.brand_id" [options]="brands" optionLabel="BrandName" optionValue="brand_id" placeholder="Select a brand" fluid> </p-select>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="height" class="block font-bold mb-2">Height</label>
+                        <input type="number" pInputText id="height" [(ngModel)]="invCustlip.height" step="0.01" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="width" class="block font-bold mb-2">Width</label>
+                        <input type="number" pInputText id="width" [(ngModel)]="invCustlip.width" step="0.01" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="package" class="block font-bold mb-2">Package</label>
+                        <input type="text" pInputText id="package" [(ngModel)]="invCustlip.package" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="material" class="block font-bold mb-2">Material</label>
+                        <input type="text" pInputText id="material" [(ngModel)]="invCustlip.material" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="invNo" class="block font-bold mb-2">Inventory No</label>
+                        <input type="text" pInputText id="invNo" [(ngModel)]="invCustlip.InvNo" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="dateAcquiredInv" class="block font-bold mb-2">Date Acquired</label>
+                        <input type="date" pInputText id="dateAcquiredInv" [(ngModel)]="invCustlip.DateAcquired" fluid />
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #footer>
+                <p-button label="Cancel" icon="pi pi-times" text (click)="hideInvCustlipDialog()" />
+                <p-button label="Save" icon="pi pi-check" (click)="saveInvCustlip()" />
+            </ng-template>
+        </p-dialog>
+
+        <p-confirmdialog [style]="{ width: '450px' }" />
+    `,
+    providers: [MessageService, AssetService, ConfirmationService]
 })
 export class CustodianComponent implements OnInit {
-    itemDialog: boolean = false;
-    deleteItemDialog: boolean = false;
-    deleteItemsDialog: boolean = false;
+    assetDialog: boolean = false;
+    qrCodeViewerDialog: boolean = false;
+    invCustlipDialog: boolean = false;
 
-    invCustlips: InvCustlip[] = [];
-    item: InvCustlip = {};
-    selectedItems: InvCustlip[] = [];
+    assets = signal<Asset[]>([]);
+
+    asset: Asset = {};
+    invCustlip: InvCustlip = {};
+    selectedQrCode: string = '';
+
+    selectedAssets: Asset[] | null = null;
+
     submitted: boolean = false;
-    saving: boolean = false;
-    cols: any[] = [];
+    submittedInv: boolean = false;
 
+    statuses: any[] = [];
+    categories: any[] = [];
+    activeOptions: any[] = [];
+
+    // Reference data for dropdowns
+    locations: Location[] = [];
+    suppliers: Supplier[] = [];
+    programs: Program[] = [];
+    statusOptions: Status[] = [];
     colors: Color[] = [];
     brands: Brand[] = [];
+
+    @ViewChild('dt') dt!: Table;
+
+    exportColumns!: ExportColumn[];
+
+    cols!: Column[];
 
     constructor(
         private assetService: AssetService,
@@ -487,45 +372,124 @@ export class CustodianComponent implements OnInit {
         private confirmationService: ConfirmationService
     ) {}
 
-    ngOnInit() {
-        this.loadInvCustlips();
-        this.loadReferenceData();
-
-        this.cols = [
-            { field: 'PropertyNo', header: 'Property No' },
-            { field: 'InvNo', header: 'Invoice No' },
-            { field: 'Description', header: 'Description' },
-            { field: 'Quantity', header: 'Quantity' },
-            { field: 'UoM', header: 'Unit' },
-            { field: 'DateAcquired', header: 'Date Acquired' }
-        ];
+    exportCSV() {
+        this.dt.exportCSV();
     }
 
-    loadInvCustlips() {
-        this.assetService.getInvCustlips().subscribe({
+    ngOnInit() {
+        this.loadAssets();
+        this.initializeDropdowns();
+    }
+
+    loadAssets() {
+        this.assetService.getAssets().subscribe({
             next: (data) => {
-                this.invCustlips = data;
+                this.assets.set(data);
             },
             error: (error) => {
-                Swal.fire('Error', 'Failed to load InvCustlips data', 'error');
-                console.error('Error loading InvCustlips:', error);
+                console.error('Error loading assets:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load assets. Please try again.',
+                    confirmButtonColor: '#EF4444'
+                });
             }
         });
     }
 
+    initializeDropdowns() {
+        this.statuses = [
+            { label: 'ACTIVE', value: 'ACTIVE' },
+            { label: 'MAINTENANCE', value: 'MAINTENANCE' },
+            { label: 'DISPOSED', value: 'DISPOSED' },
+            { label: 'LOST', value: 'LOST' }
+        ];
+
+        this.categories = [
+            { label: 'IT Equipment', value: 'IT Equipment' },
+            { label: 'Furniture', value: 'Furniture' },
+            { label: 'Vehicle', value: 'Vehicle' },
+            { label: 'Office Supplies', value: 'Office Supplies' },
+            { label: 'Tools', value: 'Tools' }
+        ];
+
+        this.activeOptions = [
+            { label: 'Yes', value: 'Y' },
+            { label: 'No', value: 'N' }
+        ];
+
+        // Load reference data from API
+        this.loadReferenceData();
+
+        this.cols = [
+            { field: 'PropertyNo', header: 'Property No' },
+            { field: 'AssetName', header: 'Asset Name' },
+            { field: 'Category', header: 'Category' },
+            { field: 'FoundCluster', header: 'Found Cluster' },
+            { field: 'IssuedTo', header: 'Issued To' },
+            { field: 'Status_id', header: 'Status' },
+            { field: 'DateAcquired', header: 'Date Acquired' }
+        ];
+
+        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
+    }
+
     loadReferenceData() {
+        // Load locations
+        this.assetService.getLocations().subscribe({
+            next: (data) => {
+                this.locations = data;
+            },
+            error: (error) => {
+                console.error('Error loading locations:', error);
+            }
+        });
+
+        // Load suppliers
+        this.assetService.getSuppliers().subscribe({
+            next: (data) => {
+                this.suppliers = data;
+            },
+            error: (error) => {
+                console.error('Error loading suppliers:', error);
+            }
+        });
+
+        // Load programs
+        this.assetService.getPrograms().subscribe({
+            next: (data) => {
+                this.programs = data;
+            },
+            error: (error) => {
+                console.error('Error loading programs:', error);
+            }
+        });
+
+        // Load statuses from API
+        this.assetService.getStatuses().subscribe({
+            next: (data) => {
+                this.statusOptions = data;
+            },
+            error: (error) => {
+                console.error('Error loading statuses:', error);
+            }
+        });
+
+        // Load colors
         this.assetService.getColors().subscribe({
-            next: (colors) => {
-                this.colors = colors;
+            next: (data) => {
+                this.colors = data;
             },
             error: (error) => {
                 console.error('Error loading colors:', error);
             }
         });
 
+        // Load brands
         this.assetService.getBrands().subscribe({
-            next: (brands) => {
-                this.brands = brands;
+            next: (data) => {
+                this.brands = data;
             },
             error: (error) => {
                 console.error('Error loading brands:', error);
@@ -533,128 +497,288 @@ export class CustodianComponent implements OnInit {
         });
     }
 
+    onGlobalFilter(table: Table, event: Event) {
+        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    }
+
     openNew() {
-        this.item = {
-            specs: {}
-        };
+        this.asset = {};
         this.submitted = false;
-        this.itemDialog = true;
+        this.assetDialog = true;
     }
 
-    deleteSelectedItems() {
+    editAsset(asset: Asset) {
+        this.asset = { ...asset };
+        this.assetDialog = true;
+    }
+
+    deleteSelectedAssets() {
+        if (!this.selectedAssets || this.selectedAssets.length === 0) return;
+
         this.confirmationService.confirm({
-            message: 'Are you sure you want to delete the selected items?',
+            message: 'Are you sure you want to delete the selected assets?',
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                // Implement bulk delete logic here
-                this.selectedItems = [];
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Items Deleted', life: 3000 });
-            }
-        });
-    }
+                const deletePromises = this.selectedAssets!.map((asset) => this.assetService.deleteAsset(asset.id!).toPromise());
 
-    editItem(item: InvCustlip) {
-        this.item = { ...item };
-        if (!this.item.specs) {
-            this.item.specs = {};
-        }
-        this.itemDialog = true;
-    }
-
-    deleteItem(item: InvCustlip) {
-        this.confirmationService.confirm({
-            message: 'Are you sure you want to delete ' + item.PropertyNo + '?',
-            header: 'Confirm',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                if (item.inv_custlip_id) {
-                    this.assetService.deleteInvCustlip(item.inv_custlip_id).subscribe({
-                        next: () => {
-                            this.invCustlips = this.invCustlips.filter((val) => val.inv_custlip_id !== item.inv_custlip_id);
-                            this.item = {};
-                            Swal.fire('Deleted!', 'InvCustlip has been deleted.', 'success');
-                        },
-                        error: (error) => {
-                            Swal.fire('Error', 'Failed to delete InvCustlip', 'error');
-                            console.error('Error deleting InvCustlip:', error);
-                        }
+                Promise.all(deletePromises)
+                    .then(() => {
+                        this.loadAssets();
+                        this.selectedAssets = null;
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Assets deleted successfully',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting assets:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to delete assets. Please try again.',
+                            confirmButtonColor: '#EF4444'
+                        });
                     });
-                }
             }
         });
     }
 
     hideDialog() {
-        this.itemDialog = false;
+        this.assetDialog = false;
         this.submitted = false;
-        this.saving = false;
     }
 
-    saveItem() {
-        this.submitted = true;
-
-        if (this.item.PropertyNo?.trim()) {
-            this.saving = true;
-
-            if (this.item.inv_custlip_id) {
-                // Update existing item
-                this.assetService.updateInvCustlip(this.item.inv_custlip_id, this.item).subscribe({
-                    next: (updatedItem) => {
-                        const index = this.invCustlips.findIndex((val) => val.inv_custlip_id === this.item.inv_custlip_id);
-                        if (index > -1) {
-                            this.invCustlips[index] = updatedItem;
-                        }
-                        Swal.fire('Success', 'InvCustlip updated successfully!', 'success');
-                        this.itemDialog = false;
-                        this.item = {};
-                        this.saving = false;
+    deleteAsset(asset: Asset) {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to delete ' + asset.AssetName + '?',
+            header: 'Confirm',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.assetService.deleteAsset(asset.id!).subscribe({
+                    next: () => {
+                        this.loadAssets();
+                        this.asset = {};
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Asset deleted successfully',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
                     },
                     error: (error) => {
-                        Swal.fire('Error', 'Failed to update InvCustlip', 'error');
-                        console.error('Error updating InvCustlip:', error);
-                        this.saving = false;
-                    }
-                });
-            } else {
-                // Create new item
-                this.assetService.createInvCustlip(this.item).subscribe({
-                    next: (newItem) => {
-                        this.invCustlips.push(newItem);
-                        Swal.fire('Success', 'InvCustlip created successfully!', 'success');
-                        this.itemDialog = false;
-                        this.item = {};
-                        this.saving = false;
-                    },
-                    error: (error) => {
-                        Swal.fire('Error', 'Failed to create InvCustlip', 'error');
-                        console.error('Error creating InvCustlip:', error);
-                        this.saving = false;
+                        console.error('Error deleting asset:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to delete asset. Please try again.',
+                            confirmButtonColor: '#EF4444'
+                        });
                     }
                 });
             }
+        });
+    }
+
+    generatePropertyNo(): string {
+        const prefix = 'PROP';
+        const timestamp = new Date().getTime().toString().slice(-6);
+        return prefix + timestamp;
+    }
+
+    generateQrCode(): string {
+        const timestamp = new Date().getTime().toString();
+        const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+        return 'QR' + random + timestamp.slice(-4);
+    }
+
+    getStatusSeverity(status: string) {
+        switch (status) {
+            case 'ACTIVE':
+                return 'success';
+            case 'MAINTENANCE':
+                return 'warn';
+            case 'DISPOSED':
+                return 'danger';
+            case 'LOST':
+                return 'danger';
+            default:
+                return 'info';
         }
     }
 
-    onGlobalFilter(table: any, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    onQrCodeSelect(event: any) {
+        const file = event.files[0];
+        if (file) {
+            // Check if file is an image
+            if (!file.type.startsWith('image/')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid File Type',
+                    text: 'Please select an image file for QR Code.',
+                    confirmButtonColor: '#EF4444'
+                });
+                return;
+            }
+
+            // Check file size (max 1MB)
+            if (file.size > 1000000) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Too Large',
+                    text: 'QR Code image must be less than 1MB.',
+                    confirmButtonColor: '#EF4444'
+                });
+                return;
+            }
+
+            // Convert to base64
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+                this.asset.QrCode = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
-    getBrandName(brandId: string | undefined): string {
-        if (!brandId) return '';
-        const brand = this.brands.find((b) => b.brand_id === brandId);
-        return brand ? brand.BrandName || '' : '';
+    removeQrCode() {
+        this.asset.QrCode = '';
     }
 
-    getColorCode(colorId: string | undefined): string {
-        if (!colorId) return '#ffffff';
-        const color = this.colors.find((c) => c.color_id === colorId);
-        return color ? color.ColorCode || '#ffffff' : '#ffffff';
+    viewQrCode(qrCodeData: string) {
+        if (qrCodeData) {
+            this.selectedQrCode = qrCodeData;
+            this.qrCodeViewerDialog = true;
+        }
     }
 
-    getColorDescription(colorId: string | undefined): string {
-        if (!colorId) return '';
-        const color = this.colors.find((c) => c.color_id === colorId);
-        return color ? color.Description || '' : '';
+    closeQrCodeViewer() {
+        this.qrCodeViewerDialog = false;
+        this.selectedQrCode = '';
+    }
+
+    downloadQrCode() {
+        if (this.selectedQrCode) {
+            // Create a temporary anchor element to trigger download
+            const link = document.createElement('a');
+            link.href = this.selectedQrCode;
+            link.download = `qr-code-${new Date().getTime()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Downloaded!',
+                text: 'QR Code image has been downloaded.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    }
+
+    saveAsset() {
+        this.submitted = true;
+
+        if (!this.asset.PropertyNo?.trim() || !this.asset.AssetName?.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Property No and Asset Name are required fields.',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        // Generate PropertyNo if creating new asset
+        if (!this.asset.id) {
+            this.asset.PropertyNo = this.generatePropertyNo();
+        }
+
+        const saveOperation = this.asset.id ? this.assetService.updateAsset(this.asset.id, this.asset) : this.assetService.createAsset(this.asset);
+
+        saveOperation.subscribe({
+            next: () => {
+                this.loadAssets();
+                this.assetDialog = false;
+                this.asset = {};
+                this.submitted = false;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: this.asset.id ? 'Asset updated successfully' : 'Asset created successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            },
+            error: (error) => {
+                console.error('Error saving asset:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to save asset. Please try again.',
+                    confirmButtonColor: '#EF4444'
+                });
+            }
+        });
+    }
+
+    openInvCustlipDialog(asset: Asset) {
+        this.invCustlip = {
+            PropertyNo: asset.PropertyNo
+        };
+        this.submittedInv = false;
+        this.invCustlipDialog = true;
+    }
+
+    hideInvCustlipDialog() {
+        this.invCustlipDialog = false;
+        this.submittedInv = false;
+    }
+
+    saveInvCustlip() {
+        this.submittedInv = true;
+
+        if (!this.invCustlip.PropertyNo?.trim() || !this.invCustlip.Description?.trim() || !this.invCustlip.Quantity || !this.invCustlip.UoM?.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Property No, Description, Quantity, and Unit of Measure are required fields.',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        const saveOperation = this.invCustlip.inv_custlip_id ? this.assetService.updateInvCustlip(this.invCustlip.inv_custlip_id, this.invCustlip) : this.assetService.createInvCustlip(this.invCustlip);
+
+        saveOperation.subscribe({
+            next: () => {
+                this.invCustlipDialog = false;
+                this.invCustlip = {};
+                this.submittedInv = false;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: this.invCustlip.inv_custlip_id ? 'InvCustlip updated successfully' : 'InvCustlip created successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            },
+            error: (error) => {
+                console.error('Error saving InvCustlip:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to save InvCustlip. Please try again.',
+                    confirmButtonColor: '#EF4444'
+                });
+            }
+        });
     }
 }
