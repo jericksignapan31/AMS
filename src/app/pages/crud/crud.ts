@@ -17,7 +17,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { TooltipModule } from 'primeng/tooltip';
-import { Asset, AssetService } from '../service/asset.service';
+import { Asset, AssetService, Location, Supplier, Program, Status } from '../service/asset.service';
 import Swal from 'sweetalert2';
 
 interface Column {
@@ -176,16 +176,16 @@ interface ExportColumn {
                         <input type="text" pInputText id="foundCluster" [(ngModel)]="asset.FoundCluster" fluid />
                     </div>
                     <div class="col-span-6">
-                        <label for="locationId" class="block font-bold mb-2">Location ID</label>
-                        <input type="text" pInputText id="locationId" [(ngModel)]="asset.Location_id" fluid />
+                        <label for="locationId" class="block font-bold mb-2">Location</label>
+                        <p-select id="locationId" [(ngModel)]="asset.Location_id" [options]="locations" optionLabel="LocationName" optionValue="id" placeholder="Select a location" fluid> </p-select>
                     </div>
                     <div class="col-span-6">
-                        <label for="supplierId" class="block font-bold mb-2">Supplier ID</label>
-                        <input type="text" pInputText id="supplierId" [(ngModel)]="asset.Supplier_id" fluid />
+                        <label for="supplierId" class="block font-bold mb-2">Supplier</label>
+                        <p-select id="supplierId" [(ngModel)]="asset.Supplier_id" [options]="suppliers" optionLabel="SupplierName" optionValue="id" placeholder="Select a supplier" fluid> </p-select>
                     </div>
                     <div class="col-span-6">
-                        <label for="programId" class="block font-bold mb-2">Program ID</label>
-                        <input type="text" pInputText id="programId" [(ngModel)]="asset.Program_id" fluid />
+                        <label for="programId" class="block font-bold mb-2">Program</label>
+                        <p-select id="programId" [(ngModel)]="asset.Program_id" [options]="programs" optionLabel="ProgramName" optionValue="id" placeholder="Select a program" fluid> </p-select>
                     </div>
                     <div class="col-span-12">
                         <label for="purpose" class="block font-bold mb-2">Purpose</label>
@@ -201,7 +201,7 @@ interface ExportColumn {
                     </div>
                     <div class="col-span-6">
                         <label for="status" class="block font-bold mb-2">Status</label>
-                        <p-select [(ngModel)]="asset.Status_id" inputId="status" [options]="statuses" optionLabel="label" optionValue="value" placeholder="Select Status" fluid />
+                        <p-select [(ngModel)]="asset.Status_id" inputId="status" [options]="statusOptions" optionLabel="StatusName" optionValue="id" placeholder="Select Status" fluid />
                     </div>
                     <div class="col-span-6">
                         <label for="active" class="block font-bold mb-2">Active</label>
@@ -257,6 +257,12 @@ export class Crud implements OnInit {
     statuses: any[] = [];
     categories: any[] = [];
     activeOptions: any[] = [];
+
+    // Reference data for dropdowns
+    locations: Location[] = [];
+    suppliers: Supplier[] = [];
+    programs: Program[] = [];
+    statusOptions: Status[] = [];
 
     @ViewChild('dt') dt!: Table;
 
@@ -317,6 +323,9 @@ export class Crud implements OnInit {
             { label: 'No', value: 'N' }
         ];
 
+        // Load reference data from API
+        this.loadReferenceData();
+
         this.cols = [
             { field: 'PropertyNo', header: 'Property No' },
             { field: 'AssetName', header: 'Asset Name' },
@@ -328,6 +337,48 @@ export class Crud implements OnInit {
         ];
 
         this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
+    }
+
+    loadReferenceData() {
+        // Load locations
+        this.assetService.getLocations().subscribe({
+            next: (data) => {
+                this.locations = data;
+            },
+            error: (error) => {
+                console.error('Error loading locations:', error);
+            }
+        });
+
+        // Load suppliers
+        this.assetService.getSuppliers().subscribe({
+            next: (data) => {
+                this.suppliers = data;
+            },
+            error: (error) => {
+                console.error('Error loading suppliers:', error);
+            }
+        });
+
+        // Load programs
+        this.assetService.getPrograms().subscribe({
+            next: (data) => {
+                this.programs = data;
+            },
+            error: (error) => {
+                console.error('Error loading programs:', error);
+            }
+        });
+
+        // Load statuses from API
+        this.assetService.getStatuses().subscribe({
+            next: (data) => {
+                this.statusOptions = data;
+            },
+            error: (error) => {
+                console.error('Error loading statuses:', error);
+            }
+        });
     }
 
     onGlobalFilter(table: Table, event: Event) {
