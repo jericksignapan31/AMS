@@ -74,6 +74,17 @@ export interface Brand {
     BrandName?: string;
 }
 
+export interface MaintenanceRequest {
+    maintenance_request_id?: string;
+    assets_id?: string;
+    RequestDate?: string;
+    IssueDescription?: string;
+    RequestedBy?: string;
+    Status?: string;
+    Priority?: string;
+    id?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -148,5 +159,10 @@ export class AssetService {
 
     getBrands(): Observable<Brand[]> {
         return this.http.get<Brand[]>(`${this.baseApiUrl}/brands`);
+    }
+
+    // Maintenance Request methods
+    createMaintenanceRequest(maintenanceRequest: MaintenanceRequest): Observable<MaintenanceRequest> {
+        return this.http.post<MaintenanceRequest>(`${this.baseApiUrl}/MaintenanceRequests`, maintenanceRequest);
     }
 }

@@ -318,5 +318,26 @@
       "InvNo": "asd",
       "DateAcquired": "2025-10-08"
     }
+  ],
+  "MaintenanceRequests": [
+    {
+      "maintenance_request_id": "mr001",
+      "assets_id": "3",
+      "RequestDate": "2024-06-15",
+      "IssueDescription": "Printer is not responding to print commands.",
+      "RequestedBy": "John Doe",
+      "Status": "Pending",
+      "Priority": "High",
+      "id": "e4f3"
+    },
+    {
+      "id": "f54b",
+      "assets_id": "6db5",
+      "RequestDate": "2025-10-09",
+      "RequestedBy": "Current User",
+      "Status": "Pending",
+      "Priority": "Low",
+      "IssueDescription": "guba ang heart"
+    }
   ]
 }

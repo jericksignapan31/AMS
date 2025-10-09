@@ -18,7 +18,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { Asset, AssetService, Location, Supplier, Program, Status, InvCustlip, Color, Brand } from '../service/asset.service';
+import { Asset, AssetService, Location, Supplier, Program, Status, InvCustlip, Color, Brand, MaintenanceRequest } from '../service/asset.service';
 import Swal from 'sweetalert2';
 
 interface Column {
@@ -149,7 +149,7 @@ interface ExportColumn {
                     </td>
                     <td>
                         <div class="flex align-items-center gap-2">
-                            <p-button icon="pi pi-plus" severity="success" [rounded]="true" [outlined]="true" (click)="openInvCustlipDialog(asset)" pTooltip="Add New InvCustlip" />
+                            <p-button icon="pi pi-wrench" severity="success" [rounded]="true" [outlined]="true" (click)="openMaintenanceRequest(asset)" pTooltip="Request repair" />
                             <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" (click)="editAsset(asset)" pTooltip="Edit Asset" />
                             <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteAsset(asset)" pTooltip="Delete Asset" />
                         </div>
@@ -364,6 +364,50 @@ interface ExportColumn {
             </ng-template>
         </p-dialog>
 
+        <!-- Maintenance Request Dialog -->
+        <p-dialog [(visible)]="maintenanceRequestDialog" [style]="{ width: '700px' }" header="Request Maintenance" [modal]="true">
+            <ng-template #content>
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-12 mb-4">
+                        <h5 class="text-lg font-semibold text-primary">Asset Information</h5>
+                        <div class="surface-50 p-3 border-round">
+                            <p><strong>Property No:</strong> {{ selectedAssetForMaintenance?.PropertyNo }}</p>
+                            <p><strong>Asset Name:</strong> {{ selectedAssetForMaintenance?.AssetName }}</p>
+                            <p><strong>Category:</strong> {{ selectedAssetForMaintenance?.Category }}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="requestDate" class="block font-bold mb-2">Request Date</label>
+                        <input type="date" pInputText id="requestDate" [(ngModel)]="maintenanceRequest.RequestDate" required fluid />
+                        <small class="text-red-500" *ngIf="submittedMaintenance && !maintenanceRequest.RequestDate">Request Date is required.</small>
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="priority" class="block font-bold mb-2">Priority</label>
+                        <p-select id="priority" [(ngModel)]="maintenanceRequest.Priority" [options]="priorityOptions" optionLabel="label" optionValue="value" placeholder="Select Priority" fluid />
+                        <small class="text-red-500" *ngIf="submittedMaintenance && !maintenanceRequest.Priority">Priority is required.</small>
+                    </div>
+
+                    <div class="col-span-12">
+                        <label for="issueDescription" class="block font-bold mb-2">Issue Description</label>
+                        <textarea id="issueDescription" pTextarea [(ngModel)]="maintenanceRequest.IssueDescription" rows="4" required fluid placeholder="Describe the issue in detail..."></textarea>
+                        <small class="text-red-500" *ngIf="submittedMaintenance && !maintenanceRequest.IssueDescription">Issue Description is required.</small>
+                    </div>
+
+                    <div class="col-span-12">
+                        <label for="requestedBy" class="block font-bold mb-2">Requested By</label>
+                        <input type="text" pInputText id="requestedBy" [(ngModel)]="maintenanceRequest.RequestedBy" required fluid readonly />
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #footer>
+                <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (click)="closeMaintenanceRequest()" />
+                <p-button label="Submit Request" icon="pi pi-check" (click)="saveMaintenanceRequest()" />
+            </ng-template>
+        </p-dialog>
+
         <p-dialog [(visible)]="invCustlipDialog" [style]="{ width: '800px' }" header="InvCustlip Details" [modal]="true">
             <ng-template #content>
                 <div class="grid grid-cols-12 gap-4">
@@ -432,17 +476,21 @@ export class Crud implements OnInit {
     qrCodeViewerDialog: boolean = false;
     invCustlipDialog: boolean = false;
     stepperDialog: boolean = false;
+    maintenanceRequestDialog: boolean = false;
 
     assets = signal<Asset[]>([]);
 
     asset: Asset = {};
     invCustlip: InvCustlip = {};
+    maintenanceRequest: MaintenanceRequest = {};
+    selectedAssetForMaintenance: Asset | null = null;
     selectedQrCode: string = '';
 
     selectedAssets: Asset[] | null = null;
 
     submitted: boolean = false;
     submittedInv: boolean = false;
+    submittedMaintenance: boolean = false;
 
     // Stepper properties
     currentStep: number = 0;
@@ -460,6 +508,12 @@ export class Crud implements OnInit {
     suppliers: Supplier[] = [];
     programs: Program[] = [];
     statusOptions: Status[] = [];
+    priorityOptions = [
+        { label: 'Low', value: 'Low' },
+        { label: 'Medium', value: 'Medium' },
+        { label: 'High', value: 'High' },
+        { label: 'Critical', value: 'Critical' }
+    ];
     colors: Color[] = [];
     brands: Brand[] = [];
 
@@ -793,6 +847,67 @@ export class Crud implements OnInit {
                 showConfirmButton: false
             });
         }
+    }
+
+    openMaintenanceRequest(asset: Asset) {
+        this.selectedAssetForMaintenance = asset;
+        this.maintenanceRequest = {
+            assets_id: String(asset.id),
+            RequestDate: new Date().toISOString().split('T')[0], // Today's date
+            RequestedBy: 'Current User', // You can get this from auth service
+            Status: 'Pending'
+        };
+        this.submittedMaintenance = false;
+        this.maintenanceRequestDialog = true;
+    }
+
+    closeMaintenanceRequest() {
+        this.maintenanceRequestDialog = false;
+        this.maintenanceRequest = {};
+        this.selectedAssetForMaintenance = null;
+        this.submittedMaintenance = false;
+    }
+
+    saveMaintenanceRequest() {
+        this.submittedMaintenance = true;
+
+        if (!this.maintenanceRequest.RequestDate || !this.maintenanceRequest.IssueDescription?.trim() || !this.maintenanceRequest.Priority) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Request Date, Issue Description, and Priority are required fields.',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        const saveOperation = this.assetService.createMaintenanceRequest(this.maintenanceRequest);
+
+        saveOperation.subscribe({
+            next: () => {
+                this.maintenanceRequestDialog = false;
+                this.maintenanceRequest = {};
+                this.selectedAssetForMaintenance = null;
+                this.submittedMaintenance = false;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Maintenance request has been submitted successfully.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            },
+            error: (error) => {
+                console.error('Error submitting maintenance request:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to submit maintenance request. Please try again.',
+                    confirmButtonColor: '#EF4444'
+                });
+            }
+        });
     }
 
     saveAsset() {
