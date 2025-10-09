@@ -137,31 +137,31 @@ interface ExportColumn {
                         <p-tableCheckbox [value]="invCustlip" />
                     </td>
                     <td style="width:12%; min-width:10rem;">
-                        <span class="p-column-title">Inventory No</span>
+                        <span class="p-column-title"></span>
                         {{ invCustlip.InvNo }}
                     </td>
                     <td style="width:14%; min-width:15rem;">
-                        <span class="p-column-title">Description</span>
+                        <span class="p-column-title"></span>
                         {{ invCustlip.Description }}
                     </td>
                     <td style="width:12%; min-width:8rem;">
-                        <span class="p-column-title">Quantity</span>
+                        <span class="p-column-title"></span>
                         {{ invCustlip.Quantity }}
                     </td>
                     <td style="width:10%; min-width:8rem;">
-                        <span class="p-column-title">UoM</span>
+                        <span class="p-column-title"></span>
                         {{ invCustlip.UoM }}
                     </td>
                     <td style="width:12%; min-width:10rem;">
-                        <span class="p-column-title">Brand</span>
+                        <span class="p-column-title"></span>
                         {{ getBrandName(invCustlip.brand_id) }}
                     </td>
                     <td style="width:12%; min-width:10rem;">
-                        <span class="p-column-title">Color</span>
+                        <span class="p-column-title"></span>
                         {{ getColorName(invCustlip.color_id) }}
                     </td>
                     <td style="width:14%; min-width:10rem;">
-                        <span class="p-column-title">Date Acquired</span>
+                        <span class="p-column-title"></span>
                         {{ invCustlip.DateAcquired }}
                     </td>
                     <td>

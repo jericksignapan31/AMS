@@ -88,7 +88,7 @@ export class AppMenu {
                     {
                         label: 'Request Maintenance',
                         icon: 'pi pi-fw pi-wrench',
-                        routerLink: ['/app/maintenance']
+                        routerLink: ['/app/requestmaintenance']
                     }
                     // {
                     //     label: 'Not Found',

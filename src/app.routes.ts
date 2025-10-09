@@ -8,6 +8,7 @@ import { Notfound } from './app/pages/notfound/notfound';
 import { AuthGuard } from './app/pages/auth/auth.guard';
 import { Crud } from './app/pages/crud/crud';
 import { CustodianComponent } from './app/pages/custodian/custodian';
+import { RequestmaintenanceComponent } from './app/pages/requestmaintenance/requestmaintenance/requestmaintenance.component';
 
 export const appRoutes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -22,10 +23,12 @@ export const appRoutes: Routes = [
             { path: 'dashboard', component: Dashboard },
             { path: 'crud', component: Crud },
             { path: 'custodian', component: CustodianComponent },
+            { path: 'requestmaintenance', component: RequestmaintenanceComponent },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },
+    { path: 'notfound', component: Notfound },
     { path: '**', redirectTo: '/notfound' }
 ];

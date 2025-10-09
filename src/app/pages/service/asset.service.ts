@@ -162,7 +162,23 @@ export class AssetService {
     }
 
     // Maintenance Request methods
+    getMaintenanceRequests(): Observable<MaintenanceRequest[]> {
+        return this.http.get<MaintenanceRequest[]>(`${this.baseApiUrl}/MaintenanceRequests`);
+    }
+
+    getMaintenanceRequest(id: string): Observable<MaintenanceRequest> {
+        return this.http.get<MaintenanceRequest>(`${this.baseApiUrl}/MaintenanceRequests/${id}`);
+    }
+
     createMaintenanceRequest(maintenanceRequest: MaintenanceRequest): Observable<MaintenanceRequest> {
         return this.http.post<MaintenanceRequest>(`${this.baseApiUrl}/MaintenanceRequests`, maintenanceRequest);
+    }
+
+    updateMaintenanceRequest(id: string, maintenanceRequest: MaintenanceRequest): Observable<MaintenanceRequest> {
+        return this.http.put<MaintenanceRequest>(`${this.baseApiUrl}/MaintenanceRequests/${id}`, maintenanceRequest);
+    }
+
+    deleteMaintenanceRequest(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseApiUrl}/MaintenanceRequests/${id}`);
     }
 }
