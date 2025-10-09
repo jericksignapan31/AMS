@@ -3,18 +3,41 @@ import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { FileUploadModule } from 'primeng/fileupload';
+import { AvatarModule } from 'primeng/avatar';
 import { Router } from '@angular/router';
 import { AssetService } from '../service/asset.service';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, CardModule, ButtonModule, InputTextModule],
+    imports: [CommonModule, CardModule, ButtonModule, InputTextModule, FileUploadModule, AvatarModule],
     template: `
         <div class="grid">
             <div class="col-12">
                 <div class="card">
                     <h5>User Profile</h5>
+
+                    <!-- Profile Image Section -->
+                    <div class="flex flex-column align-items-center mb-4" *ngIf="currentUser">
+                        <div class="relative">
+                            <img *ngIf="currentUser.profileImage; else defaultAvatar" [src]="currentUser.profileImage" alt="Profile" class="border-circle" style="width: 150px; height: 150px; object-fit: cover;" />
+                            <ng-template #defaultAvatar>
+                                <p-avatar [label]="getInitials()" size="xlarge" shape="circle" styleClass="text-2xl" style="width: 150px; height: 150px; font-size: 3rem;"> </p-avatar>
+                            </ng-template>
+
+                            <button type="button" class="p-button p-button-rounded p-button-sm absolute" style="bottom: 0; right: 0; width: 40px; height: 40px;" (click)="fileUpload.choose()" title="Upload Profile Picture">
+                                <i class="pi pi-camera"></i>
+                            </button>
+                        </div>
+
+                        <h4 class="mt-3 mb-1">{{ currentUser.FirstName }} {{ currentUser.LastName }}</h4>
+                        <p class="text-600 m-0">{{ currentUser.role }}</p>
+
+                        <p-fileUpload #fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" (onSelect)="onImageSelect($event)" [auto]="true" chooseLabel="Choose Image" [ngStyle]="{ display: 'none' }"></p-fileUpload>
+                    </div>
+
                     <div class="grid formgrid p-fluid" *ngIf="currentUser">
                         <div class="field col-12 md:col-6">
                             <label for="firstName">First Name</label>
@@ -71,6 +94,56 @@ export class ProfileComponent implements OnInit {
         this.loadCurrentUser();
     }
 
+    getInitials(): string {
+        if (!this.currentUser) return 'U';
+        const firstName = this.currentUser.FirstName || '';
+        const lastName = this.currentUser.LastName || '';
+        return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    }
+
+    onImageSelect(event: any) {
+        const file = event.files[0];
+        if (file) {
+            // Validate file size (1MB = 1000000 bytes)
+            if (file.size > 1000000) {
+                Swal.fire({
+                    title: 'File Too Large',
+                    text: 'Please select an image smaller than 1MB.',
+                    icon: 'error'
+                });
+                return;
+            }
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                Swal.fire({
+                    title: 'Invalid File Type',
+                    text: 'Please select a valid image file.',
+                    icon: 'error'
+                });
+                return;
+            }
+
+            // Convert to base64
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+                this.currentUser.profileImage = e.target.result;
+
+                // Save to localStorage
+                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Profile picture updated successfully.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
     loadCurrentUser() {
         // Get user from localStorage
         const userStr = localStorage.getItem('currentUser');
@@ -104,10 +177,10 @@ export class ProfileComponent implements OnInit {
     }
 
     editProfile() {
-        this.router.navigate(['/account']);
+        this.router.navigate(['/app/account']);
     }
 
     goBack() {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/app/dashboard']);
     }
 }

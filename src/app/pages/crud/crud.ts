@@ -145,7 +145,9 @@ interface ExportColumn {
                     <td>{{ asset.DateAcquired }}</td>
                     <td>
                         <img *ngIf="asset.QrCode" [src]="asset.QrCode" alt="QR Code" class="w-8 h-8 rounded border cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
-                        <span *ngIf="!asset.QrCode" class="text-muted-color text-sm">No QR Code</span>
+                        @if (!asset.QrCode) {
+                            <span class="text-muted-color text-sm">No QR Code</span>
+                        }
                     </td>
                     <td>
                         <div class="flex align-items-center gap-2">

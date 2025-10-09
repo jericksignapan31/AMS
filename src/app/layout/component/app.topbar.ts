@@ -384,11 +384,11 @@ export class AppTopbar {
     }
 
     navigateToProfile() {
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/app/profile']);
     }
 
     navigateToAccount() {
-        this.router.navigate(['/account']);
+        this.router.navigate(['/app/account']);
     }
 
     logout() {
