@@ -1,28 +1,129 @@
 {
   "users": [
     {
-      "user_id": "1",
-      "email": "admin@lams.com",
+      "user_id": "UID2025-10-15-123456",
+      "email": "superadmin@lams.com",
       "password": "admin123",
-      "name": "Admin User",
-      "role": "admin",
-      "id": "413a"
+      "FirstName": "Jerick",
+      "LastName": "Signapan",
+      "Department": "Admin",
+      "MobileNo": "09999991111",
+      "Campus": "Villanueva Campus",
+      "role": "Super Admin"
     },
     {
-      "user_id": "2",
-      "email": "user@lams.com",
-      "password": "user123",
-      "name": "Regular User",
-      "role": "user",
-      "id": "f182"
+      "user_id": "UID2025-10-15-123457",
+      "email": "campusadmin@lams.com",
+      "password": "admin123",
+      "FirstName": "Jerick",
+      "LastName": "Signapan",
+      "Department": "Admin",
+      "MobileNo": "09999991111",
+      "Campus": "Villanueva Campus",
+      "role": "Campus Admin"
     },
     {
-      "user_id": "3",
-      "email": "test@lams.com",
-      "password": "test123",
-      "name": "Test User",
-      "role": "user",
-      "id": "5b6f"
+      "user_id": "UID2025-10-15-123458",
+      "email": "faculty@lams.com",
+      "password": "admin123",
+      "FirstName": "Jerick",
+      "LastName": "Signapan",
+      "Department": "Admin",
+      "MobileNo": "09999991111",
+      "Campus": "Villanueva Campus",
+      "role": "Faculty"
+    },
+    {
+      "user_id": "UID2025-10-15-123459",
+      "email": "labtech@lams.com",
+      "password": "labtech123",
+      "FirstName": "jeth",
+      "LastName": "gwapo",
+      "Department": "Admin",
+      "MobileNo": "09999991111",
+      "Campus": "Villanueva Campus",
+      "role": "Labtech"
+    }
+  ],
+  "campus": [
+    {
+      "campus_id": "CAMP001",
+      "CampusName": "Villanueva Campus",
+      "Address": "Villanueva Misamis Oriental",
+      "ContactNumber": "(123) 456-7890",
+      "Email": "info@villanuevacampus.edu.ph"
+    },
+    {
+      "campus_id": "CAMP002",
+      "CampusName": "Jasaan Campus",
+      "Address": "Jasaan Misamis Oriental",
+      "ContactNumber": "(098) 765-4321",
+      "Email": "info@jasaan.edu.ph"
+    },
+    {
+      "campus_id": "CAMP003",
+      "CampusName": "Cdo Campus",
+      "Address": "Cagayan de Oro City, Misamis Oriental",
+      "ContactNumber": "(555) 123-4567",
+      "Email": "info@cagayandeoro.edu.ph"     
+    },
+    {
+      "campus_id": "CAMP004",
+      "CampusName": "Alubijid Campus",
+      "Address": "Alubijid Misamis Oriental",
+      "ContactNumber": "(800) 123-4567",
+      "Email": "info@alubijid.edu.ph"
+    },
+    {
+      "campus_id": "CAMP005",
+      "CampusName": "Oroquieta Campus",
+      "Address": "Oroquieta City, Misamis Occidental",
+      "ContactNumber": "(700) 123-4567",
+      "Email": "info@oroquieta.edu.ph"
+    },
+    {
+      "campus_id": "CAMP006",
+      "CampusName": "Panaon Campus",
+      "Address": "Ozamiz City, Misamis Occidental",
+      "ContactNumber": "(600) 123-4567",
+      "Email": "info@panaon.edu.ph"
+    },
+    {
+      "campus_id": "CAMP007",
+      "CampusName": "Claveria Campus",
+      "Address": "Claveria, Misamis Oriental",
+      "ContactNumber": "(400) 123-4567",
+      "Email": "info@claveria.edu.ph"
+    }
+  ],
+"departments": [
+    {
+      "department_id": "DEP001",
+      "DepartmentName": "Administration"
+    },
+    {
+      "department_id": "DEP002",
+      "DepartmentName": "HR Department"
+    },
+    {
+      "department_id": "DEP003",
+      "DepartmentName": "OSA Department"
+    },
+    {
+      "department_id": "DEP004",
+      "DepartmentName": "Registrar Department"
+    },
+    {
+      "department_id": "DEP005",
+      "DepartmentName": "Finance Department"
+    },
+    {
+      "department_id": "DEP006",
+      "DepartmentName": "Accounting Department"
+    },
+    {
+      "department_id": "DEP007",
+      "DepartmentName": "Library Department"
     }
   ],
   "assets": [

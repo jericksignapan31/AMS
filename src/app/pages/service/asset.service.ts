@@ -181,4 +181,13 @@ export class AssetService {
     deleteMaintenanceRequest(id: string): Observable<void> {
         return this.http.delete<void>(`${this.baseApiUrl}/MaintenanceRequests/${id}`);
     }
+
+    // User methods
+    getUsers(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.baseApiUrl}/users`);
+    }
+
+    getUserById(id: string): Observable<any> {
+        return this.http.get<any>(`${this.baseApiUrl}/users/${id}`);
+    }
 }

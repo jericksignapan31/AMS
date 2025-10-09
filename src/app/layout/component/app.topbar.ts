@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
+import { MenuModule } from 'primeng/menu';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AssetService } from '../../pages/service/asset.service';
@@ -16,7 +17,7 @@ import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, DialogModule, ButtonModule, AppConfigurator],
+    imports: [RouterModule, CommonModule, StyleClassModule, DialogModule, ButtonModule, MenuModule, AppConfigurator],
     template: ` <div class="layout-topbar">
             <div class="layout-topbar-logo-container">
                 <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -69,10 +70,12 @@ import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
                             <i class="pi pi-inbox"></i>
                             <span>Messages</span>
                         </button>
-                        <button type="button" class="layout-topbar-action">
+                        <button type="button" class="layout-topbar-action" (click)="showProfileMenu($event)" #profileMenuButton>
                             <i class="pi pi-user"></i>
-                            <span>Profile</span>
+                            <span>{{ currentUser?.FirstName || 'Profile' }}</span>
+                            <i class="pi pi-angle-down ml-2"></i>
                         </button>
+                        <p-menu #profileMenu [model]="profileMenuItems" [popup]="true"></p-menu>
                     </div>
                 </div>
             </div>
@@ -114,9 +117,11 @@ import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
 })
 export class AppTopbar {
     items!: MenuItem[];
+    profileMenuItems!: MenuItem[];
 
     // QR Scanner properties
     @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+    @ViewChild('profileMenu') profileMenu!: any;
     showQRScanner = false;
     hasPermission = false;
     scanResult: string | null = null;
@@ -127,6 +132,9 @@ export class AppTopbar {
 
     // PWA properties
     canInstallPWA = false;
+    
+    // Profile properties
+    currentUser: any = null;
 
     constructor(
         public layoutService: LayoutService,
@@ -139,6 +147,9 @@ export class AppTopbar {
         this.installPromptService.isInstallable.subscribe((canInstall) => {
             this.canInstallPWA = canInstall;
         });
+        
+        this.initializeProfileMenu();
+        this.loadCurrentUser();
     }
 
     toggleDarkMode() {
@@ -326,5 +337,82 @@ export class AppTopbar {
                 confirmButtonText: 'OK'
             });
         }
+    }
+
+    // Profile Menu Methods
+    initializeProfileMenu() {
+        this.profileMenuItems = [
+            {
+                label: 'Profile',
+                icon: 'pi pi-user',
+                command: () => this.navigateToProfile()
+            },
+            {
+                label: 'Account',
+                icon: 'pi pi-cog',
+                command: () => this.navigateToAccount()
+            },
+            {
+                separator: true
+            },
+            {
+                label: 'Logout',
+                icon: 'pi pi-sign-out',
+                command: () => this.logout()
+            }
+        ];
+    }
+
+    loadCurrentUser() {
+        // Get user from localStorage or service
+        const userStr = localStorage.getItem('currentUser');
+        if (userStr) {
+            this.currentUser = JSON.parse(userStr);
+        } else {
+            // Default user for demonstration - replace with actual auth service
+            this.currentUser = {
+                FirstName: 'Jerick',
+                LastName: 'Signapan',
+                Department: 'Admin',
+                role: 'Super Admin'
+            };
+        }
+    }
+
+    showProfileMenu(event: Event) {
+        this.profileMenu.toggle(event);
+    }
+
+    navigateToProfile() {
+        this.router.navigate(['/profile']);
+    }
+
+    navigateToAccount() {
+        this.router.navigate(['/account']);
+    }
+
+    logout() {
+        Swal.fire({
+            title: 'Logout Confirmation',
+            text: 'Are you sure you want to logout?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Logout',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('authToken');
+                this.router.navigate(['/auth/login']);
+                
+                Swal.fire({
+                    title: 'Logged Out',
+                    text: 'You have been successfully logged out.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
     }
 }
