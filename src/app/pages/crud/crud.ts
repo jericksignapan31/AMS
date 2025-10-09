@@ -17,6 +17,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { TooltipModule } from 'primeng/tooltip';
+import { MenuModule } from 'primeng/menu';
 
 import { Asset, AssetService, Location, Supplier, Program, Status, InvCustlip, Color, Brand, MaintenanceRequest } from '../service/asset.service';
 import Swal from 'sweetalert2';
@@ -49,6 +50,7 @@ interface ExportColumn {
         DialogModule,
         TagModule,
         InputIconModule,
+        MenuModule,
         IconFieldModule,
         ConfirmDialogModule,
         FileUploadModule,
@@ -81,6 +83,7 @@ interface ExportColumn {
             dataKey="id"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assets"
             [showCurrentPageReport]="true"
+            [expandedRowKeys]="expandedRows"
             [rowsPerPageOptions]="[10, 20, 30]"
         >
             <ng-template #caption>
@@ -97,6 +100,7 @@ interface ExportColumn {
                     <th style="width: 3rem">
                         <p-tableHeaderCheckbox />
                     </th>
+                    <th style="width: 4rem"></th>
                     <th pSortableColumn="PropertyNo" style="min-width: 10rem">
                         Property No
                         <p-sortIcon field="PropertyNo" />
@@ -129,27 +133,36 @@ interface ExportColumn {
                     <th style="min-width: 10rem">Actions</th>
                 </tr>
             </ng-template>
-            <ng-template #body let-asset>
-                <tr>
-                    <td style="width: 3rem">
+            <ng-template #body let-asset let-expanded="expanded">
+                <tr [ngClass]="{ 'row-selected': selectedRowId === asset.id, 'row-clickable': true, 'row-expanded': expanded }" (click)="onRowClick(asset, $event)" style="cursor: pointer; position: relative;">
+                    <td style="width: 3rem" (click)="$event.stopPropagation()">
                         <p-tableCheckbox [value]="asset" />
+                    </td>
+                    <td style="width: 4rem" (click)="$event.stopPropagation()">
+                        <p-button type="button" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" [text]="true" [rounded]="true" size="small" (onClick)="toggleRowExpansion(asset)" pTooltip="Click to view InvCustlips details" />
                     </td>
                     <td>{{ asset.PropertyNo }}</td>
                     <td>{{ asset.AssetName }}</td>
                     <td>{{ asset.Category }}</td>
                     <td>{{ asset.FoundCluster }}</td>
-                    <td>{{ asset.IssuedTo }}</td>
+                    <td>
+                        <div class="flex align-items-center gap-2">
+                            <span>{{ asset.IssuedTo || 'Not assigned' }}</span>
+                            <i class="pi pi-users text-primary cursor-pointer" pTooltip="Click row to assign custodian" *ngIf="!asset.IssuedTo"></i>
+                            <i class="pi pi-user-edit text-orange-500 cursor-pointer" pTooltip="Click row to change custodian" *ngIf="asset.IssuedTo"></i>
+                        </div>
+                    </td>
                     <td>
                         <p-tag [value]="asset.Status_id" [severity]="getStatusSeverity(asset.Status_id)" />
                     </td>
                     <td>{{ asset.DateAcquired }}</td>
-                    <td>
+                    <td (click)="$event.stopPropagation()">
                         <img *ngIf="asset.QrCode" [src]="asset.QrCode" alt="QR Code" class="w-8 h-8 rounded border cursor-pointer hover:opacity-75 transition-opacity" (click)="viewQrCode(asset.QrCode)" pTooltip="Click to view QR Code" />
                         @if (!asset.QrCode) {
                             <span class="text-muted-color text-sm">No QR Code</span>
                         }
                     </td>
-                    <td>
+                    <td (click)="$event.stopPropagation()">
                         <div class="flex align-items-center gap-2">
                             <p-button icon="pi pi-wrench" severity="success" [rounded]="true" [outlined]="true" (click)="openMaintenanceRequest(asset)" pTooltip="Request repair" />
                             <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" (click)="editAsset(asset)" pTooltip="Edit Asset" />
@@ -158,7 +171,85 @@ interface ExportColumn {
                     </td>
                 </tr>
             </ng-template>
+
+            <!-- Row Expansion Template for InvCustlips Details -->
+            <ng-template #rowexpansion let-asset>
+                <tr>
+                    <td colspan="11">
+                        <div class="p-4" style="background-color: var(--surface-50);">
+                            <h6 class="mb-3 text-primary">
+                                <i class="pi pi-list mr-2"></i>
+                                InvCustlips Details for {{ asset.AssetName }}
+                            </h6>
+
+                            <div *ngIf="getInvCustlipsForAsset(asset).length > 0; else noInvCustlips">
+                                <div class="grid gap-4">
+                                    <div *ngFor="let invCustlip of getInvCustlipsForAsset(asset); let i = index" class="col-12 md:col-6 lg:col-4">
+                                        <div class="card border-1 border-gray-200 h-full">
+                                            <div class="card-header bg-primary-50 p-3 border-bottom-1 border-200">
+                                                <h6 class="m-0 text-primary font-semibold">
+                                                    <i class="pi pi-box mr-2"></i>
+                                                    Item #{{ i + 1 }}
+                                                </h6>
+                                            </div>
+                                            <div class="card-body p-3">
+                                                <div class="grid gap-2 text-sm">
+                                                    <div class="col-12"><strong>Invoice No:</strong> {{ invCustlip.InvNo || 'N/A' }}</div>
+                                                    <div class="col-6"><strong>Quantity:</strong> {{ invCustlip.Quantity }}</div>
+                                                    <div class="col-6"><strong>UoM:</strong> {{ invCustlip.UoM }}</div>
+                                                    <div class="col-12"><strong>Description:</strong> {{ invCustlip.Description }}</div>
+                                                    <div class="col-6"><strong>Brand:</strong> {{ getBrandName(invCustlip.brand_id) }}</div>
+                                                    <div class="col-6">
+                                                        <strong>Color:</strong>
+                                                        <span class="inline-flex align-items-center gap-1">
+                                                            <span class="w-1rem h-1rem border-circle border-1 border-gray-300" [style.background-color]="getColorCode(invCustlip.color_id)"></span>
+                                                            {{ getColorName(invCustlip.color_id) }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-6"><strong>Height:</strong> {{ invCustlip.height }}</div>
+                                                    <div class="col-6"><strong>Width:</strong> {{ invCustlip.width }}</div>
+                                                    <div class="col-6"><strong>Package:</strong> {{ invCustlip.package }}</div>
+                                                    <div class="col-6"><strong>Material:</strong> {{ invCustlip.material }}</div>
+                                                    <div class="col-12"><strong>Date Acquired:</strong> {{ invCustlip.DateAcquired | date }}</div>
+
+                                                    <!-- Specs Section if available -->
+                                                    <div class="col-12" *ngIf="invCustlip.specs">
+                                                        <strong>Specifications:</strong>
+                                                        <div class="ml-2 mt-1" *ngFor="let spec of getSpecsArray(invCustlip.specs)">
+                                                            <small class="text-600">{{ spec.key }}:</small> {{ spec.value }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <ng-template #noInvCustlips>
+                                <div class="text-center p-4">
+                                    <i class="pi pi-info-circle text-4xl text-500 mb-3"></i>
+                                    <p class="text-600 m-0">No InvCustlips records found for this asset.</p>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
         </p-table>
+
+        <!-- Custodian Assignment Menu -->
+        <p-menu #custodianMenu [model]="custodianMenuItems" [popup]="true">
+            <ng-template #item let-item>
+                <div class="flex align-items-center gap-2 p-2" [ngClass]="item.styleClass">
+                    <i [class]="item.icon" *ngIf="item.icon"></i>
+                    <div class="flex flex-column">
+                        <span class="font-semibold">{{ item.label }}</span>
+                        <small class="text-600" *ngIf="item.detail">{{ item.detail }}</small>
+                    </div>
+                </div>
+            </ng-template>
+        </p-menu>
 
         <!-- Stepper Dialog for New Asset Creation -->
         <p-dialog [(visible)]="stepperDialog" [style]="{ width: '900px' }" header="Create New Asset & InvCustlip" [modal]="true" [closable]="false">
@@ -471,6 +562,36 @@ interface ExportColumn {
 
         <p-confirmdialog [style]="{ width: '450px' }" />
     `,
+    styles: [
+        `
+            .row-clickable:hover {
+                background-color: var(--highlight-bg) !important;
+                transition: background-color 0.2s;
+            }
+
+            .row-selected {
+                background-color: var(--primary-color-text) !important;
+                color: var(--primary-color) !important;
+            }
+
+            .current-custodian {
+                background-color: var(--green-50) !important;
+                color: var(--green-800) !important;
+            }
+
+            .unassign-option {
+                color: var(--red-600) !important;
+            }
+
+            .p-menu .p-menuitem-link:hover .current-custodian {
+                background-color: var(--green-100) !important;
+            }
+
+            .p-menu .p-menuitem-link:hover .unassign-option {
+                background-color: var(--red-50) !important;
+            }
+        `
+    ],
     providers: [MessageService, AssetService, ConfirmationService]
 })
 export class Crud implements OnInit {
@@ -518,8 +639,18 @@ export class Crud implements OnInit {
     ];
     colors: Color[] = [];
     brands: Brand[] = [];
+    invCustlips: InvCustlip[] = [];
+
+    // Custodian dropdown properties
+    custodians: any[] = [];
+    selectedRowId: number | string | null = null;
+    custodianMenuItems: any[] = [];
+
+    // Row expansion properties
+    expandedRows: { [key: string]: boolean } = {};
 
     @ViewChild('dt') dt!: Table;
+    @ViewChild('custodianMenu') custodianMenu!: any;
 
     exportColumns!: ExportColumn[];
 
@@ -538,6 +669,8 @@ export class Crud implements OnInit {
     ngOnInit() {
         this.loadAssets();
         this.initializeDropdowns();
+        this.loadCustodians();
+        this.loadInvCustlips();
     }
 
     loadAssets() {
@@ -553,6 +686,17 @@ export class Crud implements OnInit {
                     text: 'Failed to load assets. Please try again.',
                     confirmButtonColor: '#EF4444'
                 });
+            }
+        });
+    }
+
+    loadInvCustlips() {
+        this.assetService.getInvCustlips().subscribe({
+            next: (data) => {
+                this.invCustlips = data;
+            },
+            error: (error) => {
+                console.error('Error loading InvCustlips:', error);
             }
         });
     }
@@ -711,6 +855,164 @@ export class Crud implements OnInit {
     hideDialog() {
         this.assetDialog = false;
         this.submitted = false;
+    }
+
+    // Custodian-related methods
+    loadCustodians() {
+        this.assetService.getUsers().subscribe({
+            next: (users) => {
+                // Filter users who can be custodians (e.g., Faculty, Lab Tech, etc.)
+                this.custodians = users.filter((user) => user.role === 'Faculty' || user.role === 'Labtech' || user.role === 'Campus Admin' || user.role === 'Super Admin');
+            },
+            error: (error) => {
+                console.error('Error loading custodians:', error);
+            }
+        });
+    }
+
+    onRowClick(asset: Asset, event: Event) {
+        event.stopPropagation();
+
+        if (this.selectedRowId === asset.id) {
+            // If clicking the same row, hide the dropdown
+            this.selectedRowId = null;
+            return;
+        }
+
+        this.selectedRowId = asset.id!;
+
+        // Prepare custodian menu items
+        this.custodianMenuItems = this.custodians.map((custodian) => ({
+            label: `${custodian.FirstName} ${custodian.LastName}`,
+            detail: `${custodian.role} - ${custodian.Department}`,
+            icon: 'pi pi-user',
+            command: () => this.assignCustodian(asset, custodian)
+        }));
+
+        // Add separator and current assignment if exists
+        if (asset.IssuedTo) {
+            this.custodianMenuItems.unshift(
+                {
+                    label: `Currently assigned to: ${asset.IssuedTo}`,
+                    icon: 'pi pi-check-circle',
+                    disabled: true,
+                    styleClass: 'current-custodian'
+                },
+                { separator: true }
+            );
+        }
+
+        // Add unassign option
+        this.custodianMenuItems.push(
+            { separator: true },
+            {
+                label: 'Unassign Custodian',
+                icon: 'pi pi-times',
+                command: () => this.unassignCustodian(asset),
+                styleClass: 'unassign-option'
+            }
+        );
+
+        // Show the menu at the clicked position
+        setTimeout(() => {
+            if (this.custodianMenu) {
+                this.custodianMenu.toggle(event);
+            }
+        }, 50);
+    }
+
+    assignCustodian(asset: Asset, custodian: any) {
+        const custodianName = `${custodian.FirstName} ${custodian.LastName}`;
+
+        Swal.fire({
+            title: 'Assign Custodian',
+            text: `Assign ${custodianName} as custodian for ${asset.AssetName}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Assign',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Update the asset
+                const updatedAsset = { ...asset, IssuedTo: custodianName };
+
+                this.assetService.updateAsset(updatedAsset.id!, updatedAsset).subscribe({
+                    next: () => {
+                        // Update the local data
+                        const currentAssets = this.assets();
+                        const index = currentAssets.findIndex((a) => a.id === asset.id);
+                        if (index !== -1) {
+                            currentAssets[index] = updatedAsset;
+                            this.assets.set([...currentAssets]);
+                        }
+
+                        this.selectedRowId = null;
+
+                        Swal.fire({
+                            title: 'Success!',
+                            text: `${custodianName} has been assigned as custodian for ${asset.AssetName}`,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: (error) => {
+                        console.error('Error assigning custodian:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to assign custodian. Please try again.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    unassignCustodian(asset: Asset) {
+        Swal.fire({
+            title: 'Unassign Custodian',
+            text: `Remove custodian assignment from ${asset.AssetName}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Unassign',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Update the asset
+                const updatedAsset = { ...asset, IssuedTo: '' };
+
+                this.assetService.updateAsset(updatedAsset.id!, updatedAsset).subscribe({
+                    next: () => {
+                        // Update the local data
+                        const currentAssets = this.assets();
+                        const index = currentAssets.findIndex((a) => a.id === asset.id);
+                        if (index !== -1) {
+                            currentAssets[index] = updatedAsset;
+                            this.assets.set([...currentAssets]);
+                        }
+
+                        this.selectedRowId = null;
+
+                        Swal.fire({
+                            title: 'Success!',
+                            text: `Custodian has been unassigned from ${asset.AssetName}`,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: (error) => {
+                        console.error('Error unassigning custodian:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to unassign custodian. Please try again.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
     }
 
     deleteAsset(asset: Asset) {
@@ -1127,5 +1429,32 @@ export class Crud implements OnInit {
                 });
             }
         });
+    }
+
+    // Row expansion methods
+    toggleRowExpansion(asset: Asset) {
+        if (this.expandedRows[asset.id!]) {
+            delete this.expandedRows[asset.id!];
+        } else {
+            this.expandedRows[asset.id!] = true;
+        }
+    }
+
+    getInvCustlipsForAsset(asset: Asset): InvCustlip[] {
+        // Return all InvCustlips data from the database
+        // In a real application, you would filter by asset ID if there's a relationship
+        // For now, we'll show all InvCustlips since there's no direct relationship in the current schema
+        return this.invCustlips || [];
+    }
+
+    getColorCode(colorId?: string | number): string {
+        if (!colorId) return '#cccccc';
+        const color = this.colors.find((c: Color) => c.color_id === String(colorId));
+        return color?.ColorCode || '#cccccc';
+    }
+
+    getSpecsArray(specs: any): { key: string; value: any }[] {
+        if (!specs) return [];
+        return Object.keys(specs).map((key) => ({ key, value: specs[key] }));
     }
 }
