@@ -132,7 +132,7 @@ export class AppTopbar {
 
     // PWA properties
     canInstallPWA = false;
-    
+
     // Profile properties
     currentUser: any = null;
 
@@ -147,7 +147,7 @@ export class AppTopbar {
         this.installPromptService.isInstallable.subscribe((canInstall) => {
             this.canInstallPWA = canInstall;
         });
-        
+
         this.initializeProfileMenu();
         this.loadCurrentUser();
     }
@@ -404,7 +404,7 @@ export class AppTopbar {
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('authToken');
                 this.router.navigate(['/auth/login']);
-                
+
                 Swal.fire({
                     title: 'Logged Out',
                     text: 'You have been successfully logged out.',

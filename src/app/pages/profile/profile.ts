@@ -49,7 +49,7 @@ import { AssetService } from '../service/asset.service';
                             <input pInputText id="userId" type="text" [value]="currentUser.user_id" readonly />
                         </div>
                     </div>
-                    
+
                     <div class="flex gap-2">
                         <p-button label="Edit Profile" icon="pi pi-pencil" (onClick)="editProfile()" />
                         <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" (onClick)="goBack()" />
