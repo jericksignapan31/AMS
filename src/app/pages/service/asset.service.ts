@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Asset {
     id?: number;
@@ -89,8 +90,8 @@ export interface MaintenanceRequest {
     providedIn: 'root'
 })
 export class AssetService {
-    private apiUrl = 'http://localhost:3001/assets';
-    private baseApiUrl = 'http://localhost:3001';
+    private apiUrl = `${environment.apiUrl}/assets`;
+    private baseApiUrl = environment.apiUrl;
 
     constructor(private http: HttpClient) {}
 

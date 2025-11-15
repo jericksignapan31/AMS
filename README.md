@@ -1,6 +1,12 @@
-# Sakai19
+# Sakai-ng - Asset Management System
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.5.
+
+## Prerequisites
+
+- Node.js and npm
+- Angular CLI (`npm install -g @angular/cli`)
+- NestJS Backend (required for data persistence and authentication)
 
 ## Development server
 
@@ -11,6 +17,17 @@ ng serve
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+**Note:** This application requires a NestJS backend running on `http://localhost:3000`. See [NESTJS-INTEGRATION-GUIDE.md](./NESTJS-INTEGRATION-GUIDE.md) for backend setup instructions.
+
+## Environment Configuration
+
+The application uses environment files for configuration:
+
+- `src/environments/environment.development.ts` - Development environment
+- `src/environments/environment.ts` - Production environment
+
+Default API URL is set to `http://localhost:3000/api`
 
 ## Code scaffolding
 

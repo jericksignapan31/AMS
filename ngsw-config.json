@@ -30,29 +30,15 @@
   ],
   "dataGroups": [
     {
-      "name": "api-assets",
+      "name": "api-cache",
       "urls": [
-        "http://localhost:3001/assets",
-        "http://localhost:3000/assets"
+        "http://localhost:3000/api/**"
       ],
       "cacheConfig": {
         "strategy": "freshness",
         "maxSize": 100,
         "maxAge": "1h",
         "timeout": "10s"
-      }
-    },
-    {
-      "name": "api-users",
-      "urls": [
-        "http://localhost:3001/users",
-        "http://localhost:3000/users"
-      ],
-      "cacheConfig": {
-        "strategy": "freshness",
-        "maxSize": 20,
-        "maxAge": "30m",
-        "timeout": "5s"
       }
     }
   ]

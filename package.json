@@ -7,8 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "format": "prettier --write \"**/*.{js,mjs,ts,mts,d.ts,html}\" --cache",
-    "test": "ng test",
-    "json-server": "json-server --watch db.json --port 3000"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
@@ -26,7 +25,6 @@
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
     "chart.js": "4.4.2",
-    "json-server": "^1.0.0-beta.3",
     "primeclt": "^0.1.5",
     "primeicons": "^7.0.0",
     "primeng": "^20",
