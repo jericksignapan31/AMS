@@ -5,7 +5,7 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { SelectModule } from 'primeng/select';
+import { Select } from 'primeng/select';
 import { FileUploadModule } from 'primeng/fileupload';
 import { AvatarModule } from 'primeng/avatar';
 import { DividerModule } from 'primeng/divider';
@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 @Component({
     selector: 'app-account',
     standalone: true,
-    imports: [CommonModule, FormsModule, CardModule, ButtonModule, InputTextModule, PasswordModule, SelectModule, FileUploadModule, AvatarModule, DividerModule],
+    imports: [CommonModule, FormsModule, CardModule, ButtonModule, InputTextModule, PasswordModule, Select, FileUploadModule, AvatarModule, DividerModule],
     template: `
         <div class="grid">
             <!-- Header Section -->

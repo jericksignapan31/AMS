@@ -80,11 +80,11 @@ export class AppMenu {
                         icon: 'pi pi-fw pi-pencil',
                         routerLink: ['/app/crud']
                     },
-                    {
-                        label: 'Custodian',
-                        icon: 'pi pi-fw pi-users',
-                        routerLink: ['/app/custodian']
-                    },
+                    // {
+                    //     label: 'Custodian',
+                    //     icon: 'pi pi-fw pi-users',
+                    //     routerLink: ['/app/custodian']
+                    // },
                     {
                         label: 'Request Maintenance',
                         icon: 'pi pi-fw pi-wrench',

@@ -4,11 +4,16 @@ import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 export interface User {
-    id: number;
+    user_id: string;
     email: string;
     password: string;
-    name: string;
+    FirstName: string;
+    LastName: string;
+    Department: string;
+    MobileNo: string;
+    Campus: string;
     role: string;
+    profileImage?: string;
 }
 
 export interface LoginResponse {

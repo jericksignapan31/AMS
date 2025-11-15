@@ -82,7 +82,7 @@ export class Login {
                     Swal.fire({
                         icon: 'success',
                         title: 'Login Successful!',
-                        text: `Welcome back, ${response.user?.name || 'User'}!`,
+                        text: `Welcome back, ${response.user?.FirstName || 'User'}!`,
                         timer: 2000,
                         showConfirmButton: false,
                         confirmButtonColor: '#10B981'

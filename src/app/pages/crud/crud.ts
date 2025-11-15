@@ -85,14 +85,20 @@ interface ExportColumn {
             [showCurrentPageReport]="true"
             [expandedRowKeys]="expandedRows"
             [rowsPerPageOptions]="[10, 20, 30]"
+            (onRowExpand)="onRowExpand($event)"
+            (onRowCollapse)="onRowCollapse($event)"
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
                     <h5 class="m-0">assets Management</h5>
-                    <p-iconfield>
-                        <p-inputicon styleClass="pi pi-search" />
-                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search assets..." />
-                    </p-iconfield>
+                    <div class="flex items-center gap-2">
+                        <p-button label="Expand All" icon="pi pi-plus" text (onClick)="expandAll()" />
+                        <p-button label="Collapse All" icon="pi pi-minus" text (onClick)="collapseAll()" />
+                        <p-iconfield>
+                            <p-inputicon styleClass="pi pi-search" />
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search assets..." />
+                        </p-iconfield>
+                    </div>
                 </div>
             </ng-template>
             <ng-template #header>
@@ -139,7 +145,7 @@ interface ExportColumn {
                         <p-tableCheckbox [value]="asset" />
                     </td>
                     <td style="width: 4rem" (click)="$event.stopPropagation()">
-                        <p-button type="button" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" [text]="true" [rounded]="true" size="small" (onClick)="toggleRowExpansion(asset)" pTooltip="Click to view InvCustlips details" />
+                        <p-button type="button" pRipple [pRowToggler]="asset" [text]="true" severity="secondary" [rounded]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" pTooltip="Click to view InvCustlips details" />
                     </td>
                     <td>{{ asset.PropertyNo }}</td>
                     <td>{{ asset.AssetName }}</td>
@@ -173,7 +179,7 @@ interface ExportColumn {
             </ng-template>
 
             <!-- Row Expansion Template for InvCustlips Details -->
-            <ng-template #rowexpansion let-asset>
+            <ng-template #expandedrow let-asset>
                 <tr>
                     <td colspan="11">
                         <div class="p-4" style="background-color: var(--surface-50);">
@@ -1391,13 +1397,17 @@ export class Crud implements OnInit {
             next: (assetResponse) => {
                 console.log('Asset created successfully', assetResponse);
 
+                // Link InvCustlip to Asset by setting InvNo to match PropertyNo
+                this.stepperData.invCustlip.InvNo = this.stepperData.asset.PropertyNo;
+
                 // Now save InvCustlip
                 this.assetService.createInvCustlip(this.stepperData.invCustlip).subscribe({
                     next: (invCustlipResponse) => {
                         console.log('InvCustlip created successfully', invCustlipResponse);
 
-                        // Reload assets and close stepper
+                        // Reload assets and InvCustlips, then close stepper
                         this.loadAssets();
+                        this.loadInvCustlips();
                         this.closeStepper();
 
                         Swal.fire({
@@ -1431,20 +1441,36 @@ export class Crud implements OnInit {
         });
     }
 
-    // Row expansion methods
-    toggleRowExpansion(asset: Asset) {
-        if (this.expandedRows[asset.id!]) {
-            delete this.expandedRows[asset.id!];
-        } else {
-            this.expandedRows[asset.id!] = true;
-        }
+    // Row expansion event handlers
+    onRowExpand(event: any) {
+        console.log('Row expanded:', event.data);
+    }
+
+    onRowCollapse(event: any) {
+        console.log('Row collapsed:', event.data);
+    }
+
+    expandAll() {
+        this.expandedRows = {};
+        this.assets().forEach((asset) => {
+            if (asset.id) {
+                this.expandedRows[asset.id] = true;
+            }
+        });
+    }
+
+    collapseAll() {
+        this.expandedRows = {};
     }
 
     getInvCustlipsForAsset(asset: Asset): InvCustlip[] {
-        // Return all InvCustlips data from the database
-        // In a real application, you would filter by asset ID if there's a relationship
-        // For now, we'll show all InvCustlips since there's no direct relationship in the current schema
-        return this.invCustlips || [];
+        // Filter InvCustlips that belong to this specific asset
+        // Match PropertyNo from asset with InvNo from InvCustlip
+        if (!this.invCustlips || !asset.PropertyNo) {
+            return [];
+        }
+
+        return this.invCustlips.filter((invCustlip) => invCustlip.InvNo === asset.PropertyNo);
     }
 
     getColorCode(colorId?: string | number): string {

@@ -128,6 +128,7 @@
   ],
   "assets": [
     {
+      "id": "3",
       "assets_id": "3",
       "PropertyNo": "PROP003",
       "Category": "IT Equipment",
@@ -141,11 +142,11 @@
       "IssuedTo": "Jerick Signapan",
       "Status_id": "ACTIVE",
       "Active": "Y",
-      "QrCode": "QR003PRINTER2024",
-      "id": "6db5"
+      "QrCode": "QR003PRINTER2024"
     },
     {
       "id": "8bcc",
+      "assets_id": "8bcc",
       "PropertyNo": "asdasd",
       "Category": "Hardware",
       "AssetName": "asdasd",
@@ -163,10 +164,10 @@
   ],
   "locations": [
     {
+      "id": "LOC001",
       "location_id": "LOC001",
       "LocationName": "Main Office",
-      "Description": "Primary location for administrative tasks and meetings.",
-      "id": "b9b4"
+      "Description": "Primary location for administrative tasks and meetings."
     },
     {
       "id": "LOC002",
@@ -174,10 +175,10 @@
       "Description": "Room designated for storing equipment and supplies."
     },
     {
+      "id": "LOC003",
       "location_id": "LOC003",
       "LocationName": "Laboratory A",
-      "Description": "Main laboratory for conducting experiments and research.",
-      "id": "c2ff"
+      "Description": "Main laboratory for conducting experiments and research."
     }
   ],
   "suppliers": [
@@ -342,7 +343,7 @@
       "inv_custlip_id": "inv001",
       "Quantity": "5",
       "UoM": "pieces",
-      "Description": "Invoice",
+      "Description": "Invoice for HP Printer LaserJet Pro",
       "brand_id": "brd001",
       "specs": {
         "CPU": "Intel i7",
@@ -354,50 +355,50 @@
       "width": "10 inches",
       "package": "Box",
       "material": "Plastic",
-      "InvNo": "INV123456",
-      "DateAcquired": "2023-01-15",
+      "InvNo": "PROP003",
+      "DateAcquired": "2024-03-05",
       "id": "0afb"
     },
     {
       "id": "6d6a",
-      "Quantity": 1,
-      "UoM": "2",
+      "Quantity": "1",
+      "UoM": "pieces",
       "color_id": "clr001",
-      "Description": "as",
+      "Description": "Related to asdasd asset",
       "brand_id": "brd002",
-      "height": 12,
+      "height": "12",
       "package": "box",
-      "width": 0.04,
-      "InvNo": "1122",
+      "width": "0.04",
+      "InvNo": "asdasd",
       "material": "metal",
-      "DateAcquired": "2025-10-08"
+      "DateAcquired": "2025-10-09"
     },
     {
       "id": "2e52",
       "color_id": "clr002",
-      "Quantity": 2,
-      "UoM": "sadsa",
-      "Description": "asdsa",
+      "Quantity": "2",
+      "UoM": "pieces",
+      "Description": "Sample inventory item",
       "brand_id": "brd002",
       "height": "231",
-      "package": "asdsa",
+      "package": "box",
       "width": "123",
-      "material": "asd",
-      "InvNo": "asd",
+      "material": "plastic",
+      "InvNo": "SAMPLE001",
       "DateAcquired": "2025-10-08"
     },
     {
       "id": "c9eb",
-      "Quantity": 2,
-      "UoM": "sadsa",
+      "Quantity": "2",
+      "UoM": "pieces",
       "color_id": "clr002",
-      "Description": "asdas",
+      "Description": "Another sample inventory",
       "brand_id": "brd001",
       "height": "23",
-      "package": "2",
+      "package": "box",
       "width": "123",
-      "InvNo": "asd",
-      "material": "asdas",
+      "InvNo": "SAMPLE002",
+      "material": "metal",
       "DateAcquired": "2025-10-09"
     }
   ],
