@@ -19,9 +19,8 @@ export interface User {
 }
 
 export interface LoginResponse {
-    success: boolean;
-    user?: User;
-    message?: string;
+    access_token: string;
+    user: Omit<User, 'password'>;
 }
 
 @Injectable({
@@ -33,17 +32,16 @@ export class AuthService {
 
     constructor(private http: HttpClient) {}
 
-    login(email: string, password: string): Observable<LoginResponse> {
+    login(email: string, password: string): Observable<{ success: boolean; user?: User; message?: string }> {
         return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
             map((response) => {
-                if (response.success && response.user) {
-                    this.currentUser = response.user;
+                if (response.user && response.access_token) {
+                    this.currentUser = response.user as User;
                     localStorage.setItem('currentUser', JSON.stringify(response.user));
-                    if (response.user.token) {
-                        localStorage.setItem('token', response.user.token);
-                    }
+                    localStorage.setItem('token', response.access_token);
+                    return { success: true, user: response.user as User };
                 }
-                return response;
+                return { success: false, message: 'Login failed' };
             }),
             catchError((error) => {
                 console.error('Login error:', error);
