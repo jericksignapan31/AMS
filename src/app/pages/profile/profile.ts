@@ -7,75 +7,136 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { AvatarModule } from 'primeng/avatar';
 import { Router } from '@angular/router';
 import { AssetService } from '../service/asset.service';
+import { DividerModule } from 'primeng/divider';
 import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, CardModule, ButtonModule, InputTextModule, FileUploadModule, AvatarModule],
+    imports: [CommonModule, CardModule, ButtonModule, InputTextModule, FileUploadModule, AvatarModule, DividerModule],
+    styleUrls: ['../../../assets/layout/_profile.scss'],
     template: `
-        <div class="grid">
-            <div class="col-12">
-                <div class="card">
-                    <h5>User Profile</h5>
+        <div class="profile-container">
+            <!-- Background Header Section -->
+            <div class="profile-header-bg" [style.backgroundImage]="'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
+                <button type="button" class="p-button p-button-rounded p-button-text absolute" style="top: 1rem; right: 1rem; color: white;" title="Edit Cover" (click)="editCover()">
+                    <i class="pi pi-camera"></i>
+                </button>
+            </div>
 
-                    <!-- Profile Image Section -->
-                    <div class="flex flex-column align-items-center mb-4" *ngIf="currentUser">
-                        <div class="relative">
-                            <img *ngIf="currentUser.profileImage; else defaultAvatar" [src]="currentUser.profileImage" alt="Profile" class="border-circle" style="width: 150px; height: 150px; object-fit: cover;" />
-                            <ng-template #defaultAvatar>
-                                <p-avatar [label]="getInitials()" size="xlarge" shape="circle" styleClass="text-2xl" style="width: 150px; height: 150px; font-size: 3rem;"> </p-avatar>
-                            </ng-template>
+            <!-- Profile Info Section -->
+            <div class="profile-info-section">
+                <div class="profile-picture-container">
+                    <img *ngIf="currentUser?.profileImage; else defaultAvatar" [src]="currentUser.profileImage" alt="Profile" class="profile-picture" />
+                    <ng-template #defaultAvatar>
+                        <p-avatar [label]="getInitials()" shape="circle" styleClass="profile-picture-avatar"></p-avatar>
+                    </ng-template>
+                    <button type="button" class="p-button p-button-rounded p-button-sm camera-btn" (click)="fileUpload.choose()" title="Upload Profile Picture">
+                        <i class="pi pi-camera"></i>
+                    </button>
+                    <p-fileUpload #fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" (onSelect)="onImageSelect($event)" [auto]="true" chooseLabel="Choose Image" [ngStyle]="{ display: 'none' }"></p-fileUpload>
+                </div>
 
-                            <button type="button" class="p-button p-button-rounded p-button-sm absolute" style="bottom: 0; right: 0; width: 40px; height: 40px;" (click)="fileUpload.choose()" title="Upload Profile Picture">
-                                <i class="pi pi-camera"></i>
-                            </button>
+                <div class="profile-name-section">
+                    <h1 class="profile-name">{{ currentUser?.FirstName }} {{ currentUser?.LastName }}</h1>
+                    <p class="profile-role">{{ currentUser?.role }}</p>
+                    <p class="profile-bio">{{ currentUser?.Department }} • {{ currentUser?.Campus }}</p>
+                </div>
+            </div>
+
+            <!-- Main Content - Two Column Layout -->
+            <div style="gap: 1.5rem;">
+                <!-- Left Column - User Details -->
+                <div class="col-12 lg:col-8">
+                    <div class="card profile-card mt-2.5">
+                        <div class="card-header">
+                            <h5 class="m-0"><i class="pi pi-user mr-2"></i>Personal Information</h5>
+                        </div>
+                        <p-divider></p-divider>
+
+                        <div class="info-grid" *ngIf="currentUser">
+                            <div class="info-item">
+                                <label>First Name</label>
+                                <p>{{ currentUser.FirstName }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Last Name</label>
+                                <p>{{ currentUser.LastName }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Email</label>
+                                <p>{{ currentUser.email }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Mobile Number</label>
+                                <p>{{ currentUser.MobileNo }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Department</label>
+                                <p>{{ currentUser.Department }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Campus</label>
+                                <p>{{ currentUser.Campus }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Role</label>
+                                <p>{{ currentUser.role }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>User ID</label>
+                                <p>{{ currentUser.user_id }}</p>
+                            </div>
                         </div>
 
-                        <h4 class="mt-3 mb-1">{{ currentUser.FirstName }} {{ currentUser.LastName }}</h4>
-                        <p class="text-600 m-0">{{ currentUser.role }}</p>
-
-                        <p-fileUpload #fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" (onSelect)="onImageSelect($event)" [auto]="true" chooseLabel="Choose Image" [ngStyle]="{ display: 'none' }"></p-fileUpload>
+                        <!-- <div class="flex gap-2 mt-4">
+                            <p-button label="Edit Profile" icon="pi pi-pencil" (onClick)="editProfile()" />
+                            <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" (onClick)="goBack()" />
+                        </div> -->
                     </div>
+                </div>
 
-                    <div class="grid formgrid p-fluid" *ngIf="currentUser">
-                        <div class="field col-12 md:col-6">
-                            <label for="firstName">First Name</label>
-                            <input pInputText id="firstName" type="text" [value]="currentUser.FirstName" readonly />
+                <!-- Right Column - Account Settings -->
+                <div class="col-12 lg:col-4">
+                    <div class="card profile-card mt-2.5 ">
+                        <div class="card-header">
+                            <h5 class="m-0"><i class="pi pi-cog mr-2"></i>Account Settings</h5>
                         </div>
-                        <div class="field col-12 md:col-6">
-                            <label for="lastName">Last Name</label>
-                            <input pInputText id="lastName" type="text" [value]="currentUser.LastName" readonly />
-                        </div>
-                        <div class="field col-12 md:col-6">
-                            <label for="email">Email</label>
-                            <input pInputText id="email" type="email" [value]="currentUser.email" readonly />
-                        </div>
-                        <div class="field col-12 md:col-6">
-                            <label for="department">Department</label>
-                            <input pInputText id="department" type="text" [value]="currentUser.Department" readonly />
-                        </div>
-                        <div class="field col-12 md:col-6">
-                            <label for="campus">Campus</label>
-                            <input pInputText id="campus" type="text" [value]="currentUser.Campus" readonly />
-                        </div>
-                        <div class="field col-12 md:col-6">
-                            <label for="role">Role</label>
-                            <input pInputText id="role" type="text" [value]="currentUser.role" readonly />
-                        </div>
-                        <div class="field col-12 md:col-6">
-                            <label for="mobileNo">Mobile Number</label>
-                            <input pInputText id="mobileNo" type="text" [value]="currentUser.MobileNo" readonly />
-                        </div>
-                        <div class="field col-12 md:col-6">
-                            <label for="userId">User ID</label>
-                            <input pInputText id="userId" type="text" [value]="currentUser.user_id" readonly />
-                        </div>
-                    </div>
+                        <p-divider></p-divider>
 
-                    <div class="flex gap-2">
-                        <p-button label="Edit Profile" icon="pi pi-pencil" (onClick)="editProfile()" />
-                        <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" (onClick)="goBack()" />
+                        <div class="settings-grid">
+                            <div class="settings-card-item">
+                                <div class="settings-card-icon">
+                                    <i class="pi pi-lock"></i>
+                                </div>
+                                <p class="settings-card-title">Change Password</p>
+                                <p class="settings-card-desc">Update your password</p>
+                            </div>
+
+                            <div class="settings-card-item">
+                                <div class="settings-card-icon">
+                                    <i class="pi pi-shield"></i>
+                                </div>
+                                <p class="settings-card-title">Privacy & Security</p>
+                                <p class="settings-card-desc">Control your privacy</p>
+                            </div>
+
+                            <div class="settings-card-item">
+                                <div class="settings-card-icon">
+                                    <i class="pi pi-download"></i>
+                                </div>
+                                <p class="settings-card-title">Download Data</p>
+                                <p class="settings-card-desc">Export your data</p>
+                            </div>
+
+                            <div class="settings-card-item danger-card">
+                                <div class="settings-card-icon danger-icon">
+                                    <i class="pi pi-sign-out"></i>
+                                </div>
+                                <p class="settings-card-title danger-title">Logout</p>
+                                <p class="settings-card-desc">Sign out from your account</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -174,6 +235,14 @@ export class ProfileComponent implements OnInit {
                 }
             });
         }
+    }
+
+    editCover() {
+        Swal.fire({
+            title: 'Edit Cover Photo',
+            text: 'Cover photo editing feature coming soon',
+            icon: 'info'
+        });
     }
 
     editProfile() {

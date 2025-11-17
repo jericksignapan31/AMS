@@ -39,6 +39,7 @@ export class AuthService {
                     this.currentUser = response.user as User;
                     localStorage.setItem('currentUser', JSON.stringify(response.user));
                     localStorage.setItem('token', response.access_token);
+                    console.log('User logged in successfully:', response.user);
                     return { success: true, user: response.user as User };
                 }
                 return { success: false, message: 'Login failed' };
