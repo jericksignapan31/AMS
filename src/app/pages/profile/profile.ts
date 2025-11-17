@@ -7,6 +7,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { AvatarModule } from 'primeng/avatar';
 import { Router } from '@angular/router';
 import { AssetService } from '../service/asset.service';
+import { UserContextService } from '../service/user-context.service';
 import { DividerModule } from 'primeng/divider';
 import Swal from 'sweetalert2';
 
@@ -41,6 +42,7 @@ import Swal from 'sweetalert2';
                     <h1 class="profile-name">{{ currentUser?.FirstName }} {{ currentUser?.LastName }}</h1>
                     <p class="profile-role">{{ currentUser?.role }}</p>
                     <p class="profile-bio">{{ currentUser?.Department }} • {{ currentUser?.Campus }}</p>
+                    <button type="button" class="p-button p-button-sm mt-3" (click)="logUserIdFromService()" title="View User ID from Service"><i class="pi pi-info-circle mr-2"></i>View User Context</button>
                 </div>
             </div>
 
@@ -148,7 +150,8 @@ export class ProfileComponent implements OnInit {
 
     constructor(
         private router: Router,
-        private assetService: AssetService
+        private assetService: AssetService,
+        private userContextService: UserContextService
     ) {}
 
     ngOnInit() {
@@ -251,5 +254,30 @@ export class ProfileComponent implements OnInit {
 
     goBack() {
         this.router.navigate(['/app/dashboard']);
+    }
+
+    /**
+     * Sample method to demonstrate UserContextService usage
+     * This will log the current userId to console
+     */
+    logUserIdFromService() {
+        const userId = this.userContextService.getUserId();
+        console.log('UserId from UserContextService:', userId);
+
+        Swal.fire({
+            title: 'User Context',
+            html: `<strong>UserId:</strong> ${userId}<br><strong>Name:</strong> ${this.currentUser?.FirstName} ${this.currentUser?.LastName}`,
+            icon: 'info'
+        });
+    }
+
+    /**
+     * Sample method to subscribe to userId changes
+     * This will log whenever userId changes
+     */
+    subscribeToUserIdChanges() {
+        this.userContextService.userId$.subscribe((userId) => {
+            console.log('UserId changed to:', userId);
+        });
     }
 }
