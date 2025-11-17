@@ -59,104 +59,12 @@ import Swal from 'sweetalert2';
                         <p-divider></p-divider>
 
                         <div class="info-grid" *ngIf="fetchedUserData || currentUser">
-                            <div class="info-item">
-                                <label>First Name</label>
-                                <p>{{ fetchedUserData?.firstName || currentUser?.FirstName }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Last Name</label>
-                                <p>{{ fetchedUserData?.lastName || currentUser?.LastName }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Middle Name</label>
-                                <p>{{ fetchedUserData?.middleName || 'N/A' }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Email</label>
-                                <p>{{ fetchedUserData?.email || currentUser?.email }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Username</label>
-                                <p>{{ fetchedUserData?.userName || 'N/A' }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Contact Number</label>
-                                <p>{{ fetchedUserData?.contactNumber || 'N/A' }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Department</label>
-                                <p>{{ fetchedUserData?.department || currentUser?.Department }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Campus</label>
-                                <p>{{ fetchedUserData?.campus || currentUser?.Campus }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Role</label>
-                                <p>{{ fetchedUserData?.role || currentUser?.role }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>User ID</label>
-                                <p>{{ fetchedUserData?.userId || currentUser?.user_id }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label>Status</label>
-                                <p>
+                            <div class="info-item" *ngFor="let item of profileInfoItems">
+                                <label>{{ item.label }}</label>
+                                <p *ngIf="item.key !== 'isActive'">{{ item.value }}</p>
+                                <p *ngIf="item.key === 'isActive'">
                                     <span [style.color]="fetchedUserData?.isActive ? '#28a745' : '#dc3545'">{{ fetchedUserData?.isActive ? 'Active' : 'Inactive' }}</span>
                                 </p>
-                            </div>
-                            <div class="info-item">
-                                <label>Staff</label>
-                                <p>{{ fetchedUserData?.isStaff ? 'Yes' : 'No' }}</p>
-                            </div>
-                        </div>
-
-                        <!-- <div class="flex gap-2 mt-4">
-                            <p-button label="Edit Profile" icon="pi pi-pencil" (onClick)="editProfile()" />
-                            <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" (onClick)="goBack()" />
-                        </div> -->
-                    </div>
-                </div>
-
-                <!-- Right Column - Account Settings -->
-                <div class="col-12 lg:col-4">
-                    <div class="card profile-card mt-2.5 ">
-                        <div class="card-header">
-                            <h5 class="m-0"><i class="pi pi-cog mr-2"></i>Account Settings</h5>
-                        </div>
-                        <p-divider></p-divider>
-
-                        <div class="settings-grid">
-                            <div class="settings-card-item">
-                                <div class="settings-card-icon">
-                                    <i class="pi pi-lock"></i>
-                                </div>
-                                <p class="settings-card-title">Change Password</p>
-                                <p class="settings-card-desc">Update your password</p>
-                            </div>
-
-                            <div class="settings-card-item">
-                                <div class="settings-card-icon">
-                                    <i class="pi pi-shield"></i>
-                                </div>
-                                <p class="settings-card-title">Privacy & Security</p>
-                                <p class="settings-card-desc">Control your privacy</p>
-                            </div>
-
-                            <div class="settings-card-item">
-                                <div class="settings-card-icon">
-                                    <i class="pi pi-download"></i>
-                                </div>
-                                <p class="settings-card-title">Download Data</p>
-                                <p class="settings-card-desc">Export your data</p>
-                            </div>
-
-                            <div class="settings-card-item danger-card">
-                                <div class="settings-card-icon danger-icon">
-                                    <i class="pi pi-sign-out"></i>
-                                </div>
-                                <p class="settings-card-title danger-title">Logout</p>
-                                <p class="settings-card-desc">Sign out from your account</p>
                             </div>
                         </div>
                     </div>
@@ -168,6 +76,7 @@ import Swal from 'sweetalert2';
 export class ProfileComponent implements OnInit {
     currentUser: any = null;
     fetchedUserData: any = null; // Store fetched user data from backend
+    profileInfoItems: any[] = []; // Store info items for ngFor
 
     constructor(
         private router: Router,
@@ -180,6 +89,8 @@ export class ProfileComponent implements OnInit {
         this.loadCurrentUser();
         // Automatically fetch user data from backend
         this.fetchUserDataByUserIdAuto();
+        // Build profile info items for display
+        setTimeout(() => this.buildProfileInfoItems(), 100);
     }
 
     getInitials(): string {
@@ -281,6 +192,26 @@ export class ProfileComponent implements OnInit {
     }
 
     /**
+     * Build profile info items array for ngFor
+     */
+    buildProfileInfoItems() {
+        this.profileInfoItems = [
+            { label: 'First Name', key: 'firstName', value: this.fetchedUserData?.firstName || this.currentUser?.FirstName },
+            { label: 'Last Name', key: 'lastName', value: this.fetchedUserData?.lastName || this.currentUser?.LastName },
+            { label: 'Middle Name', key: 'middleName', value: this.fetchedUserData?.middleName || 'N/A' },
+            { label: 'Email', key: 'email', value: this.fetchedUserData?.email || this.currentUser?.email },
+            { label: 'Username', key: 'userName', value: this.fetchedUserData?.userName || 'N/A' },
+            { label: 'Contact Number', key: 'contactNumber', value: this.fetchedUserData?.contactNumber || 'N/A' },
+            { label: 'Department', key: 'department', value: this.fetchedUserData?.department || this.currentUser?.Department },
+            { label: 'Campus', key: 'campus', value: this.fetchedUserData?.campus || this.currentUser?.Campus },
+            { label: 'Role', key: 'role', value: this.fetchedUserData?.role || this.currentUser?.role },
+            { label: 'User ID', key: 'userId', value: this.fetchedUserData?.userId || this.currentUser?.user_id },
+            { label: 'Status', key: 'isActive', value: this.fetchedUserData?.isActive ? 'Active' : 'Inactive' },
+            { label: 'Staff', key: 'isStaff', value: this.fetchedUserData?.isStaff ? 'Yes' : 'No' }
+        ];
+    }
+
+    /**
      * Sample method to demonstrate UserContextService usage
      * This will log the current userId to console
      */
@@ -364,6 +295,7 @@ export class ProfileComponent implements OnInit {
             next: (userData) => {
                 console.log('User data auto-fetched successfully:', userData);
                 this.fetchedUserData = userData; // Store in component
+                this.buildProfileInfoItems(); // Rebuild info items with new data
             },
             error: (error) => {
                 console.error('Error auto-fetching user data:', error);
