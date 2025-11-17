@@ -10,12 +10,13 @@ import { AssetService } from '../service/asset.service';
 import { UserService } from '../service/user.service';
 import { UserContextService } from '../service/user-context.service';
 import { DividerModule } from 'primeng/divider';
+import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, CardModule, ButtonModule, InputTextModule, FileUploadModule, AvatarModule, DividerModule],
+    imports: [CommonModule, CardModule, ButtonModule, InputTextModule, FileUploadModule, AvatarModule, DividerModule, FormsModule],
     styleUrls: ['../../../assets/layout/_profile.scss'],
     template: `
         <div class="profile-container">
@@ -53,18 +54,36 @@ import Swal from 'sweetalert2';
                 <!-- Left Column - User Details -->
                 <div class="col-12 lg:col-8">
                     <div class="card profile-card mt-2.5">
-                        <div class="card-header">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                             <h5 class="m-0"><i class="pi pi-user mr-2"></i>Personal Information</h5>
+                            <button type="button" pButton [ngClass]="isEditMode ? 'p-button-success' : 'p-button-warning'" [label]="isEditMode ? 'Save Changes' : 'Edit Profile'" (click)="toggleEditMode()" icon="pi pi-pencil"></button>
                         </div>
                         <p-divider></p-divider>
 
-                        <div class="info-grid" *ngIf="fetchedUserData || currentUser">
-                            <div class="info-item" *ngFor="let item of profileInfoItems">
-                                <label>{{ item.label }}</label>
-                                <p *ngIf="item.key !== 'isActive'">{{ item.value }}</p>
-                                <p *ngIf="item.key === 'isActive'">
-                                    <span [style.color]="fetchedUserData?.isActive ? '#28a745' : '#dc3545'">{{ fetchedUserData?.isActive ? 'Active' : 'Inactive' }}</span>
-                                </p>
+                        <div *ngIf="fetchedUserData || currentUser">
+                            <div class="info-grid-editable" *ngIf="!isEditMode">
+                                <div class="info-item-display" *ngFor="let item of profileInfoItems">
+                                    <label class="info-label">{{ item.label }}</label>
+                                    <div class="info-value-display" *ngIf="item.key !== 'isActive'">{{ item.value || 'N/A' }}</div>
+                                    <div class="info-value-display" *ngIf="item.key === 'isActive'">
+                                        <span class="status-badge" [style.backgroundColor]="fetchedUserData?.isActive ? '#d4edda' : '#f8d7da'" [style.color]="fetchedUserData?.isActive ? '#155724' : '#721c24'">
+                                            {{ fetchedUserData?.isActive ? '✓ Active' : '✕ Inactive' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-grid-edit" *ngIf="isEditMode">
+                                <div class="edit-input-group" *ngFor="let item of profileInfoItems">
+                                    <label class="edit-label">{{ item.label }}</label>
+                                    <input *ngIf="item.key !== 'isActive'" type="text" [(ngModel)]="editFormData[item.key]" class="edit-input" placeholder="Enter {{ item.label | lowercase }}" />
+                                    <div *ngIf="item.key === 'isActive'" class="status-toggle">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" [(ngModel)]="editFormData['isActive']" />
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span style="margin-left: 0.5rem;">{{ editFormData['isActive'] ? 'Active' : 'Inactive' }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -77,6 +96,8 @@ export class ProfileComponent implements OnInit {
     currentUser: any = null;
     fetchedUserData: any = null; // Store fetched user data from backend
     profileInfoItems: any[] = []; // Store info items for ngFor
+    isEditMode: boolean = false; // Toggle between view and edit mode
+    editFormData: any = {}; // Store form data during edit mode
 
     constructor(
         private router: Router,
@@ -209,6 +230,94 @@ export class ProfileComponent implements OnInit {
             { label: 'Status', key: 'isActive', value: this.fetchedUserData?.isActive ? 'Active' : 'Inactive' },
             { label: 'Staff', key: 'isStaff', value: this.fetchedUserData?.isStaff ? 'Yes' : 'No' }
         ];
+        // Initialize edit form data
+        this.initializeEditFormData();
+    }
+
+    /**
+     * Initialize edit form data with current values
+     */
+    initializeEditFormData() {
+        this.editFormData = {
+            firstName: this.fetchedUserData?.firstName || this.currentUser?.FirstName || '',
+            lastName: this.fetchedUserData?.lastName || this.currentUser?.LastName || '',
+            middleName: this.fetchedUserData?.middleName || '',
+            email: this.fetchedUserData?.email || this.currentUser?.email || '',
+            userName: this.fetchedUserData?.userName || '',
+            contactNumber: this.fetchedUserData?.contactNumber || '',
+            department: this.fetchedUserData?.department || this.currentUser?.Department || '',
+            campus: this.fetchedUserData?.campus || this.currentUser?.Campus || '',
+            role: this.fetchedUserData?.role || this.currentUser?.role || '',
+            userId: this.fetchedUserData?.userId || this.currentUser?.user_id || '',
+            isActive: this.fetchedUserData?.isActive || false,
+            isStaff: this.fetchedUserData?.isStaff || false
+        };
+    }
+
+    /**
+     * Toggle between view and edit mode
+     */
+    toggleEditMode() {
+        if (this.isEditMode) {
+            // Save changes
+            this.saveChanges();
+        } else {
+            // Enter edit mode
+            this.isEditMode = true;
+        }
+    }
+
+    /**
+     * Save changes from edit mode
+     */
+    saveChanges() {
+        Swal.fire({
+            title: 'Save Changes',
+            html: 'Are you sure you want to save these changes?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Save',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Update fetchedUserData with form changes
+                this.fetchedUserData = {
+                    ...this.fetchedUserData,
+                    ...this.editFormData
+                };
+
+                // Save to localStorage
+                if (this.currentUser) {
+                    this.currentUser.FirstName = this.editFormData.firstName;
+                    this.currentUser.LastName = this.editFormData.lastName;
+                    this.currentUser.email = this.editFormData.email;
+                    this.currentUser.Department = this.editFormData.department;
+                    this.currentUser.Campus = this.editFormData.campus;
+                    this.currentUser.role = this.editFormData.role;
+                    localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                }
+
+                // Rebuild profile info items
+                this.buildProfileInfoItems();
+                this.isEditMode = false;
+
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Your changes have been saved successfully.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+
+    /**
+     * Cancel edit mode without saving
+     */
+    cancelEdit() {
+        this.isEditMode = false;
+        this.buildProfileInfoItems();
     }
 
     /**
