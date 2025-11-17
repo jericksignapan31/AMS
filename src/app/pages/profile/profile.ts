@@ -7,6 +7,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { AvatarModule } from 'primeng/avatar';
 import { Router } from '@angular/router';
 import { AssetService } from '../service/asset.service';
+import { UserService } from '../service/user.service';
 import { UserContextService } from '../service/user-context.service';
 import { DividerModule } from 'primeng/divider';
 import Swal from 'sweetalert2';
@@ -39,10 +40,11 @@ import Swal from 'sweetalert2';
                 </div>
 
                 <div class="profile-name-section">
-                    <h1 class="profile-name">{{ currentUser?.FirstName }} {{ currentUser?.LastName }}</h1>
-                    <p class="profile-role">{{ currentUser?.role }}</p>
-                    <p class="profile-bio">{{ currentUser?.Department }} • {{ currentUser?.Campus }}</p>
-                    <button type="button" class="p-button p-button-sm mt-3" (click)="logUserIdFromService()" title="View User ID from Service"><i class="pi pi-info-circle mr-2"></i>View User Context</button>
+                    <h1 class="profile-name">
+                        {{ fetchedUserData?.firstName }} {{ fetchedUserData?.middleName }} {{ fetchedUserData?.lastName }} <span *ngIf="!fetchedUserData">{{ currentUser?.FirstName }} {{ currentUser?.LastName }}</span>
+                    </h1>
+                    <p class="profile-role">{{ fetchedUserData?.role || currentUser?.role }}</p>
+                    <p class="profile-bio">{{ fetchedUserData?.department || currentUser?.Department }} • {{ fetchedUserData?.campus || currentUser?.Campus }}</p>
                 </div>
             </div>
 
@@ -56,38 +58,56 @@ import Swal from 'sweetalert2';
                         </div>
                         <p-divider></p-divider>
 
-                        <div class="info-grid" *ngIf="currentUser">
+                        <div class="info-grid" *ngIf="fetchedUserData || currentUser">
                             <div class="info-item">
                                 <label>First Name</label>
-                                <p>{{ currentUser.FirstName }}</p>
+                                <p>{{ fetchedUserData?.firstName || currentUser?.FirstName }}</p>
                             </div>
                             <div class="info-item">
                                 <label>Last Name</label>
-                                <p>{{ currentUser.LastName }}</p>
+                                <p>{{ fetchedUserData?.lastName || currentUser?.LastName }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Middle Name</label>
+                                <p>{{ fetchedUserData?.middleName || 'N/A' }}</p>
                             </div>
                             <div class="info-item">
                                 <label>Email</label>
-                                <p>{{ currentUser.email }}</p>
+                                <p>{{ fetchedUserData?.email || currentUser?.email }}</p>
                             </div>
                             <div class="info-item">
-                                <label>Mobile Number</label>
-                                <p>{{ currentUser.MobileNo }}</p>
+                                <label>Username</label>
+                                <p>{{ fetchedUserData?.userName || 'N/A' }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Contact Number</label>
+                                <p>{{ fetchedUserData?.contactNumber || 'N/A' }}</p>
                             </div>
                             <div class="info-item">
                                 <label>Department</label>
-                                <p>{{ currentUser.Department }}</p>
+                                <p>{{ fetchedUserData?.department || currentUser?.Department }}</p>
                             </div>
                             <div class="info-item">
                                 <label>Campus</label>
-                                <p>{{ currentUser.Campus }}</p>
+                                <p>{{ fetchedUserData?.campus || currentUser?.Campus }}</p>
                             </div>
                             <div class="info-item">
                                 <label>Role</label>
-                                <p>{{ currentUser.role }}</p>
+                                <p>{{ fetchedUserData?.role || currentUser?.role }}</p>
                             </div>
                             <div class="info-item">
                                 <label>User ID</label>
-                                <p>{{ currentUser.user_id }}</p>
+                                <p>{{ fetchedUserData?.userId || currentUser?.user_id }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Status</label>
+                                <p>
+                                    <span [style.color]="fetchedUserData?.isActive ? '#28a745' : '#dc3545'">{{ fetchedUserData?.isActive ? 'Active' : 'Inactive' }}</span>
+                                </p>
+                            </div>
+                            <div class="info-item">
+                                <label>Staff</label>
+                                <p>{{ fetchedUserData?.isStaff ? 'Yes' : 'No' }}</p>
                             </div>
                         </div>
 
@@ -147,15 +167,19 @@ import Swal from 'sweetalert2';
 })
 export class ProfileComponent implements OnInit {
     currentUser: any = null;
+    fetchedUserData: any = null; // Store fetched user data from backend
 
     constructor(
         private router: Router,
         private assetService: AssetService,
+        private userService: UserService,
         private userContextService: UserContextService
     ) {}
 
     ngOnInit() {
         this.loadCurrentUser();
+        // Automatically fetch user data from backend
+        this.fetchUserDataByUserIdAuto();
     }
 
     getInitials(): string {
@@ -278,6 +302,73 @@ export class ProfileComponent implements OnInit {
     subscribeToUserIdChanges() {
         this.userContextService.userId$.subscribe((userId) => {
             console.log('UserId changed to:', userId);
+        });
+    }
+
+    /**
+     * Sample method to fetch user data by userId from backend
+     * Demonstrates how to use UserService with userId from UserContextService
+     */
+    fetchUserDataByUserId() {
+        const userId = this.userContextService.getUserId();
+
+        if (!userId) {
+            Swal.fire({
+                title: 'Error',
+                text: 'UserId not found. Please login first.',
+                icon: 'error'
+            });
+            return;
+        }
+
+        console.log('Fetching user data for userId:', userId);
+
+        this.userService.getUserById(userId).subscribe({
+            next: (userData) => {
+                console.log('User data fetched successfully:', userData);
+                this.fetchedUserData = userData; // Store in component
+
+                Swal.fire({
+                    title: 'Success',
+                    text: 'User data loaded successfully!',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            },
+            error: (error) => {
+                console.error('Error fetching user data:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to fetch user data: ' + (error.error?.message || error.message),
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    /**
+     * Automatically fetch user data on page load (no popups)
+     */
+    private fetchUserDataByUserIdAuto() {
+        const userId = this.userContextService.getUserId();
+
+        if (!userId) {
+            console.warn('UserId not found for auto-fetch');
+            return;
+        }
+
+        console.log('Auto-fetching user data for userId:', userId);
+
+        this.userService.getUserById(userId).subscribe({
+            next: (userData) => {
+                console.log('User data auto-fetched successfully:', userData);
+                this.fetchedUserData = userData; // Store in component
+            },
+            error: (error) => {
+                console.error('Error auto-fetching user data:', error);
+                // Fail silently for auto-fetch
+            }
         });
     }
 }
