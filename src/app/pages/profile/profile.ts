@@ -30,7 +30,7 @@ import Swal from 'sweetalert2';
             <!-- Profile Info Section -->
             <div class="profile-info-section">
                 <div class="profile-picture-container">
-                    <img *ngIf="currentUser?.profileImage; else defaultAvatar" [src]="currentUser.profileImage" alt="Profile" class="profile-picture" />
+                    <img *ngIf="currentUser?.profilePicture; else defaultAvatar" [src]="currentUser.profilePicture" alt="Profile" class="profile-picture" />
                     <ng-template #defaultAvatar>
                         <p-avatar [label]="getInitials()" shape="circle" styleClass="profile-picture-avatar"></p-avatar>
                     </ng-template>
@@ -280,33 +280,59 @@ export class ProfileComponent implements OnInit {
             cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Update fetchedUserData with form changes
-                this.fetchedUserData = {
-                    ...this.fetchedUserData,
-                    ...this.editFormData
-                };
+                const userId = this.userContextService.getUserId();
 
-                // Save to localStorage
-                if (this.currentUser) {
-                    this.currentUser.FirstName = this.editFormData.firstName;
-                    this.currentUser.LastName = this.editFormData.lastName;
-                    this.currentUser.email = this.editFormData.email;
-                    this.currentUser.Department = this.editFormData.department;
-                    this.currentUser.Campus = this.editFormData.campus;
-                    this.currentUser.role = this.editFormData.role;
-                    localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                if (!userId) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'UserId not found. Cannot save changes.',
+                        icon: 'error'
+                    });
+                    return;
                 }
 
-                // Rebuild profile info items
-                this.buildProfileInfoItems();
-                this.isEditMode = false;
+                // Call backend API to update user
+                this.userService.updateUser(userId, this.editFormData).subscribe({
+                    next: (response) => {
+                        console.log('User updated successfully:', response);
 
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Your changes have been saved successfully.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
+                        // Update fetchedUserData with response
+                        this.fetchedUserData = {
+                            ...this.fetchedUserData,
+                            ...response
+                        };
+
+                        // Save to localStorage
+                        if (this.currentUser) {
+                            this.currentUser.FirstName = response['firstName'] || this.editFormData.firstName;
+                            this.currentUser.LastName = response['lastName'] || this.editFormData.lastName;
+                            this.currentUser.email = response['email'] || this.editFormData.email;
+                            this.currentUser.Department = response['department'] || this.editFormData.department;
+                            this.currentUser.Campus = response['campus'] || this.editFormData.campus;
+                            this.currentUser.role = response['role'] || this.editFormData.role;
+                            localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                        }
+
+                        // Rebuild profile info items
+                        this.buildProfileInfoItems();
+                        this.isEditMode = false;
+
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Your changes have been saved successfully.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: (error) => {
+                        console.error('Error updating user:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to save changes: ' + (error.error?.message || error.message),
+                            icon: 'error'
+                        });
+                    }
                 });
             }
         });
@@ -346,41 +372,31 @@ export class ProfileComponent implements OnInit {
     }
 
     /**
-     * Sample method to fetch user data by userId from backend
-     * Demonstrates how to use UserService with userId from UserContextService
+     * Sample method to fetch user profile from backend
+     * Demonstrates how to use UserService getUserProfile method
      */
     fetchUserDataByUserId() {
-        const userId = this.userContextService.getUserId();
+        console.log('Fetching current user profile');
 
-        if (!userId) {
-            Swal.fire({
-                title: 'Error',
-                text: 'UserId not found. Please login first.',
-                icon: 'error'
-            });
-            return;
-        }
-
-        console.log('Fetching user data for userId:', userId);
-
-        this.userService.getUserById(userId).subscribe({
+        this.userService.getUserProfile().subscribe({
             next: (userData) => {
-                console.log('User data fetched successfully:', userData);
+                console.log('User profile fetched successfully:', userData);
                 this.fetchedUserData = userData; // Store in component
+                this.buildProfileInfoItems(); // Rebuild info items
 
                 Swal.fire({
                     title: 'Success',
-                    text: 'User data loaded successfully!',
+                    text: 'User profile loaded successfully!',
                     icon: 'success',
                     timer: 2000,
                     showConfirmButton: false
                 });
             },
             error: (error) => {
-                console.error('Error fetching user data:', error);
+                console.error('Error fetching user profile:', error);
                 Swal.fire({
                     title: 'Error',
-                    text: 'Failed to fetch user data: ' + (error.error?.message || error.message),
+                    text: 'Failed to fetch user profile: ' + (error.error?.message || error.message),
                     icon: 'error'
                 });
             }
@@ -388,26 +404,19 @@ export class ProfileComponent implements OnInit {
     }
 
     /**
-     * Automatically fetch user data on page load (no popups)
+     * Automatically fetch user profile on page load (no popups)
      */
     private fetchUserDataByUserIdAuto() {
-        const userId = this.userContextService.getUserId();
+        console.log('Auto-fetching current user profile');
 
-        if (!userId) {
-            console.warn('UserId not found for auto-fetch');
-            return;
-        }
-
-        console.log('Auto-fetching user data for userId:', userId);
-
-        this.userService.getUserById(userId).subscribe({
+        this.userService.getUserProfile().subscribe({
             next: (userData) => {
-                console.log('User data auto-fetched successfully:', userData);
+                console.log('User profile auto-fetched successfully:', userData);
                 this.fetchedUserData = userData; // Store in component
                 this.buildProfileInfoItems(); // Rebuild info items with new data
             },
             error: (error) => {
-                console.error('Error auto-fetching user data:', error);
+                console.error('Error auto-fetching user profile:', error);
                 // Fail silently for auto-fetch
             }
         });
