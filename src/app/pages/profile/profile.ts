@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { AssetService } from '../service/asset.service';
 import { UserService } from '../service/user.service';
 import { UserContextService } from '../service/user-context.service';
+import { StorageService } from '../service/storage.service';
 import { DividerModule } from 'primeng/divider';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -34,10 +35,10 @@ import Swal from 'sweetalert2';
                     <ng-template #defaultAvatar>
                         <p-avatar [label]="getInitials()" shape="circle" styleClass="profile-picture-avatar"></p-avatar>
                     </ng-template>
-                    <button type="button" class="p-button p-button-rounded p-button-sm camera-btn" (click)="fileUpload.choose()" title="Upload Profile Picture">
+                    <button type="button" class="p-button p-button-rounded p-button-sm camera-btn" (click)="triggerFileUpload()" title="Upload Profile Picture" style="cursor: pointer; position: relative; z-index: 25;">
                         <i class="pi pi-camera"></i>
                     </button>
-                    <p-fileUpload #fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" (onSelect)="onImageSelect($event)" [auto]="true" chooseLabel="Choose Image" [ngStyle]="{ display: 'none' }"></p-fileUpload>
+                    <p-fileUpload #fileUpload mode="basic" accept="image/*" [maxFileSize]="5242880" (onSelect)="onImageSelect($event)" [auto]="false" chooseLabel="Choose Image" [ngStyle]="{ display: 'none' }"></p-fileUpload>
                 </div>
 
                 <div class="profile-name-section">
@@ -103,7 +104,8 @@ export class ProfileComponent implements OnInit {
         private router: Router,
         private assetService: AssetService,
         private userService: UserService,
-        private userContextService: UserContextService
+        private userContextService: UserContextService,
+        private storageService: StorageService
     ) {}
 
     ngOnInit() {
@@ -121,14 +123,22 @@ export class ProfileComponent implements OnInit {
         return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
     }
 
+    triggerFileUpload(): void {
+        // Get reference to file upload element and trigger click
+        const fileUploadElement = document.querySelector('input[type="file"]');
+        if (fileUploadElement) {
+            (fileUploadElement as HTMLInputElement).click();
+        }
+    }
+
     onImageSelect(event: any) {
         const file = event.files[0];
         if (file) {
-            // Validate file size (1MB = 1000000 bytes)
-            if (file.size > 1000000) {
+            // Validate file size (5MB = 5242880 bytes)
+            if (file.size > 5242880) {
                 Swal.fire({
                     title: 'File Too Large',
-                    text: 'Please select an image smaller than 1MB.',
+                    text: 'Please select an image smaller than 5MB.',
                     icon: 'error'
                 });
                 return;
@@ -144,23 +154,47 @@ export class ProfileComponent implements OnInit {
                 return;
             }
 
-            // Convert to base64
-            const reader = new FileReader();
-            reader.onload = (e: any) => {
-                this.currentUser.profileImage = e.target.result;
+            // Show loading notification
+            Swal.fire({
+                title: 'Uploading...',
+                text: 'Please wait while your profile picture is being uploaded.',
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            });
 
-                // Save to localStorage
-                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+            // Upload to backend
+            this.storageService.uploadProfilePicture(file).subscribe({
+                next: (response) => {
+                    console.log('Profile picture uploaded successfully:', response);
 
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Profile picture updated successfully.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            };
-            reader.readAsDataURL(file);
+                    // Update currentUser with new profile picture URL
+                    if (response.url || response.imageUrl || response.data?.url) {
+                        const imageUrl = response.url || response.imageUrl || response.data?.url;
+                        this.currentUser.profilePicture = imageUrl;
+                        this.currentUser.profileImage = imageUrl;
+                        localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                    }
+
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Profile picture updated successfully.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                },
+                error: (error) => {
+                    console.error('Error uploading profile picture:', error);
+                    Swal.fire({
+                        title: 'Upload Failed',
+                        text: 'Failed to upload profile picture: ' + (error.error?.message || error.message),
+                        icon: 'error'
+                    });
+                }
+            });
         }
     }
 
