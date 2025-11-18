@@ -47,12 +47,12 @@ export class AppMenu {
             {
                 label: 'Pages',
                 icon: 'pi pi-fw pi-briefcase',
-                routerLink: ['/pages'],
+                routerLink: ['/app/pages'],
                 items: [
                     {
-                        label: 'Landing',
-                        icon: 'pi pi-fw pi-globe',
-                        routerLink: ['/landing']
+                        label: 'Users',
+                        icon: 'pi pi-fw pi-user',
+                        routerLink: ['/app/pages/users']
                     },
                     // {
                     //     label: 'Auth',
