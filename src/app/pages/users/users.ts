@@ -190,9 +190,13 @@ export class UsersComponent implements OnInit {
         };
 
         Swal.fire({
-            title: 'Edit User',
+            title: '',
+            titleText: '',
             html: `
-                <div style="text-align: left; width: 100%; max-width: 700px; margin: 0 auto;">
+                <div style="text-align: left; width: 100%; max-width: 700px; margin: 4 auto;">
+                    <div style="background: #f5f5f5; color: #333; padding: 16px; margin: -16px -16px 16px -16px; border-radius: 8px 8px 0 0;">
+                        <h2 style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: 0.5px;">✎ Edit User</h2>
+                    </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
                         <div>
                             <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">First Name</label>
@@ -226,8 +230,8 @@ export class UsersComponent implements OnInit {
                             </select>
                         </div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0;">
-                        <label style="font-weight: 500; color: #555; margin: 0; font-size: 13px; flex: 1;">Active Status</label>
+                    <div style="display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; cursor: pointer;" onclick="document.getElementById('isActive').click();">
+                        <label style="font-weight: 500; color: #555; margin: 0; font-size: 13px; flex: 1; cursor: pointer;">Active Status</label>
                         <div style="position: relative; display: inline-block; width: 48px; height: 24px;">
                             <input id="isActive" type="checkbox" ${editData.isActive ? 'checked' : ''} style="opacity: 0; width: 0; height: 0; cursor: pointer;" />
                             <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${editData.isActive ? '#667eea' : '#ddd'}; transition: 0.3s; border-radius: 24px;"></span>
@@ -248,13 +252,34 @@ export class UsersComponent implements OnInit {
 
                 // Add toggle functionality
                 const checkbox = document.getElementById('isActive') as HTMLInputElement;
+                const toggleDiv = checkbox?.parentElement?.parentElement as HTMLElement;
                 const toggleSpan = checkbox?.parentElement?.querySelector('span:nth-child(2)') as HTMLElement;
                 const toggleCircle = checkbox?.parentElement?.querySelector('span:nth-child(3)') as HTMLElement;
 
-                if (checkbox && toggleSpan && toggleCircle) {
+                if (checkbox && toggleSpan && toggleCircle && toggleDiv) {
+                    // Toggle on checkbox change
                     checkbox.addEventListener('change', () => {
                         toggleSpan.style.backgroundColor = checkbox.checked ? '#667eea' : '#ddd';
                         toggleCircle.style.left = checkbox.checked ? '24px' : '2px';
+                    });
+
+                    // Make entire div clickable
+                    toggleDiv.addEventListener('click', (e: Event) => {
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+
+                    // Also make the toggle spans clickable
+                    toggleSpan?.addEventListener('click', () => {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+
+                    toggleCircle?.addEventListener('click', () => {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                     });
                 }
             }
