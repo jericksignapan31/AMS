@@ -192,43 +192,71 @@ export class UsersComponent implements OnInit {
         Swal.fire({
             title: 'Edit User',
             html: `
-                <div style="text-align: left; display: flex; flex-direction: column; gap: 10px;">
-                    <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">First Name</label>
-                        <input id="firstName" type="text" class="swal2-input" value="${editData.firstName || ''}" placeholder="First Name" />
+                <div style="text-align: left; width: 100%; max-width: 700px; margin: 0 auto;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">First Name</label>
+                            <input id="firstName" type="text" value="${editData.firstName || ''}" placeholder="First" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; transition: border-color 0.2s;" onmouseover="this.style.borderBottomColor='#667eea'" onmouseout="this.style.borderBottomColor='#e0e0e0'" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Middle Name</label>
+                            <input id="middleName" type="text" value="${editData.middleName || ''}" placeholder="Middle" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; transition: border-color 0.2s;" onmouseover="this.style.borderBottomColor='#667eea'" onmouseout="this.style.borderBottomColor='#e0e0e0'" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Last Name</label>
+                            <input id="lastName" type="text" value="${editData.lastName || ''}" placeholder="Last" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; transition: border-color 0.2s;" onmouseover="this.style.borderBottomColor='#667eea'" onmouseout="this.style.borderBottomColor='#e0e0e0'" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
                     </div>
-                    <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Middle Name</label>
-                        <input id="middleName" type="text" class="swal2-input" value="${editData.middleName || ''}" placeholder="Middle Name" />
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Email</label>
+                            <input id="email" type="email" value="${editData.email || ''}" placeholder="email@example.com" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; transition: border-color 0.2s;" onmouseover="this.style.borderBottomColor='#667eea'" onmouseout="this.style.borderBottomColor='#e0e0e0'" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Contact</label>
+                            <input id="contactNumber" type="text" value="${editData.contactNumber || ''}" placeholder="+63" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; transition: border-color 0.2s;" onmouseover="this.style.borderBottomColor='#667eea'" onmouseout="this.style.borderBottomColor='#e0e0e0'" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Role</label>
+                            <select id="role" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; cursor: pointer; transition: border-color 0.2s;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'">
+                                <option value="SuperAdmin" ${editData.role === 'SuperAdmin' ? 'selected' : ''}>SuperAdmin</option>
+                                <option value="CampusAdmin" ${editData.role === 'CampusAdmin' ? 'selected' : ''}>CampusAdmin</option>
+                                <option value="Faculty" ${editData.role === 'Faculty' ? 'selected' : ''}>Faculty</option>
+                                <option value="LabTech" ${editData.role === 'LabTech' ? 'selected' : ''}>LabTech</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Last Name</label>
-                        <input id="lastName" type="text" class="swal2-input" value="${editData.lastName || ''}" placeholder="Last Name" />
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Email</label>
-                        <input id="email" type="email" class="swal2-input" value="${editData.email || ''}" placeholder="Email" />
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Contact Number</label>
-                        <input id="contactNumber" type="text" class="swal2-input" value="${editData.contactNumber || ''}" placeholder="Contact Number" />
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Role</label>
-                        <input id="role" type="text" class="swal2-input" value="${editData.role || ''}" placeholder="Role" />
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <label style="font-weight: bold;">Active Status</label>
-                        <input id="isActive" type="checkbox" ${editData.isActive ? 'checked' : ''} style="width: 20px; height: 20px; cursor: pointer;" />
+                    <div style="display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0;">
+                        <label style="font-weight: 500; color: #555; margin: 0; font-size: 13px; flex: 1;">Active Status</label>
+                        <div style="position: relative; display: inline-block; width: 48px; height: 24px;">
+                            <input id="isActive" type="checkbox" ${editData.isActive ? 'checked' : ''} style="opacity: 0; width: 0; height: 0; cursor: pointer;" />
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${editData.isActive ? '#667eea' : '#ddd'}; transition: 0.3s; border-radius: 24px;"></span>
+                            <span style="position: absolute; content: ''; height: 20px; width: 20px; left: ${editData.isActive ? '24px' : '2px'}; bottom: 2px; background-color: white; transition: 0.3s; border-radius: 50%;"></span>
+                        </div>
                     </div>
                 </div>
             `,
+            width: '750px',
             showCancelButton: true,
             confirmButtonText: 'Save',
             cancelButtonText: 'Cancel',
+            confirmButtonColor: '#667eea',
+            cancelButtonColor: '#e0e0e0',
             didOpen: () => {
                 const firstNameInput = document.getElementById('firstName') as HTMLInputElement;
                 if (firstNameInput) firstNameInput.focus();
+
+                // Add toggle functionality
+                const checkbox = document.getElementById('isActive') as HTMLInputElement;
+                const toggleSpan = checkbox?.parentElement?.querySelector('span:nth-child(2)') as HTMLElement;
+                const toggleCircle = checkbox?.parentElement?.querySelector('span:nth-child(3)') as HTMLElement;
+
+                if (checkbox && toggleSpan && toggleCircle) {
+                    checkbox.addEventListener('change', () => {
+                        toggleSpan.style.backgroundColor = checkbox.checked ? '#667eea' : '#ddd';
+                        toggleCircle.style.left = checkbox.checked ? '24px' : '2px';
+                    });
+                }
             }
         }).then((result) => {
             if (result.isConfirmed) {
@@ -237,7 +265,7 @@ export class UsersComponent implements OnInit {
                 const lastName = (document.getElementById('lastName') as HTMLInputElement).value;
                 const email = (document.getElementById('email') as HTMLInputElement).value;
                 const contactNumber = (document.getElementById('contactNumber') as HTMLInputElement).value;
-                const role = (document.getElementById('role') as HTMLInputElement).value;
+                const role = (document.getElementById('role') as HTMLSelectElement).value;
                 const isActive = (document.getElementById('isActive') as HTMLInputElement).checked;
 
                 const updatedData = {
@@ -270,7 +298,6 @@ export class UsersComponent implements OnInit {
             }
         });
     }
-
     deleteUser(user: any) {
         Swal.fire({
             title: 'Confirm Delete',
