@@ -88,7 +88,7 @@ import Swal from 'sweetalert2';
                     <td style="width: 3rem">
                         <p-tableCheckbox [value]="user" />
                     </td>
-                    <td>{{ user.FirstName }} {{ user.LastName }}</td>
+                    <td>{{ user.firstName || user.FirstName }} {{ user.middleName || user.MiddleName || '' }} {{ user.lastName || user.LastName }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.Department || 'N/A' }}</td>
                     <td>{{ user.Campus || 'N/A' }}</td>
@@ -161,14 +161,16 @@ export class UsersComponent implements OnInit {
     }
 
     viewUser(user: any) {
+        const createdDate = new Date(user.userCreated).toLocaleDateString();
         Swal.fire({
-            title: user.FirstName + ' ' + user.LastName,
+            title: user.firstName + ' ' + (user.middleName || '') + ' ' + user.lastName,
             html: `
                 <div style="text-align: left;">
                     <p><strong>Email:</strong> ${user.email}</p>
-                    <p><strong>Department:</strong> ${user.Department || 'N/A'}</p>
-                    <p><strong>Campus:</strong> ${user.Campus || 'N/A'}</p>
+                    <p><strong>Contact Number:</strong> ${user.contactNumber || 'N/A'}</p>
                     <p><strong>Role:</strong> ${user.role || 'N/A'}</p>
+                    <p><strong>Active:</strong> <span style="color: ${user.isActive ? 'green' : 'red'}">${user.isActive ? 'Yes' : 'No'}</span></p>
+                    <p><strong>Created:</strong> ${createdDate}</p>
                 </div>
             `,
             icon: 'info',
@@ -177,11 +179,95 @@ export class UsersComponent implements OnInit {
     }
 
     editUser(user: any) {
+        const editData = {
+            firstName: user.firstName,
+            middleName: user.middleName,
+            lastName: user.lastName,
+            email: user.email,
+            contactNumber: user.contactNumber,
+            role: user.role,
+            isActive: user.isActive
+        };
+
         Swal.fire({
             title: 'Edit User',
-            text: 'Edit functionality coming soon',
-            icon: 'info',
-            confirmButtonText: 'OK'
+            html: `
+                <div style="text-align: left; display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">First Name</label>
+                        <input id="firstName" type="text" class="swal2-input" value="${editData.firstName || ''}" placeholder="First Name" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Middle Name</label>
+                        <input id="middleName" type="text" class="swal2-input" value="${editData.middleName || ''}" placeholder="Middle Name" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Last Name</label>
+                        <input id="lastName" type="text" class="swal2-input" value="${editData.lastName || ''}" placeholder="Last Name" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Email</label>
+                        <input id="email" type="email" class="swal2-input" value="${editData.email || ''}" placeholder="Email" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Contact Number</label>
+                        <input id="contactNumber" type="text" class="swal2-input" value="${editData.contactNumber || ''}" placeholder="Contact Number" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Role</label>
+                        <input id="role" type="text" class="swal2-input" value="${editData.role || ''}" placeholder="Role" />
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="font-weight: bold;">Active Status</label>
+                        <input id="isActive" type="checkbox" ${editData.isActive ? 'checked' : ''} style="width: 20px; height: 20px; cursor: pointer;" />
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Cancel',
+            didOpen: () => {
+                const firstNameInput = document.getElementById('firstName') as HTMLInputElement;
+                if (firstNameInput) firstNameInput.focus();
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const firstName = (document.getElementById('firstName') as HTMLInputElement).value;
+                const middleName = (document.getElementById('middleName') as HTMLInputElement).value;
+                const lastName = (document.getElementById('lastName') as HTMLInputElement).value;
+                const email = (document.getElementById('email') as HTMLInputElement).value;
+                const contactNumber = (document.getElementById('contactNumber') as HTMLInputElement).value;
+                const role = (document.getElementById('role') as HTMLInputElement).value;
+                const isActive = (document.getElementById('isActive') as HTMLInputElement).checked;
+
+                const updatedData = {
+                    firstName: firstName || user.firstName,
+                    middleName: middleName || user.middleName,
+                    lastName: lastName || user.lastName,
+                    email: email || user.email,
+                    contactNumber: contactNumber || user.contactNumber,
+                    role: role || user.role,
+                    isActive
+                };
+
+                this.userService.updateUser(user.userId, updatedData).subscribe({
+                    next: () => {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'User updated successfully',
+                            icon: 'success'
+                        });
+                        this.loadUsers();
+                    },
+                    error: (error) => {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to update user: ' + (error.error?.message || error.message),
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
         });
     }
 

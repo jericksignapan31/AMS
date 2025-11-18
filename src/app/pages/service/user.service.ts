@@ -4,14 +4,26 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface UserData {
-    user_id: string;
+    userId?: string;
+    user_id?: string;
     email: string;
-    FirstName: string;
-    LastName: string;
-    Department: string;
-    MobileNo: string;
-    Campus: string;
+    firstName: string;
+    FirstName?: string;
+    lastName: string;
+    LastName?: string;
+    middleName?: string;
+    MiddleName?: string;
+    Department?: string;
+    MobileNo?: string;
+    contactNumber?: string;
+    Campus?: string;
     role: string;
+    isActive?: boolean;
+    isStaff?: boolean;
+    isSuperUser?: boolean;
+    userCreated?: string;
+    userUpdated?: string;
+    profilePicture?: string;
     profileImage?: string;
     [key: string]: any; // Allow additional fields
 }
