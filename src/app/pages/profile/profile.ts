@@ -408,15 +408,19 @@ export class ProfileComponent implements OnInit {
      */
     private fetchUserDataByUserIdAuto() {
         console.log('Auto-fetching current user profile');
+        console.log('Token:', localStorage.getItem('token') ? 'Present' : 'Missing');
 
         this.userService.getUserProfile().subscribe({
             next: (userData) => {
-                console.log('User profile auto-fetched successfully:', userData);
+                console.log('✓ User profile auto-fetched successfully:', userData);
                 this.fetchedUserData = userData; // Store in component
                 this.buildProfileInfoItems(); // Rebuild info items with new data
             },
             error: (error) => {
-                console.error('Error auto-fetching user profile:', error);
+                console.error('✗ Error auto-fetching user profile:', error);
+                console.error('Status:', error.status);
+                console.error('Message:', error.message);
+                console.error('Error Object:', error.error);
                 // Fail silently for auto-fetch
             }
         });
