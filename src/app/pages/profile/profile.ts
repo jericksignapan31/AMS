@@ -111,8 +111,14 @@ export class ProfileComponent implements OnInit {
         this.loadCurrentUser();
         // Automatically fetch user data from backend
         this.fetchUserDataByUserIdAuto();
-        // Load background image
-        this.loadBackgroundImage();
+        // Load background image (from localStorage first, then from API)
+        const savedBackground = localStorage.getItem('backgroundImage');
+        if (savedBackground) {
+            this.backgroundImage = savedBackground;
+            console.log('Background image loaded from localStorage');
+        } else {
+            this.loadBackgroundImage();
+        }
         // Build profile info items for display
         setTimeout(() => this.buildProfileInfoItems(), 100);
     }
@@ -257,9 +263,93 @@ export class ProfileComponent implements OnInit {
 
     editCover() {
         Swal.fire({
-            title: 'Edit Cover Photo',
-            text: 'Cover photo editing feature coming soon',
-            icon: 'info'
+            title: 'Upload Cover Photo',
+            html: `
+                <input type="file" id="coverFileInput" accept="image/*" style="display: none;" />
+                <div style="text-align: center;">
+                    <button type="button" onclick="document.getElementById('coverFileInput').click()" 
+                            style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Choose Image
+                    </button>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Upload',
+            cancelButtonText: 'Cancel',
+            didOpen: () => {
+                const fileInput = document.getElementById('coverFileInput') as HTMLInputElement;
+                if (fileInput) {
+                    fileInput.addEventListener('change', (e: any) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            // Validate file size (5MB)
+                            if (file.size > 5242880) {
+                                Swal.fire({
+                                    title: 'File Too Large',
+                                    text: 'Please select an image smaller than 5MB.',
+                                    icon: 'error'
+                                });
+                                return;
+                            }
+                            // Validate file type
+                            if (!file.type.startsWith('image/')) {
+                                Swal.fire({
+                                    title: 'Invalid File Type',
+                                    text: 'Please select a valid image file.',
+                                    icon: 'error'
+                                });
+                                return;
+                            }
+                            // Store file in component for upload on confirm
+                            (this as any).selectedCoverFile = file;
+                            Swal.update({
+                                confirmButtonText: 'Upload: ' + file.name
+                            });
+                        }
+                    });
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed && (this as any).selectedCoverFile) {
+                Swal.fire({
+                    title: 'Uploading...',
+                    text: 'Please wait while your cover photo is being uploaded.',
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
+
+                this.storageService.uploadBackgroundPicture((this as any).selectedCoverFile).subscribe({
+                    next: (response) => {
+                        console.log('Cover photo uploaded successfully:', response);
+                        const imageUrl = response.url || response.imageUrl || response.data?.url;
+                        if (imageUrl) {
+                            this.backgroundImage = `url('${imageUrl}')`;
+                            // Save to localStorage for persistence
+                            localStorage.setItem('backgroundImage', this.backgroundImage);
+                            console.log('Background image saved to localStorage');
+                        }
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Cover photo updated successfully.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: (error) => {
+                        console.error('Error uploading cover photo:', error);
+                        Swal.fire({
+                            title: 'Upload Failed',
+                            text: 'Failed to upload cover photo: ' + (error.error?.message || error.message),
+                            icon: 'error'
+                        });
+                    }
+                });
+                (this as any).selectedCoverFile = null;
+            }
         });
     }
 
