@@ -43,6 +43,7 @@ import Swal from 'sweetalert2';
             [globalFilterFields]="['FirstName', 'email']"
             [tableStyle]="{ 'min-width': '100rem' }"
             [(selection)]="selectedUsers"
+            (selectionChange)="onSelectionChange($event)"
             [rowHover]="true"
             dataKey="userId"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
@@ -216,6 +217,17 @@ export class UsersComponent implements OnInit {
         );
     }
 
+    onSelectionChange(event: any) {
+        console.log('Selection changed:', event);
+        console.log('Selected users:', this.selectedUsers);
+        if (this.selectedUsers && this.selectedUsers.length > 0) {
+            console.log(
+                'Selected user IDs:',
+                this.selectedUsers.map((u: any) => u.userId || u.user_id)
+            );
+        }
+    }
+
     viewUser(user: any) {
         const createdDate = new Date(user.userCreated).toLocaleDateString();
         Swal.fire({
@@ -380,17 +392,23 @@ export class UsersComponent implements OnInit {
         });
     }
     deleteUser(user: any) {
+        const userId = user.userId || user.user_id;
+        console.log('Deleting single user:', userId, 'Full user object:', user);
+
         Swal.fire({
             title: 'Confirm Delete',
             text: 'Are you sure you want to delete this user?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel'
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d'
         }).then((result) => {
             if (result.isConfirmed) {
-                this.userService.deleteUser(user.user_id).subscribe({
+                this.userService.deleteUser(userId).subscribe({
                     next: () => {
+                        console.log('User deleted successfully:', userId);
                         Swal.fire({
                             title: 'Deleted!',
                             text: 'User has been deleted successfully.',
@@ -399,6 +417,7 @@ export class UsersComponent implements OnInit {
                         this.loadUsers();
                     },
                     error: (error) => {
+                        console.error('Error deleting user:', userId, error);
                         Swal.fire({
                             title: 'Error',
                             text: 'Failed to delete user: ' + (error.error?.message || error.message),
@@ -694,9 +713,13 @@ export class UsersComponent implements OnInit {
                 let failedCount = 0;
 
                 this.selectedUsers.forEach((user) => {
-                    this.userService.deleteUser(user.user_id).subscribe({
+                    const userId = user.userId || user.user_id;
+                    console.log('Deleting user:', userId, 'Full user object:', user);
+
+                    this.userService.deleteUser(userId).subscribe({
                         next: () => {
                             deletedCount++;
+                            console.log(`User deleted: ${userId} (${deletedCount}/${this.selectedUsers.length})`);
                             if (deletedCount + failedCount === this.selectedUsers.length) {
                                 this.selectedUsers = [];
                                 this.loadUsers();
@@ -707,8 +730,9 @@ export class UsersComponent implements OnInit {
                                 });
                             }
                         },
-                        error: () => {
+                        error: (error) => {
                             failedCount++;
+                            console.error(`Failed to delete user ${userId}:`, error);
                             if (deletedCount + failedCount === this.selectedUsers.length) {
                                 this.selectedUsers = [];
                                 this.loadUsers();
