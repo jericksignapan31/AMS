@@ -32,4 +32,13 @@ export class StorageService {
             body: { url: pictureUrl }
         });
     }
+
+    /**
+     * Get profile picture for a user
+     * @param userId - The user ID
+     * @returns Observable of the image URL
+     */
+    getProfilePicture(userId: string): Observable<any> {
+        return this.http.get(`${this.apiUrl}/profile-picture/${userId}`);
+    }
 }

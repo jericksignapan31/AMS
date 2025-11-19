@@ -22,10 +22,8 @@ import Swal from 'sweetalert2';
     template: `
         <div class="profile-container">
             <!-- Background Header Section -->
-            <div class="profile-header-bg" [style.backgroundImage]="'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
-                <button type="button" class="p-button p-button-rounded p-button-text absolute" style="top: 1rem; right: 1rem; color: white;" title="Edit Cover" (click)="editCover()">
-                    <i class="pi pi-camera"></i>
-                </button>
+            <div class="profile-header-bg" [style.backgroundImage]="backgroundImage">
+                <button type="button" pButton label="Edit Cover" class="p-button-secondary" style="position: absolute; top: 1rem; right: 1rem;" (click)="editCover()"></button>
             </div>
 
             <!-- Profile Info Section -->
@@ -99,6 +97,7 @@ export class ProfileComponent implements OnInit {
     profileInfoItems: any[] = []; // Store info items for ngFor
     isEditMode: boolean = false; // Toggle between view and edit mode
     editFormData: any = {}; // Store form data during edit mode
+    backgroundImage: string = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; // Background image/gradient
 
     constructor(
         private router: Router,
@@ -112,6 +111,8 @@ export class ProfileComponent implements OnInit {
         this.loadCurrentUser();
         // Automatically fetch user data from backend
         this.fetchUserDataByUserIdAuto();
+        // Load background image
+        this.loadBackgroundImage();
         // Build profile info items for display
         setTimeout(() => this.buildProfileInfoItems(), 100);
     }
@@ -121,6 +122,30 @@ export class ProfileComponent implements OnInit {
         const firstName = this.currentUser.FirstName || '';
         const lastName = this.currentUser.LastName || '';
         return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    }
+
+    loadBackgroundImage() {
+        const userId = this.userContextService.getUserId();
+
+        if (!userId) {
+            console.log('No userId found, using default background');
+            return;
+        }
+
+        this.storageService.getProfilePicture(userId).subscribe({
+            next: (response: any) => {
+                const imageUrl = response.url || response.imageUrl || response.data?.url;
+                if (imageUrl) {
+                    this.backgroundImage = `url('${imageUrl}')`;
+                    console.log('Background image loaded:', imageUrl);
+                }
+            },
+            error: (error) => {
+                console.error('Error loading background image:', error);
+                // Keep default gradient on error
+                this.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }
+        });
     }
 
     triggerFileUpload(): void {
