@@ -88,4 +88,20 @@ export class UserService {
     createUser(userData: UserData): Observable<UserData> {
         return this.http.post<UserData>(this.apiUrl, userData);
     }
+
+    /**
+     * Get all campuses
+     * @returns Observable of array of campuses
+     */
+    getCampuses(): Observable<any[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/campuses`);
+    }
+
+    /**
+     * Get all departments
+     * @returns Observable of array of departments
+     */
+    getDepartments(): Observable<any[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/departments`);
+    }
 }

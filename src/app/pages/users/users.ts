@@ -12,6 +12,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../service/user.service';
+import { UserContextService } from '../service/user-context.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -117,17 +118,71 @@ export class UsersComponent implements OnInit {
     selectedUsers: any[] = [];
     searchValue: string = '';
     loading: boolean = false;
+    currentUserRole: string = '';
+    campuses: any[] = [];
+    departments: any[] = [];
 
     constructor(
         private userService: UserService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private userContextService: UserContextService
     ) {}
 
     ngOnInit() {
+        console.log('UsersComponent initialized');
         this.loadUsers();
+        this.loadCurrentUserRole();
+        this.loadCampuses();
+        this.loadDepartments();
+    }
+
+    loadDepartments() {
+        console.log('Loading departments...');
+        this.userService.getDepartments().subscribe({
+            next: (response: any) => {
+                console.log('API Department Response:', response);
+                console.table(response);
+                this.departments = Array.isArray(response) ? response : response.data || [];
+                console.log('Departments set:', this.departments);
+            },
+            error: (error) => {
+                console.error('Error loading departments:', error);
+            }
+        });
+    }
+
+    loadCampuses() {
+        console.log('Loading campuses...');
+        this.userService.getCampuses().subscribe({
+            next: (response: any) => {
+                console.log('Campuses loaded:', response);
+                this.campuses = Array.isArray(response) ? response : response.data || [];
+                console.log('Campuses set:', this.campuses);
+            },
+            error: (error) => {
+                console.error('Error loading campuses:', error);
+            }
+        });
+    }
+
+    loadCurrentUserRole() {
+        const userId = this.userContextService.getUserId();
+        console.log('Loading current user role, userId:', userId);
+        if (userId) {
+            this.userService.getUserById(userId).subscribe({
+                next: (user: any) => {
+                    this.currentUserRole = user.role || '';
+                    console.log('Current user role:', this.currentUserRole);
+                },
+                error: (error) => {
+                    console.error('Error loading current user:', error);
+                }
+            });
+        }
     }
 
     loadUsers() {
+        console.log('Loading users...');
         this.loading = true;
         this.userService.getAllUsers().subscribe({
             next: (response: any) => {
@@ -135,6 +190,7 @@ export class UsersComponent implements OnInit {
                 this.users = Array.isArray(response) ? response : response.data || [];
                 this.filteredUsers = [...this.users];
                 this.loading = false;
+                console.log('Users set:', this.users);
             },
             error: (error) => {
                 console.error('Error loading users:', error);
@@ -355,12 +411,268 @@ export class UsersComponent implements OnInit {
     }
 
     openNewUserDialog() {
+        const newUserData = {
+            userName: '',
+            email: '',
+            password: '',
+            firstName: '',
+            lastName: '',
+            middleName: '',
+            contactNumber: '',
+            department: '',
+            campus: '',
+            role: 'CampusAdmin',
+            isActive: true,
+            isStaff: false,
+            isSuperUser: false
+        };
+
         Swal.fire({
-            title: 'Add New User',
-            text: 'Add user functionality coming soon',
-            icon: 'info',
-            confirmButtonText: 'OK'
+            title: '',
+            titleText: '',
+            html: `
+                <div style="text-align: left; width: 100%; max-width: 700px; margin: 0 auto;">
+                    <div style="background: #f5f5f5; color: #333; padding: 16px; margin: -16px -16px 16px -16px; border-radius: 8px 8px 0 0;">
+                        <h2 style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: 0.5px;">➕ Add New User</h2>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">First Name *</label>
+                            <input id="newFirstName" type="text" placeholder="First" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Middle Name</label>
+                            <input id="newMiddleName" type="text" placeholder="Middle" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Last Name *</label>
+                            <input id="newLastName" type="text" placeholder="Last" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Username *</label>
+                            <input id="newUserName" type="text" placeholder="username" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Email *</label>
+                            <input id="newEmail" type="email" placeholder="email@example.com" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Password *</label>
+                            <input id="newPassword" type="password" placeholder="••••••••" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Contact Number</label>
+                            <input id="newContactNumber" type="text" placeholder="+63" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Department * <span style="color: #999; font-size: 11px;" id="deptLockStatus">(Select Campus First)</span></label>
+                            <select id="newDepartment" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #ccc; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; color: #999; cursor: not-allowed;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" disabled>
+                                <option value="">-- Select Department --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Campus *</label>
+                            <select id="newCampus" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'">
+                                <option value="">-- Select Campus --</option>
+                                ${this.campuses.map((campus: any) => `<option value="${campus.campusId}">${campus.campusName}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Role * ${this.currentUserRole === 'SuperAdmin' ? '<span style="color: #999; font-size: 11px;">(Auto)</span>' : ''}</label>
+                            ${
+                                this.currentUserRole === 'SuperAdmin'
+                                    ? `<input id="newRole" type="text" value="CampusAdmin" placeholder="Role" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #ccc; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; color: #999; cursor: not-allowed;" disabled />`
+                                    : `<select id="newRole" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'">
+                                    <option value="Faculty">Faculty</option>
+                                    <option value="LabTech">LabTech</option>
+                                    <option value="CampusAdmin" selected>CampusAdmin</option>
+                                    <option value="SuperAdmin">SuperAdmin</option>
+                                </select>`
+                            }
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0;">
+                        <label style="font-weight: 500; color: #555; margin: 0; font-size: 13px; flex: 1;">Active Status</label>
+                        <div style="position: relative; display: inline-block; width: 48px; height: 24px;">
+                            <input id="newIsActive" type="checkbox" checked style="opacity: 0; width: 0; height: 0; cursor: pointer;" />
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #667eea; transition: 0.3s; border-radius: 24px;"></span>
+                            <span style="position: absolute; content: ''; height: 20px; width: 20px; left: 24px; bottom: 2px; background-color: white; transition: 0.3s; border-radius: 50%;"></span>
+                        </div>
+                    </div>
+                </div>
+            `,
+            width: '750px',
+            showCancelButton: true,
+            confirmButtonText: 'Create User',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#667eea',
+            cancelButtonColor: '#e0e0e0',
+            didOpen: () => {
+                const firstNameInput = document.getElementById('newFirstName') as HTMLInputElement;
+                if (firstNameInput) firstNameInput.focus();
+
+                // Campus selection change handler
+                const campusSelect = document.getElementById('newCampus') as HTMLSelectElement;
+                const departmentSelect = document.getElementById('newDepartment') as HTMLSelectElement;
+                const deptLockStatus = document.getElementById('deptLockStatus') as HTMLElement;
+
+                if (campusSelect && departmentSelect) {
+                    campusSelect.addEventListener('change', (e: Event) => {
+                        const selectedCampusId = (e.target as HTMLSelectElement).value;
+
+                        if (selectedCampusId) {
+                            // Filter departments by campus
+                            const filteredDepts = this.departments.filter((dept: any) => dept.campus && dept.campus.campusId === selectedCampusId);
+
+                            // Clear current options
+                            departmentSelect.innerHTML = '<option value="">-- Select Department --</option>';
+
+                            // Add filtered department options
+                            filteredDepts.forEach((dept: any) => {
+                                const option = document.createElement('option');
+                                option.value = dept.departmentId;
+                                option.textContent = dept.departmentName;
+                                departmentSelect.appendChild(option);
+                            });
+
+                            // Enable department select
+                            departmentSelect.disabled = false;
+                            departmentSelect.style.color = '#333';
+                            departmentSelect.style.borderBottomColor = '#e0e0e0';
+                            departmentSelect.style.cursor = 'pointer';
+                            deptLockStatus.textContent = '';
+                        } else {
+                            // Disable department select
+                            departmentSelect.disabled = true;
+                            departmentSelect.innerHTML = '<option value="">-- Select Department --</option>';
+                            departmentSelect.style.color = '#999';
+                            departmentSelect.style.borderBottomColor = '#ccc';
+                            departmentSelect.style.cursor = 'not-allowed';
+                            deptLockStatus.textContent = '(Select Campus First)';
+                        }
+                    });
+                }
+
+                // Toggle functionality
+                const toggleCheckbox = document.getElementById('newIsActive') as HTMLInputElement;
+                const toggleDiv = toggleCheckbox?.parentElement?.parentElement as HTMLElement;
+                const toggleSpan = toggleCheckbox?.parentElement?.querySelector('span:nth-child(2)') as HTMLElement;
+                const toggleCircle = toggleCheckbox?.parentElement?.querySelector('span:nth-child(3)') as HTMLElement;
+
+                if (toggleCheckbox && toggleSpan && toggleCircle && toggleDiv) {
+                    toggleCheckbox.addEventListener('change', () => {
+                        toggleSpan.style.backgroundColor = toggleCheckbox.checked ? '#667eea' : '#ddd';
+                        toggleCircle.style.left = toggleCheckbox.checked ? '24px' : '2px';
+                    });
+
+                    toggleDiv.addEventListener('click', (e: Event) => {
+                        if (e.target !== toggleCheckbox) {
+                            toggleCheckbox.checked = !toggleCheckbox.checked;
+                            toggleCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+
+                    toggleSpan?.addEventListener('click', () => {
+                        toggleCheckbox.checked = !toggleCheckbox.checked;
+                        toggleCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+
+                    toggleCircle?.addEventListener('click', () => {
+                        toggleCheckbox.checked = !toggleCheckbox.checked;
+                        toggleCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Get form values
+                const firstName = (document.getElementById('newFirstName') as HTMLInputElement).value.trim();
+                const lastName = (document.getElementById('newLastName') as HTMLInputElement).value.trim();
+                const userName = (document.getElementById('newUserName') as HTMLInputElement).value.trim();
+                const email = (document.getElementById('newEmail') as HTMLInputElement).value.trim();
+                const password = (document.getElementById('newPassword') as HTMLInputElement).value.trim();
+                const middleName = (document.getElementById('newMiddleName') as HTMLInputElement).value.trim();
+                const contactNumber = (document.getElementById('newContactNumber') as HTMLInputElement).value.trim();
+                const department = (document.getElementById('newDepartment') as HTMLSelectElement).value;
+                const campus = (document.getElementById('newCampus') as HTMLSelectElement).value;
+                const role = (document.getElementById('newRole') as HTMLSelectElement).value;
+                const isActive = (document.getElementById('newIsActive') as HTMLInputElement).checked;
+
+                // Validation
+                if (!firstName) {
+                    Swal.fire({ title: 'Error', text: 'First Name is required', icon: 'error' });
+                    return;
+                }
+                if (!lastName) {
+                    Swal.fire({ title: 'Error', text: 'Last Name is required', icon: 'error' });
+                    return;
+                }
+                if (!userName) {
+                    Swal.fire({ title: 'Error', text: 'Username is required', icon: 'error' });
+                    return;
+                }
+                if (!email || !this.isValidEmail(email)) {
+                    Swal.fire({ title: 'Error', text: 'Valid email is required', icon: 'error' });
+                    return;
+                }
+                if (!password || password.length < 6) {
+                    Swal.fire({ title: 'Error', text: 'Password must be at least 6 characters', icon: 'error' });
+                    return;
+                }
+                if (!department) {
+                    Swal.fire({ title: 'Error', text: 'Department is required', icon: 'error' });
+                    return;
+                }
+                if (!campus) {
+                    Swal.fire({ title: 'Error', text: 'Campus is required', icon: 'error' });
+                    return;
+                }
+
+                const newUserPayload = {
+                    userName,
+                    email,
+                    password,
+                    firstName,
+                    lastName,
+                    middleName: middleName || undefined,
+                    contactNumber: contactNumber || undefined,
+                    department,
+                    campus,
+                    role,
+                    isActive,
+                    profilePicture: undefined
+                };
+
+                this.userService.createUser(newUserPayload).subscribe({
+                    next: () => {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'User created successfully',
+                            icon: 'success'
+                        });
+                        this.loadUsers();
+                    },
+                    error: (error) => {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to create user: ' + (error.error?.message || error.message),
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
         });
+    }
+
+    private isValidEmail(email: string): boolean {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     }
 
     deleteSelectedUsers() {
