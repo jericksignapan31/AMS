@@ -12,6 +12,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../service/user.service';
+import { AuthService } from '../service/auth.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -112,7 +113,8 @@ export class DepartmentsComponent implements OnInit {
 
     constructor(
         private userService: UserService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private authService: AuthService
     ) {}
 
     ngOnInit() {
@@ -198,8 +200,7 @@ export class DepartmentsComponent implements OnInit {
 
     editDepartment(department: any) {
         const editData = {
-            departmentName: department.departmentName,
-            campusId: department.campus?.campusId || ''
+            departmentName: department.departmentName
         };
 
         Swal.fire({
@@ -214,13 +215,6 @@ export class DepartmentsComponent implements OnInit {
                         <div>
                             <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Department Name *</label>
                             <input id="departmentName" type="text" value="${editData.departmentName}" placeholder="Department Name" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
-                        </div>
-                        <div>
-                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Campus *</label>
-                            <select id="campusId" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'">
-                                <option value="">-- Select Campus --</option>
-                                ${this.campuses.map((campus: any) => `<option value="${campus.campusId}" ${campus.campusId === editData.campusId ? 'selected' : ''}>${campus.campusName}</option>`).join('')}
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -238,21 +232,14 @@ export class DepartmentsComponent implements OnInit {
         }).then((result) => {
             if (result.isConfirmed) {
                 const departmentName = (document.getElementById('departmentName') as HTMLInputElement).value.trim();
-                const campusId = (document.getElementById('campusId') as HTMLSelectElement).value;
 
                 if (!departmentName) {
                     Swal.fire({ title: 'Error', text: 'Department Name is required', icon: 'error' });
                     return;
                 }
 
-                if (!campusId) {
-                    Swal.fire({ title: 'Error', text: 'Campus is required', icon: 'error' });
-                    return;
-                }
-
                 const updatedData = {
-                    departmentName,
-                    campusId
+                    departmentName
                 };
 
                 this.userService.updateDepartment(department.departmentId, updatedData).subscribe({
@@ -328,13 +315,6 @@ export class DepartmentsComponent implements OnInit {
                             <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Department Name *</label>
                             <input id="newDepartmentName" type="text" placeholder="Department Name" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
                         </div>
-                        <div>
-                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Campus *</label>
-                            <select id="newCampusId" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'">
-                                <option value="">-- Select Campus --</option>
-                                ${this.campuses.map((campus: any) => `<option value="${campus.campusId}">${campus.campusName}</option>`).join('')}
-                            </select>
-                        </div>
                     </div>
                 </div>
             `,
@@ -351,21 +331,14 @@ export class DepartmentsComponent implements OnInit {
         }).then((result) => {
             if (result.isConfirmed) {
                 const departmentName = (document.getElementById('newDepartmentName') as HTMLInputElement).value.trim();
-                const campusId = (document.getElementById('newCampusId') as HTMLSelectElement).value;
 
                 if (!departmentName) {
                     Swal.fire({ title: 'Error', text: 'Department Name is required', icon: 'error' });
                     return;
                 }
 
-                if (!campusId) {
-                    Swal.fire({ title: 'Error', text: 'Campus is required', icon: 'error' });
-                    return;
-                }
-
                 const newDepartmentPayload = {
-                    departmentName,
-                    campusId
+                    departmentName
                 };
 
                 this.userService.createDepartment(newDepartmentPayload).subscribe({
