@@ -44,7 +44,7 @@ import Swal from 'sweetalert2';
                         {{ fetchedUserData?.firstName }} {{ fetchedUserData?.middleName }} {{ fetchedUserData?.lastName }} <span *ngIf="!fetchedUserData">{{ currentUser?.FirstName }} {{ currentUser?.LastName }}</span>
                     </h1>
                     <p class="profile-role">{{ fetchedUserData?.role || currentUser?.role }}</p>
-                    <p class="profile-bio">{{ fetchedUserData?.department || currentUser?.Department }} • {{ fetchedUserData?.campus || currentUser?.Campus }}</p>
+                    <p class="profile-bio">{{ getDepartmentName(fetchedUserData?.department || currentUser?.Department) }} • {{ getCampusName(fetchedUserData?.campus || currentUser?.Campus) }}</p>
                 </div>
             </div>
 
@@ -128,6 +128,28 @@ export class ProfileComponent implements OnInit {
         const firstName = this.currentUser.FirstName || '';
         const lastName = this.currentUser.LastName || '';
         return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    }
+
+    getCampusName(campus: any): string {
+        // Handle campus as object or string
+        if (typeof campus === 'string') {
+            return campus;
+        }
+        if (campus && typeof campus === 'object') {
+            return campus.campusName || campus.name || 'N/A';
+        }
+        return 'N/A';
+    }
+
+    getDepartmentName(department: any): string {
+        // Handle department as object or string
+        if (typeof department === 'string') {
+            return department;
+        }
+        if (department && typeof department === 'object') {
+            return department.departmentName || department.name || 'N/A';
+        }
+        return 'N/A';
     }
 
     loadBackgroundImage() {
@@ -373,7 +395,7 @@ export class ProfileComponent implements OnInit {
             { label: 'Username', key: 'userName', value: this.fetchedUserData?.userName || 'N/A' },
             { label: 'Contact Number', key: 'contactNumber', value: this.fetchedUserData?.contactNumber || 'N/A' },
             { label: 'Department', key: 'department', value: this.fetchedUserData?.department || this.currentUser?.Department },
-            { label: 'Campus', key: 'campus', value: this.fetchedUserData?.campus || this.currentUser?.Campus },
+            { label: 'Campus', key: 'campus', value: this.getCampusName(this.fetchedUserData?.campus || this.currentUser?.Campus) },
             { label: 'Role', key: 'role', value: this.fetchedUserData?.role || this.currentUser?.role },
             { label: 'User ID', key: 'userId', value: this.fetchedUserData?.userId || this.currentUser?.user_id },
             { label: 'Status', key: 'isActive', value: this.fetchedUserData?.isActive ? 'Active' : 'Inactive' },
