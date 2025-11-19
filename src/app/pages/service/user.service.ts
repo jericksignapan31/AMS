@@ -104,4 +104,32 @@ export class UserService {
     getDepartments(): Observable<any[]> {
         return this.http.get<any[]>(`${environment.apiUrl}/departments`);
     }
+
+    /**
+     * Create new campus
+     * @param campusData - The campus data to create
+     * @returns Observable of created campus
+     */
+    createCampus(campusData: any): Observable<any> {
+        return this.http.post<any>(`${environment.apiUrl}/campuses`, campusData);
+    }
+
+    /**
+     * Update campus
+     * @param campusId - The campus ID to update
+     * @param campusData - The campus data to update
+     * @returns Observable of updated campus
+     */
+    updateCampus(campusId: string, campusData: any): Observable<any> {
+        return this.http.patch<any>(`${environment.apiUrl}/campuses/${campusId}`, campusData);
+    }
+
+    /**
+     * Delete campus
+     * @param campusId - The campus ID to delete
+     * @returns Observable of delete response
+     */
+    deleteCampus(campusId: string): Observable<any> {
+        return this.http.delete(`${environment.apiUrl}/campuses/${campusId}`);
+    }
 }

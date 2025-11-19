@@ -54,27 +54,12 @@ export class AppMenu {
                         icon: 'pi pi-fw pi-user',
                         routerLink: ['/app/pages/users']
                     },
-                    // {
-                    //     label: 'Auth',
-                    //     icon: 'pi pi-fw pi-user',
-                    //     items: [
-                    //         {
-                    //             label: 'Login',
-                    //             icon: 'pi pi-fw pi-sign-in',
-                    //             routerLink: ['/auth/login']
-                    //         },
-                    //         {
-                    //             label: 'Error',
-                    //             icon: 'pi pi-fw pi-times-circle',
-                    //             routerLink: ['/auth/error']
-                    //         },
-                    //         {
-                    //             label: 'Access Denied',
-                    //             icon: 'pi pi-fw pi-lock',
-                    //             routerLink: ['/auth/access']
-                    //         }
-                    //     ]
-                    // },
+                    {
+                        label: 'Campuses',
+                        icon: 'pi pi-fw pi-building',
+                        routerLink: ['/app/pages/campuses']
+                    },
+
                     {
                         label: 'Assets',
                         icon: 'pi pi-fw pi-pencil',

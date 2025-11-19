@@ -5,9 +5,11 @@ import { Empty } from './empty/empty';
 import { CustodianComponent } from './custodian/custodian';
 import { RequestmaintenanceComponent } from './requestmaintenance/requestmaintenance/requestmaintenance.component';
 import { UsersComponent } from './users/users';
+import { CampusesComponent } from './campuses/campuses';
 
 export const pageRoutes: Routes = [
     { path: 'users', component: UsersComponent },
+    { path: 'campuses', component: CampusesComponent },
     { path: 'documentation', component: Documentation },
     { path: 'crud', component: Crud },
     { path: 'custodian', component: CustodianComponent },
