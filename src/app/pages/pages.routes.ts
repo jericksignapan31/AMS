@@ -6,10 +6,12 @@ import { CustodianComponent } from './custodian/custodian';
 import { RequestmaintenanceComponent } from './requestmaintenance/requestmaintenance/requestmaintenance.component';
 import { UsersComponent } from './users/users';
 import { CampusesComponent } from './campuses/campuses';
+import { DepartmentsComponent } from './departments/departments';
 
 export const pageRoutes: Routes = [
     { path: 'users', component: UsersComponent },
     { path: 'campuses', component: CampusesComponent },
+    { path: 'departments', component: DepartmentsComponent },
     { path: 'documentation', component: Documentation },
     { path: 'crud', component: Crud },
     { path: 'custodian', component: CustodianComponent },

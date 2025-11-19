@@ -59,6 +59,11 @@ export class AppMenu {
                         icon: 'pi pi-fw pi-building',
                         routerLink: ['/app/pages/campuses']
                     },
+                    {
+                        label: 'Departments',
+                        icon: 'pi pi-fw pi-building-columns',
+                        routerLink: ['/app/pages/departments']
+                    },
 
                     {
                         label: 'Assets',

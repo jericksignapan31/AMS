@@ -132,4 +132,32 @@ export class UserService {
     deleteCampus(campusId: string): Observable<any> {
         return this.http.delete(`${environment.apiUrl}/campuses/${campusId}`);
     }
+
+    /**
+     * Create new department
+     * @param departmentData - The department data to create
+     * @returns Observable of created department
+     */
+    createDepartment(departmentData: any): Observable<any> {
+        return this.http.post<any>(`${environment.apiUrl}/departments`, departmentData);
+    }
+
+    /**
+     * Update department
+     * @param departmentId - The department ID to update
+     * @param departmentData - The department data to update
+     * @returns Observable of updated department
+     */
+    updateDepartment(departmentId: string, departmentData: any): Observable<any> {
+        return this.http.patch<any>(`${environment.apiUrl}/departments/${departmentId}`, departmentData);
+    }
+
+    /**
+     * Delete department
+     * @param departmentId - The department ID to delete
+     * @returns Observable of delete response
+     */
+    deleteDepartment(departmentId: string): Observable<any> {
+        return this.http.delete(`${environment.apiUrl}/departments/${departmentId}`);
+    }
 }
