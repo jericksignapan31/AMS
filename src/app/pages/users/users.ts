@@ -44,7 +44,7 @@ import Swal from 'sweetalert2';
             [tableStyle]="{ 'min-width': '100rem' }"
             [(selection)]="selectedUsers"
             [rowHover]="true"
-            dataKey="user_id"
+            dataKey="userId"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
             [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
