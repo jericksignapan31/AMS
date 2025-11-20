@@ -70,6 +70,23 @@ import Swal from 'sweetalert2';
                                         </span>
                                     </div>
                                 </div>
+                                <!-- Locked Fields - Display only -->
+                                <div class="info-item-display">
+                                    <label class="info-label">Department</label>
+                                    <div class="info-value-display">{{ getDepartmentName(fetchedUserData?.department || currentUser?.Department) }}</div>
+                                </div>
+                                <div class="info-item-display">
+                                    <label class="info-label">Campus</label>
+                                    <div class="info-value-display">{{ getCampusName(fetchedUserData?.campus || currentUser?.Campus) }}</div>
+                                </div>
+                                <div class="info-item-display">
+                                    <label class="info-label">Role</label>
+                                    <div class="info-value-display">{{ fetchedUserData?.role || currentUser?.role }}</div>
+                                </div>
+                                <div class="info-item-display">
+                                    <label class="info-label">User ID</label>
+                                    <div class="info-value-display">{{ fetchedUserData?.userId || currentUser?.user_id }}</div>
+                                </div>
                             </div>
                             <div class="info-grid-edit" *ngIf="isEditMode">
                                 <div class="edit-input-group" *ngFor="let item of profileInfoItems">
@@ -82,6 +99,23 @@ import Swal from 'sweetalert2';
                                         </label>
                                         <span style="margin-left: 0.5rem;">{{ editFormData['isActive'] ? 'Active' : 'Inactive' }}</span>
                                     </div>
+                                </div>
+                                <!-- Locked Fields - Display as read-only -->
+                                <div class="edit-input-group">
+                                    <label class="edit-label">Department</label>
+                                    <input type="text" [value]="getDepartmentName(fetchedUserData?.department || currentUser?.Department)" disabled class="edit-input" style="opacity: 0.6; cursor: not-allowed;" />
+                                </div>
+                                <div class="edit-input-group">
+                                    <label class="edit-label">Campus</label>
+                                    <input type="text" [value]="getCampusName(fetchedUserData?.campus || currentUser?.Campus)" disabled class="edit-input" style="opacity: 0.6; cursor: not-allowed;" />
+                                </div>
+                                <div class="edit-input-group">
+                                    <label class="edit-label">Role</label>
+                                    <input type="text" [value]="fetchedUserData?.role || currentUser?.role" disabled class="edit-input" style="opacity: 0.6; cursor: not-allowed;" />
+                                </div>
+                                <div class="edit-input-group">
+                                    <label class="edit-label">User ID</label>
+                                    <input type="text" [value]="fetchedUserData?.userId || currentUser?.user_id" disabled class="edit-input" style="opacity: 0.6; cursor: not-allowed;" />
                                 </div>
                             </div>
                         </div>
@@ -97,6 +131,7 @@ export class ProfileComponent implements OnInit {
     profileInfoItems: any[] = []; // Store info items for ngFor
     isEditMode: boolean = false; // Toggle between view and edit mode
     editFormData: any = {}; // Store form data during edit mode
+    originalFormData: any = {}; // Store original form data for validation
     backgroundImage: string = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; // Background image/gradient
 
     constructor(
@@ -394,12 +429,7 @@ export class ProfileComponent implements OnInit {
             { label: 'Email', key: 'email', value: this.fetchedUserData?.email || this.currentUser?.email },
             { label: 'Username', key: 'userName', value: this.fetchedUserData?.userName || 'N/A' },
             { label: 'Contact Number', key: 'contactNumber', value: this.fetchedUserData?.contactNumber || 'N/A' },
-            { label: 'Department', key: 'department', value: this.fetchedUserData?.department || this.currentUser?.Department },
-            { label: 'Campus', key: 'campus', value: this.getCampusName(this.fetchedUserData?.campus || this.currentUser?.Campus) },
-            { label: 'Role', key: 'role', value: this.fetchedUserData?.role || this.currentUser?.role },
-            { label: 'User ID', key: 'userId', value: this.fetchedUserData?.userId || this.currentUser?.user_id },
-            { label: 'Status', key: 'isActive', value: this.fetchedUserData?.isActive ? 'Active' : 'Inactive' },
-            { label: 'Staff', key: 'isStaff', value: this.fetchedUserData?.isStaff ? 'Yes' : 'No' }
+            { label: 'Status', key: 'isActive', value: this.fetchedUserData?.isActive ? 'Active' : 'Inactive' }
         ];
         // Initialize edit form data
         this.initializeEditFormData();
@@ -409,6 +439,9 @@ export class ProfileComponent implements OnInit {
      * Initialize edit form data with current values
      */
     initializeEditFormData() {
+        // Get the logged-in user's departmentId (not from fetched data)
+        const userDepartmentId = this.fetchedUserData?.department?.departmentId || this.currentUser?.department?.departmentId || '';
+
         this.editFormData = {
             firstName: this.fetchedUserData?.firstName || this.currentUser?.FirstName || '',
             lastName: this.fetchedUserData?.lastName || this.currentUser?.LastName || '',
@@ -416,13 +449,11 @@ export class ProfileComponent implements OnInit {
             email: this.fetchedUserData?.email || this.currentUser?.email || '',
             userName: this.fetchedUserData?.userName || '',
             contactNumber: this.fetchedUserData?.contactNumber || '',
-            department: this.fetchedUserData?.department || this.currentUser?.Department || '',
-            campus: this.fetchedUserData?.campus || this.currentUser?.Campus || '',
-            role: this.fetchedUserData?.role || this.currentUser?.role || '',
-            userId: this.fetchedUserData?.userId || this.currentUser?.user_id || '',
-            isActive: this.fetchedUserData?.isActive || false,
-            isStaff: this.fetchedUserData?.isStaff || false
+            department: userDepartmentId,
+            isActive: this.fetchedUserData?.isActive || false
         };
+        // Store original values for validation
+        this.originalFormData = JSON.parse(JSON.stringify(this.editFormData));
     }
 
     /**
@@ -435,6 +466,9 @@ export class ProfileComponent implements OnInit {
         } else {
             // Enter edit mode
             this.isEditMode = true;
+            console.log('🔵 Edit Mode Activated');
+            console.log('Department ID:', this.editFormData.department);
+            console.log('Edit Form Data:', this.editFormData);
         }
     }
 
@@ -462,8 +496,45 @@ export class ProfileComponent implements OnInit {
                     return;
                 }
 
+                // Prepare payload with user's current department (always send the same)
+                const userDepartment = this.editFormData.department || this.originalFormData.department;
+                const userCampus = this.getCampusName(this.fetchedUserData?.campus || this.currentUser?.Campus || '');
+
+                const updatePayload = {
+                    firstName: this.editFormData.firstName?.trim() || this.originalFormData.firstName,
+                    lastName: this.editFormData.lastName?.trim() || this.originalFormData.lastName,
+                    middleName: this.editFormData.middleName?.trim() || this.originalFormData.middleName,
+                    email: this.editFormData.email?.trim() || this.originalFormData.email,
+                    userName: this.editFormData.userName?.trim() || this.originalFormData.userName,
+                    contactNumber: this.editFormData.contactNumber?.trim() || this.originalFormData.contactNumber,
+                    department: userDepartment,
+                    campus: userCampus,
+                    isActive: this.editFormData.isActive !== undefined ? this.editFormData.isActive : this.originalFormData.isActive
+                };
+
+                // Validate required fields are not empty
+                if (!updatePayload.firstName?.trim()) {
+                    Swal.fire({
+                        title: 'Validation Error',
+                        text: 'First Name is required',
+                        icon: 'error'
+                    });
+                    return;
+                }
+                if (!updatePayload.lastName?.trim()) {
+                    Swal.fire({
+                        title: 'Validation Error',
+                        text: 'Last Name is required',
+                        icon: 'error'
+                    });
+                    return;
+                }
+
+                // Log payload being sent to backend
+                console.log('📤 Sending to Backend:', updatePayload);
+
                 // Call backend API to update user
-                this.userService.updateUser(userId, this.editFormData).subscribe({
+                this.userService.updateUser(userId, updatePayload).subscribe({
                     next: (response) => {
                         console.log('User updated successfully:', response);
 

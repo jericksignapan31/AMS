@@ -51,7 +51,7 @@ export class AppMenu {
                 items: [
                     {
                         label: 'Users',
-                        icon: 'pi pi-fw pi-user',
+                        icon: 'pi pi-fw pi-users',
                         routerLink: ['/app/pages/users']
                     },
                     {

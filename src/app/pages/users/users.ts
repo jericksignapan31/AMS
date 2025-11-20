@@ -430,6 +430,47 @@ export class UsersComponent implements OnInit {
     }
 
     openNewUserDialog() {
+        // Get current logged-in user's ID from multiple sources
+        let userId = this.userContextService.getUserId();
+
+        // Fallback to localStorage
+        if (!userId) {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                userId = user.userId || user.user_id || user.id;
+            }
+        }
+
+        if (!userId) {
+            Swal.fire({
+                title: 'Error',
+                text: 'User ID not found. Please log in again.',
+                icon: 'error'
+            });
+            return;
+        }
+
+        // Fetch full user data from backend
+        this.userService.getUserById(userId).subscribe({
+            next: (loggedInUser: any) => {
+                console.log('🔵 New User Dialog Opened');
+                console.log('Logged-in User Data:', loggedInUser);
+                console.log('Campus:', loggedInUser.campus || loggedInUser.Campus);
+                console.log('Department:', loggedInUser.department || loggedInUser.Department);
+
+                // Store logged-in user data in sessionStorage for use in dialog
+                sessionStorage.setItem('loggedInUserData', JSON.stringify(loggedInUser));
+
+                this.showNewUserDialog();
+            },
+            error: (error) => {
+                console.error('Error fetching user data:', error);
+                this.showNewUserDialog();
+            }
+        });
+    }
+    private showNewUserDialog() {
         const newUserData = {
             userName: '',
             email: '',
@@ -445,6 +486,20 @@ export class UsersComponent implements OnInit {
             isStaff: false,
             isSuperUser: false
         };
+
+        // Get logged-in user data
+        const userId = this.userContextService.getUserId();
+        const loggedInUserData = JSON.parse(sessionStorage.getItem('loggedInUserData') || '{}');
+        const isCampusAdmin = this.currentUserRole === 'CampusAdmin';
+        const campusAdminCampusId = loggedInUserData.campus?.campusId || loggedInUserData.campusId || '';
+        const campusAdminCampusName = loggedInUserData.campus?.campusName || loggedInUserData.campusName || '';
+
+        console.log('CampusAdmin creating user:', isCampusAdmin);
+        console.log('CampusAdmin Campus ID:', campusAdminCampusId);
+        console.log('CampusAdmin Campus Name:', campusAdminCampusName);
+
+        // Filter departments for CampusAdmin (only their campus departments)
+        const filteredDepartments = isCampusAdmin ? this.departments.filter((dept: any) => dept.campus?.campusId === campusAdminCampusId) : this.departments;
 
         Swal.fire({
             title: '',
@@ -488,6 +543,9 @@ export class UsersComponent implements OnInit {
                             <input id="newContactNumber" type="text" placeholder="+63" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" />
                         </div>
                     </div>
+                    ${
+                        !isCampusAdmin
+                            ? `
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
                         <div>
                             <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Department * <span style="color: #999; font-size: 11px;" id="deptLockStatus">(Select Campus First)</span></label>
@@ -516,6 +574,31 @@ export class UsersComponent implements OnInit {
                             }
                         </div>
                     </div>
+                    `
+                            : `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Department *</label>
+                            <select id="newDepartment" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'">
+                                <option value="">-- Select Department --</option>
+                                ${filteredDepartments.map((dept: any) => `<option value="${dept.departmentId}">${dept.departmentName}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Campus <span style="color: #999; font-size: 11px;">(Auto)</span></label>
+                            <input id="newCampus" type="text" value="${campusAdminCampusName}" placeholder="Campus" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #ccc; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; color: #999; cursor: not-allowed;" disabled />
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Role *</label>
+                            <select id="newRole" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'">
+                                <option value="Faculty">Faculty</option>
+                                <option value="LabTech">LabTech</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input id="newCampusHidden" type="hidden" value="${campusAdminCampusId}" />
+                    `
+                    }
                     <div style="display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0;">
                         <label style="font-weight: 500; color: #555; margin: 0; font-size: 13px; flex: 1;">Active Status</label>
                         <div style="position: relative; display: inline-block; width: 48px; height: 24px;">
@@ -536,46 +619,48 @@ export class UsersComponent implements OnInit {
                 const firstNameInput = document.getElementById('newFirstName') as HTMLInputElement;
                 if (firstNameInput) firstNameInput.focus();
 
-                // Campus selection change handler
-                const campusSelect = document.getElementById('newCampus') as HTMLSelectElement;
-                const departmentSelect = document.getElementById('newDepartment') as HTMLSelectElement;
-                const deptLockStatus = document.getElementById('deptLockStatus') as HTMLElement;
+                if (!isCampusAdmin) {
+                    // Campus selection change handler (for SuperAdmin only)
+                    const campusSelect = document.getElementById('newCampus') as HTMLSelectElement;
+                    const departmentSelect = document.getElementById('newDepartment') as HTMLSelectElement;
+                    const deptLockStatus = document.getElementById('deptLockStatus') as HTMLElement;
 
-                if (campusSelect && departmentSelect) {
-                    campusSelect.addEventListener('change', (e: Event) => {
-                        const selectedCampusId = (e.target as HTMLSelectElement).value;
+                    if (campusSelect && departmentSelect) {
+                        campusSelect.addEventListener('change', (e: Event) => {
+                            const selectedCampusId = (e.target as HTMLSelectElement).value;
 
-                        if (selectedCampusId) {
-                            // Filter departments by campus
-                            const filteredDepts = this.departments.filter((dept: any) => dept.campus && dept.campus.campusId === selectedCampusId);
+                            if (selectedCampusId) {
+                                // Filter departments by campus
+                                const filteredDepts = this.departments.filter((dept: any) => dept.campus && dept.campus.campusId === selectedCampusId);
 
-                            // Clear current options
-                            departmentSelect.innerHTML = '<option value="">-- Select Department --</option>';
+                                // Clear current options
+                                departmentSelect.innerHTML = '<option value="">-- Select Department --</option>';
 
-                            // Add filtered department options
-                            filteredDepts.forEach((dept: any) => {
-                                const option = document.createElement('option');
-                                option.value = dept.departmentId;
-                                option.textContent = dept.departmentName;
-                                departmentSelect.appendChild(option);
-                            });
+                                // Add filtered department options
+                                filteredDepts.forEach((dept: any) => {
+                                    const option = document.createElement('option');
+                                    option.value = dept.departmentId;
+                                    option.textContent = dept.departmentName;
+                                    departmentSelect.appendChild(option);
+                                });
 
-                            // Enable department select
-                            departmentSelect.disabled = false;
-                            departmentSelect.style.color = '#333';
-                            departmentSelect.style.borderBottomColor = '#e0e0e0';
-                            departmentSelect.style.cursor = 'pointer';
-                            deptLockStatus.textContent = '';
-                        } else {
-                            // Disable department select
-                            departmentSelect.disabled = true;
-                            departmentSelect.innerHTML = '<option value="">-- Select Department --</option>';
-                            departmentSelect.style.color = '#999';
-                            departmentSelect.style.borderBottomColor = '#ccc';
-                            departmentSelect.style.cursor = 'not-allowed';
-                            deptLockStatus.textContent = '(Select Campus First)';
-                        }
-                    });
+                                // Enable department select
+                                departmentSelect.disabled = false;
+                                departmentSelect.style.color = '#333';
+                                departmentSelect.style.borderBottomColor = '#e0e0e0';
+                                departmentSelect.style.cursor = 'pointer';
+                                deptLockStatus.textContent = '';
+                            } else {
+                                // Disable department select
+                                departmentSelect.disabled = true;
+                                departmentSelect.innerHTML = '<option value="">-- Select Department --</option>';
+                                departmentSelect.style.color = '#999';
+                                departmentSelect.style.borderBottomColor = '#ccc';
+                                departmentSelect.style.cursor = 'not-allowed';
+                                deptLockStatus.textContent = '(Select Campus First)';
+                            }
+                        });
+                    }
                 }
 
                 // Toggle functionality
@@ -610,18 +695,38 @@ export class UsersComponent implements OnInit {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Get form values
-                const firstName = (document.getElementById('newFirstName') as HTMLInputElement).value.trim();
-                const lastName = (document.getElementById('newLastName') as HTMLInputElement).value.trim();
-                const userName = (document.getElementById('newUserName') as HTMLInputElement).value.trim();
-                const email = (document.getElementById('newEmail') as HTMLInputElement).value.trim();
-                const password = (document.getElementById('newPassword') as HTMLInputElement).value.trim();
-                const middleName = (document.getElementById('newMiddleName') as HTMLInputElement).value.trim();
-                const contactNumber = (document.getElementById('newContactNumber') as HTMLInputElement).value.trim();
-                const department = (document.getElementById('newDepartment') as HTMLSelectElement).value;
-                const campus = (document.getElementById('newCampus') as HTMLSelectElement).value;
-                const role = (document.getElementById('newRole') as HTMLSelectElement).value;
-                const isActive = (document.getElementById('newIsActive') as HTMLInputElement).checked;
+                // Get form values with null checks
+                const firstNameElement = document.getElementById('newFirstName') as HTMLInputElement;
+                const lastNameElement = document.getElementById('newLastName') as HTMLInputElement;
+                const userNameElement = document.getElementById('newUserName') as HTMLInputElement;
+                const emailElement = document.getElementById('newEmail') as HTMLInputElement;
+                const passwordElement = document.getElementById('newPassword') as HTMLInputElement;
+                const middleNameElement = document.getElementById('newMiddleName') as HTMLInputElement;
+                const contactNumberElement = document.getElementById('newContactNumber') as HTMLInputElement;
+                const departmentElement = document.getElementById('newDepartment') as HTMLSelectElement;
+
+                const firstName = firstNameElement ? firstNameElement.value.trim() : '';
+                const lastName = lastNameElement ? lastNameElement.value.trim() : '';
+                const userName = userNameElement ? userNameElement.value.trim() : '';
+                const email = emailElement ? emailElement.value.trim() : '';
+                const password = passwordElement ? passwordElement.value.trim() : '';
+                const middleName = middleNameElement ? middleNameElement.value.trim() : '';
+                const contactNumber = contactNumberElement ? contactNumberElement.value.trim() : '';
+                const department = departmentElement ? departmentElement.value : '';
+                const campusInput = document.getElementById('newCampus') as HTMLInputElement | HTMLSelectElement;
+                const campusHiddenInput = document.getElementById('newCampusHidden') as HTMLInputElement;
+
+                let campus = '';
+                if (isCampusAdmin) {
+                    campus = campusHiddenInput ? campusHiddenInput.value : campusAdminCampusId;
+                } else {
+                    campus = campusInput ? campusInput.value : '';
+                }
+
+                const role = document.getElementById('newRole') as HTMLSelectElement | HTMLInputElement;
+                const roleValue = role ? role.value : '';
+                const isActiveElement = document.getElementById('newIsActive') as HTMLInputElement;
+                const isActive = isActiveElement ? isActiveElement.checked : true;
 
                 // Validation
                 if (!firstName) {
@@ -663,10 +768,12 @@ export class UsersComponent implements OnInit {
                     contactNumber: contactNumber || undefined,
                     department,
                     campus,
-                    role,
+                    role: roleValue,
                     isActive,
                     profilePicture: undefined
                 };
+
+                console.log('📤 Creating user with payload:', newUserPayload);
 
                 this.userService.createUser(newUserPayload).subscribe({
                     next: () => {
