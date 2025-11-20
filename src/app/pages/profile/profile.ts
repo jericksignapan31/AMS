@@ -439,8 +439,30 @@ export class ProfileComponent implements OnInit {
      * Initialize edit form data with current values
      */
     initializeEditFormData() {
-        // Get the logged-in user's departmentId (not from fetched data)
-        const userDepartmentId = this.fetchedUserData?.department?.departmentId || this.currentUser?.department?.departmentId || '';
+        // Get the logged-in user's departmentId
+        // Handle both object format {departmentId: uuid} and direct UUID string format
+        let userDepartmentId = '';
+
+        if (this.fetchedUserData?.department) {
+            if (typeof this.fetchedUserData.department === 'object' && this.fetchedUserData.department?.departmentId) {
+                userDepartmentId = this.fetchedUserData.department.departmentId;
+            } else if (typeof this.fetchedUserData.department === 'string') {
+                // If it's a string, it's likely already the departmentId (UUID)
+                // Only use it if it looks like a UUID (contains hyphens)
+                if (this.fetchedUserData.department.includes('-')) {
+                    userDepartmentId = this.fetchedUserData.department;
+                }
+            }
+        }
+
+        // Fallback to currentUser
+        if (!userDepartmentId && this.currentUser) {
+            if (typeof this.currentUser.department === 'object' && this.currentUser.department?.departmentId) {
+                userDepartmentId = this.currentUser.department.departmentId;
+            } else if (typeof this.currentUser.department === 'string' && this.currentUser.department.includes('-')) {
+                userDepartmentId = this.currentUser.department;
+            }
+        }
 
         this.editFormData = {
             firstName: this.fetchedUserData?.firstName || this.currentUser?.FirstName || '',
@@ -449,7 +471,7 @@ export class ProfileComponent implements OnInit {
             email: this.fetchedUserData?.email || this.currentUser?.email || '',
             userName: this.fetchedUserData?.userName || '',
             contactNumber: this.fetchedUserData?.contactNumber || '',
-            department: userDepartmentId,
+            Department: userDepartmentId,
             isActive: this.fetchedUserData?.isActive || false
         };
         // Store original values for validation
@@ -467,7 +489,7 @@ export class ProfileComponent implements OnInit {
             // Enter edit mode
             this.isEditMode = true;
             console.log('🔵 Edit Mode Activated');
-            console.log('Department ID:', this.editFormData.department);
+            console.log('Department ID:', this.editFormData.Department);
             console.log('Edit Form Data:', this.editFormData);
         }
     }
@@ -496,9 +518,25 @@ export class ProfileComponent implements OnInit {
                     return;
                 }
 
-                // Prepare payload with user's current department (always send the same)
-                const userDepartment = this.editFormData.department || this.originalFormData.department;
-                const userCampus = this.getCampusName(this.fetchedUserData?.campus || this.currentUser?.Campus || '');
+                // Prepare payload with user's current departmentId and campusId (always send the same)
+                const userDepartmentId = this.editFormData.Department || this.originalFormData.Department;
+
+                // Extract campus ID from fetched data or current user
+                let userCampusId = '';
+                if (this.fetchedUserData?.campus) {
+                    if (typeof this.fetchedUserData.campus === 'object' && this.fetchedUserData.campus?.campusId) {
+                        userCampusId = this.fetchedUserData.campus.campusId;
+                    } else if (typeof this.fetchedUserData.campus === 'string' && this.fetchedUserData.campus.includes('-')) {
+                        userCampusId = this.fetchedUserData.campus;
+                    }
+                }
+                if (!userCampusId && this.currentUser?.campus) {
+                    if (typeof this.currentUser.campus === 'object' && this.currentUser.campus?.campusId) {
+                        userCampusId = this.currentUser.campus.campusId;
+                    } else if (typeof this.currentUser.campus === 'string' && this.currentUser.campus.includes('-')) {
+                        userCampusId = this.currentUser.campus;
+                    }
+                }
 
                 const updatePayload = {
                     firstName: this.editFormData.firstName?.trim() || this.originalFormData.firstName,
@@ -507,8 +545,8 @@ export class ProfileComponent implements OnInit {
                     email: this.editFormData.email?.trim() || this.originalFormData.email,
                     userName: this.editFormData.userName?.trim() || this.originalFormData.userName,
                     contactNumber: this.editFormData.contactNumber?.trim() || this.originalFormData.contactNumber,
-                    department: userDepartment,
-                    campus: userCampus,
+                    department: userDepartmentId,
+                    campus: userCampusId,
                     isActive: this.editFormData.isActive !== undefined ? this.editFormData.isActive : this.originalFormData.isActive
                 };
 
