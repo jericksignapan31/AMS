@@ -18,8 +18,11 @@ import { AvatarModule } from 'primeng/avatar';
                 <p-avatar *ngIf="!currentUser?.profilePicture" [label]="getInitials()" shape="circle" size="xlarge" styleClass="user-panel-avatar"></p-avatar>
             </div>
             <div class="user-panel-info">
-                <span>{{ currentUser?.firstName }} {{ currentUser?.lastName }}</span> <br />
-                <span class="user-panel-role">{{ currentUser?.role }}</span>
+                <span
+                    ><b>{{ currentUser?.firstName }} {{ currentUser?.lastName }}</b></span
+                >
+                <br />
+                <em class="user-panel-role">{{ currentUser?.role }}</em>
             </div>
         </div>
         <ng-container *ngFor="let item of model; let i = index">
