@@ -195,7 +195,7 @@ export class ProfileComponent implements OnInit {
             return;
         }
 
-        this.storageService.getProfilePicture(userId).subscribe({
+        this.storageService.getBackgroundPicture().subscribe({
             next: (response: any) => {
                 const imageUrl = response.url || response.imageUrl || response.data?.url;
                 if (imageUrl) {

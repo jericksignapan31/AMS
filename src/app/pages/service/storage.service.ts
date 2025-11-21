@@ -52,4 +52,12 @@ export class StorageService {
         formData.append('file', file);
         return this.http.post(`${this.apiUrl}/profile-background-picture`, formData);
     }
+
+    /**
+     * Get background picture for the current authenticated user
+     * @returns Observable of the background image URL
+     */
+    getBackgroundPicture(): Observable<any> {
+        return this.http.get(`${this.apiUrl}/profile-background-picture`);
+    }
 }
