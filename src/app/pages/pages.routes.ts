@@ -7,11 +7,13 @@ import { RequestmaintenanceComponent } from './requestmaintenance/requestmainten
 import { UsersComponent } from './users/users';
 import { CampusesComponent } from './campuses/campuses';
 import { DepartmentsComponent } from './departments/departments';
+import { ASSET_CATEGORY_ROUTES } from './assetcategory/assetcategory.routes';
 
 export const pageRoutes: Routes = [
     { path: 'users', component: UsersComponent },
     { path: 'campuses', component: CampusesComponent },
     { path: 'departments', component: DepartmentsComponent },
+    { path: 'assetcategory', children: ASSET_CATEGORY_ROUTES },
     { path: 'documentation', component: Documentation },
     { path: 'crud', component: Crud },
     { path: 'custodian', component: CustodianComponent },

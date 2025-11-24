@@ -108,45 +108,17 @@ export class AppMenu implements OnInit {
                 ]
             },
             {
-                label: 'Hierarchy',
+                label: 'Asset Category',
                 items: [
                     {
-                        label: 'Submenu 1',
+                        label: 'Asset Type',
                         icon: 'pi pi-fw pi-bookmark',
                         items: [
-                            {
-                                label: 'Submenu 1.1',
-                                icon: 'pi pi-fw pi-bookmark',
-                                items: [
-                                    { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                    { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
-                                    { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' }
-                                ]
-                            },
-                            {
-                                label: 'Submenu 1.2',
-                                icon: 'pi pi-fw pi-bookmark',
-                                items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }]
-                            }
-                        ]
-                    },
-                    {
-                        label: 'Submenu 2',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [
-                            {
-                                label: 'Submenu 2.1',
-                                icon: 'pi pi-fw pi-bookmark',
-                                items: [
-                                    { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                    { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' }
-                                ]
-                            },
-                            {
-                                label: 'Submenu 2.2',
-                                icon: 'pi pi-fw pi-bookmark',
-                                items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' }]
-                            }
+                            { label: 'Brand', icon: 'pi pi-fw pi-tag', routerLink: ['/app/pages/assetcategory/brand'] },
+                            { label: 'Color', icon: 'pi pi-fw pi-palette', routerLink: ['/app/pages/assetcategory/color'] },
+                            { label: 'Program', icon: 'pi pi-fw pi-list', routerLink: ['/app/pages/assetcategory/program'] },
+                            { label: 'Supplier', icon: 'pi pi-fw pi-truck', routerLink: ['/app/pages/assetcategory/supplier'] },
+                            { label: 'Location', icon: 'pi pi-fw pi-map-marker', routerLink: ['/app/pages/assetcategory/location'] }
                         ]
                     }
                 ]
