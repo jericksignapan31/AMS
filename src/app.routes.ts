@@ -6,8 +6,7 @@ import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
 import { AuthGuard } from './app/pages/auth/auth.guard';
-import { Crud } from './app/pages/crud/crud';
-import { CustodianComponent } from './app/pages/custodian/custodian';
+import { AssetsComponent } from './app/pages/assets/assets';
 import { RequestmaintenanceComponent } from './app/pages/requestmaintenance/requestmaintenance/requestmaintenance.component';
 import { ProfileComponent } from './app/pages/profile/profile';
 import { AccountComponent } from './app/pages/account/account';
@@ -23,8 +22,7 @@ export const appRoutes: Routes = [
         children: [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
             { path: 'dashboard', component: Dashboard },
-            { path: 'crud', component: Crud },
-            { path: 'custodian', component: CustodianComponent },
+            { path: 'crud', component: AssetsComponent },
             { path: 'requestmaintenance', component: RequestmaintenanceComponent },
             { path: 'profile', component: ProfileComponent },
             { path: 'account', component: AccountComponent },

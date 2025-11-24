@@ -1,9 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface Asset {
+    assetId?: string;
+    assetName?: string;
+    propertyNumber?: string;
+    category?: string;
+    foundCluster?: string;
+    issuedTo?: string;
+    purpose?: string;
+    qrCode?: string;
+    assetCreated?: string;
+    // Legacy fields for backward compatibility
     id?: number;
     PropertyNo?: string;
     Category?: string;
@@ -21,27 +32,26 @@ export interface Asset {
 }
 
 export interface Location {
-    id?: string;
-    LocationName?: string;
-    Description?: string;
+    locationId?: string;
+    locationName?: string;
+    description?: string;
 }
 
 export interface Supplier {
-    id?: string;
-    SupplierName?: string;
-    ContactInfo?: string;
+    supplierId?: string;
+    supplierName?: string;
+    contactInfo?: string;
 }
 
 export interface Program {
-    id?: string;
-    ProgramName?: string;
-    Description?: string;
+    programId?: string;
+    programName?: string;
+    description?: string;
 }
 
 export interface Status {
-    id?: string;
-    StatusName?: string;
-    Description?: string;
+    statusId?: string;
+    statusName?: string;
 }
 
 export interface InvCustlip {
@@ -65,14 +75,14 @@ export interface InvCustlip {
 }
 
 export interface Color {
-    color_id?: string;
-    ColorCode?: string;
-    Description?: string;
+    colorId?: string;
+    colorName?: string;
+    description?: string;
 }
 
 export interface Brand {
-    brand_id?: string;
-    BrandName?: string;
+    brandId?: string;
+    brandName?: string;
 }
 
 export interface MaintenanceRequest {
@@ -96,7 +106,7 @@ export class AssetService {
     constructor(private http: HttpClient) {}
 
     getAssets(): Observable<Asset[]> {
-        return this.http.get<Asset[]>(this.apiUrl);
+        return this.http.get<Asset[]>(this.apiUrl).pipe(tap((data) => console.log('getAssets API Response:', data)));
     }
 
     getAsset(id: number): Observable<Asset> {
@@ -117,19 +127,22 @@ export class AssetService {
 
     // Reference data methods
     getLocations(): Observable<Location[]> {
-        return this.http.get<Location[]>(`${this.baseApiUrl}/locations`);
+        console.log('📡 Fetching locations from:', `${this.baseApiUrl}/locations`);
+        return this.http.get<Location[]>(`${this.baseApiUrl}/locations`).pipe(tap((data) => console.log('✅ getLocations API Response:', data)));
     }
 
     getSuppliers(): Observable<Supplier[]> {
-        return this.http.get<Supplier[]>(`${this.baseApiUrl}/suppliers`);
+        console.log('📡 Fetching suppliers from:', `${this.baseApiUrl}/suppliers`);
+        return this.http.get<Supplier[]>(`${this.baseApiUrl}/suppliers`).pipe(tap((data) => console.log('✅ getSuppliers API Response:', data)));
     }
 
     getPrograms(): Observable<Program[]> {
-        return this.http.get<Program[]>(`${this.baseApiUrl}/programs`);
+        console.log('📡 Fetching programs from:', `${this.baseApiUrl}/programs`);
+        return this.http.get<Program[]>(`${this.baseApiUrl}/programs`).pipe(tap((data) => console.log('✅ getPrograms API Response:', data)));
     }
 
     getStatuses(): Observable<Status[]> {
-        return this.http.get<Status[]>(`${this.baseApiUrl}/statuses`);
+        return this.http.get<Status[]>(`${this.baseApiUrl}/status`).pipe(tap((data) => console.log('getStatuses API Response:', data)));
     }
 
     // InvCustlips methods
@@ -155,11 +168,13 @@ export class AssetService {
 
     // Colors and Brands methods
     getColors(): Observable<Color[]> {
-        return this.http.get<Color[]>(`${this.baseApiUrl}/colors`);
+        console.log('📡 Fetching colors from:', `${this.baseApiUrl}/colors`);
+        return this.http.get<Color[]>(`${this.baseApiUrl}/colors`).pipe(tap((data) => console.log('✅ getColors API Response:', data)));
     }
 
     getBrands(): Observable<Brand[]> {
-        return this.http.get<Brand[]>(`${this.baseApiUrl}/brands`);
+        console.log('📡 Fetching brands from:', `${this.baseApiUrl}/brands`);
+        return this.http.get<Brand[]>(`${this.baseApiUrl}/brands`).pipe(tap((data) => console.log('✅ getBrands API Response:', data)));
     }
 
     // Maintenance Request methods

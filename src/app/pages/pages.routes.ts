@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
 import { Documentation } from './documentation/documentation';
-import { Crud } from './crud/crud';
+import { AssetsComponent } from './assets/assets';
 import { Empty } from './empty/empty';
-import { CustodianComponent } from './custodian/custodian';
 import { RequestmaintenanceComponent } from './requestmaintenance/requestmaintenance/requestmaintenance.component';
 import { UsersComponent } from './users/users';
 import { CampusesComponent } from './campuses/campuses';
@@ -15,8 +14,7 @@ export const pageRoutes: Routes = [
     { path: 'departments', component: DepartmentsComponent },
     { path: 'assetcategory', children: ASSET_CATEGORY_ROUTES },
     { path: 'documentation', component: Documentation },
-    { path: 'crud', component: Crud },
-    { path: 'custodian', component: CustodianComponent },
+    { path: 'crud', component: AssetsComponent },
     { path: 'requestmaintenance', component: RequestmaintenanceComponent },
     { path: '**', redirectTo: '/notfound' }
 ];
