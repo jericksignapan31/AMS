@@ -18,6 +18,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { FileUploadModule } from 'primeng/fileupload';
 import { MessageService } from 'primeng/api';
 import { AssetService, Asset, Program, Supplier, Location, Color, Brand, Status } from '../service/asset.service';
+import jsQR from 'jsqr';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -157,8 +158,19 @@ import Swal from 'sweetalert2';
                     <td>{{ item.issuedTo || 'Not assigned' }}</td>
                     <td>{{ item.purpose }}</td>
                     <td>
-                        <div *ngIf="item.qrCode" class="flex items-center gap-2">
-                            <span class="text-sm bg-blue-100 px-2 py-1 rounded">{{ item.qrCode }}</span>
+                        <div *ngIf="item.qrCode" class="inline-block">
+                            <!-- Display QR Code as image if it's base64 or URL, otherwise as text -->
+                            <img
+                                *ngIf="isBase64Image(item.qrCode)"
+                                [src]="item.qrCode"
+                                alt="QR Code"
+                                class="w-14 h-14 rounded-lg border-2 border-gray-300 cursor-pointer hover:shadow-lg hover:scale-110 transition-all"
+                                (click)="viewQrCode(item.qrCode)"
+                                pTooltip="Click to view QR Code"
+                            />
+                            <span *ngIf="!isBase64Image(item.qrCode)" class="text-sm bg-blue-100 px-2 py-1 rounded cursor-pointer hover:bg-blue-200 transition-colors" (click)="copyToClipboard(item.qrCode)" pTooltip="Click to copy QR Code">
+                                {{ item.qrCode }}
+                            </span>
                         </div>
                         <span *ngIf="!item.qrCode" class="text-gray-400">N/A</span>
                     </td>
@@ -262,11 +274,7 @@ import Swal from 'sweetalert2';
                         <input pInputText [(ngModel)]="newAsset.issuedTo" placeholder="Enter person/department" class="w-full" />
                     </div>
                     <div class="col-span-6">
-                        <label class="block font-bold mb-2">QR Code *</label>
-                        <input pInputText [(ngModel)]="newAsset.qrCode" placeholder="Enter QR code" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">QR Code Image (Optional)</label>
+                        <label class="block font-bold mb-2">QR Code Image *</label>
                         <p-fileUpload
                             name="qrCodeImage"
                             [auto]="false"
@@ -276,11 +284,11 @@ import Swal from 'sweetalert2';
                             [customUpload]="true"
                             [showUploadButton]="false"
                             [showCancelButton]="false"
-                            chooseLabel="Choose QR Code Image"
+                            chooseLabel="Upload QR Code Image"
                         >
                         </p-fileUpload>
-                        <div *ngIf="newAsset.qrCodeImage" class="mt-2">
-                            <p class="text-sm text-green-600">✓ {{ newAsset.qrCodeImage.name }} selected</p>
+                        <div *ngIf="newAsset.qrCode" class="mt-2">
+                            <p class="text-sm text-green-600">✓ Scanned QR Code: {{ newAsset.qrCode }}</p>
                         </div>
                     </div>
                     <div class="col-span-6">
@@ -568,6 +576,18 @@ export class AssetsComponent implements OnInit {
                 console.log('Number of assets:', data?.length || 0);
                 if (data && data.length > 0) {
                     console.log('First asset:', data[0]);
+                    // Log QR code info for all assets
+                    console.log('📦 All Assets with QR Codes:');
+                    data.forEach((asset, index) => {
+                        console.log(`Asset #${index + 1}:`, {
+                            assetId: asset.assetId,
+                            propertyNumber: asset.propertyNumber,
+                            assetName: asset.assetName,
+                            qrCode: asset.qrCode,
+                            qrCodeType: asset.qrCode ? (asset.qrCode.startsWith('data:') ? 'Base64' : asset.qrCode.startsWith('http') ? 'URL' : 'Text') : 'None',
+                            qrCodePreview: asset.qrCode ? asset.qrCode.substring(0, 100) : 'No QR Code'
+                        });
+                    });
                 }
                 this.assets = data || [];
                 this.filteredAssets = [...this.assets];
@@ -708,15 +728,6 @@ export class AssetsComponent implements OnInit {
         return tableData;
     }
 
-    onQRCodeSelect(event: any) {
-        const file = event.files[0];
-        if (file) {
-            this.newAsset.qrCodeImage = file;
-            console.log('QR Code file selected:', file.name);
-            this.messageService.add({ severity: 'info', summary: 'File Selected', detail: file.name });
-        }
-    }
-
     openNew() {
         console.log('🔓 Opening New Asset dialog...');
         console.log('📋 Programs in dropdown:', this.programs);
@@ -724,9 +735,83 @@ export class AssetsComponent implements OnInit {
         console.log('📋 Locations in dropdown:', this.locations);
         console.log('📋 Statuses in dropdown:', this.statuses);
         console.log('📋 Colors in dropdown:', this.colors);
-        console.log('📋 Brands in dropdown:', this.brands);
-        this.newAsset = this.getEmptyAsset();
         this.assetDialog = true;
+        this.newAsset = this.getEmptyAsset();
+    }
+
+    onQRCodeSelect(event: any) {
+        const file = event.files[0];
+        if (file) {
+            // Store the file for later upload
+            this.newAsset.qrCodeImage = file;
+            console.log('QR Code file selected:', file.name);
+
+            // Read and decode QR code from image
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        // Create canvas and draw image
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) {
+                            throw new Error('Failed to get canvas context');
+                        }
+
+                        ctx.drawImage(img, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+
+                        // Decode QR code
+                        const decodedQR = jsQR(imageData.data, img.width, img.height);
+
+                        if (decodedQR) {
+                            console.log('✅ QR Code decoded:', decodedQR.data);
+                            this.newAsset.qrCode = decodedQR.data;
+                            this.messageService.add({
+                                severity: 'success',
+                                summary: 'QR Code Scanned',
+                                detail: `QR Code: ${decodedQR.data}`
+                            });
+                        } else {
+                            console.warn('❌ No QR code found in image');
+                            this.messageService.add({
+                                severity: 'warn',
+                                summary: 'No QR Code',
+                                detail: 'Could not find QR code in the image. Please try another image.'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('❌ Error decoding QR code:', error);
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Error',
+                            detail: 'Failed to decode QR code from image'
+                        });
+                    }
+                };
+                img.onerror = () => {
+                    console.error('❌ Failed to load image');
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to load image file'
+                    });
+                };
+                img.src = e.target.result;
+            };
+            reader.onerror = () => {
+                console.error('❌ Failed to read file');
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to read file'
+                });
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
     closeDialog() {
@@ -750,21 +835,21 @@ export class AssetsComponent implements OnInit {
             return;
         }
 
-        // Create a copy to send to API (remove qrCodeImage property)
+        // Create a copy and remove qrCodeImage before sending
         const assetToSend = { ...this.newAsset };
         delete assetToSend.qrCodeImage; // Remove the file object before sending
 
         console.log('Saving new asset:', assetToSend);
 
         this.assetService.createAsset(assetToSend).subscribe({
-            next: (response) => {
+            next: (response: Asset) => {
                 console.log('✅ Asset created successfully:', response);
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Asset created successfully' });
                 this.assetDialog = false;
                 this.newAsset = this.getEmptyAsset();
                 this.loadAssets();
             },
-            error: (error) => {
+            error: (error: any) => {
                 console.error('❌ Error creating asset:', error);
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create asset: ' + (error?.error?.message || error?.message) });
             }
@@ -801,5 +886,42 @@ export class AssetsComponent implements OnInit {
         a.download = 'assets.csv';
         a.click();
         window.URL.revokeObjectURL(url);
+    }
+
+    // QR Code display helper methods
+    isBase64Image(qrCode: string): boolean {
+        if (!qrCode) return false;
+        return qrCode.startsWith('data:image/') || qrCode.startsWith('data:application/') || qrCode.startsWith('http://') || qrCode.startsWith('https://');
+    }
+
+    viewQrCode(qrCode: string) {
+        if (qrCode) {
+            Swal.fire({
+                title: 'QR Code',
+                html: `<img src="${qrCode}" alt="QR Code" style="max-width: 400px; border-radius: 8px;" />`,
+                confirmButtonText: 'Close'
+            });
+        }
+    }
+
+    copyToClipboard(text: string) {
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Copied!',
+                    detail: 'QR Code copied to clipboard',
+                    life: 2000
+                });
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to copy to clipboard',
+                    life: 2000
+                });
+            });
     }
 }

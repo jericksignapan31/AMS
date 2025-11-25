@@ -118,6 +118,10 @@ export class AssetService {
         return this.http.post<Asset>(this.apiUrl, asset);
     }
 
+    createAssetWithFile(formData: FormData): Observable<Asset> {
+        return this.http.post<Asset>(this.apiUrl, formData);
+    }
+
     updateAsset(id: number, asset: Asset): Observable<Asset> {
         return this.http.put<Asset>(`${this.apiUrl}/${id}`, asset);
     }

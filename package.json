@@ -12,6 +12,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "20.3.12",
+    "@angular/cdk": "^21.0.0",
     "@angular/common": "20.3.12",
     "@angular/compiler": "20.3.12",
     "@angular/core": "20.3.12",
@@ -25,6 +26,7 @@
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
     "chart.js": "4.5.1",
+    "jsqr": "^1.4.0",
     "primeclt": "^0.1.5",
     "primeicons": "^7.0.0",
     "primeng": "20.3.0",

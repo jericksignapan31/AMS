@@ -1,55 +1,50 @@
 import {
   ProgressBar
-} from "./chunk-K4NAHP6J.js";
+} from "./chunk-IF3BQJNM.js";
 import {
   Message
-} from "./chunk-55ZZF57F.js";
+} from "./chunk-Z4OLXSBI.js";
 import {
   Button
-} from "./chunk-4Z73DBXF.js";
+} from "./chunk-C3SGSCXL.js";
+import "./chunk-ILTXSXVV.js";
+import "./chunk-RRUN4ZL6.js";
 import {
   Badge
-} from "./chunk-GUENRAWO.js";
-import "./chunk-OEZZFNV3.js";
-import "./chunk-F3RYRJTN.js";
-import "./chunk-IJXLZWW5.js";
+} from "./chunk-BP4O654K.js";
 import "./chunk-P6SMTJBG.js";
+import "./chunk-SO3S43CI.js";
 import {
   PlusIcon,
   TimesIcon,
   UploadIcon
-} from "./chunk-AMDLI4KP.js";
-import "./chunk-2EPOXNOS.js";
-import {
-  Bind
-} from "./chunk-DZVJ6T43.js";
+} from "./chunk-3Y3Y7EMA.js";
+import "./chunk-XBOFUGXY.js";
 import {
   BaseComponent,
   PARENT_INSTANCE
-} from "./chunk-XO53NIKL.js";
+} from "./chunk-G3TTX4VE.js";
 import {
   BaseStyle
-} from "./chunk-JS5TRDC5.js";
+} from "./chunk-SUSYHND3.js";
 import {
   PrimeTemplate,
   SharedModule,
   TranslationKeys
-} from "./chunk-OBXYEWG2.js";
-import "./chunk-OTTARZB5.js";
+} from "./chunk-VVQ6QSXN.js";
 import {
-  P,
-  W
-} from "./chunk-U4LT4ZJN.js";
-import "./chunk-4V527XGA.js";
+  Bind
+} from "./chunk-246XFSKK.js";
+import "./chunk-Y3VPSMBK.js";
 import "./chunk-GGMOGVES.js";
 import {
   DomSanitizer
-} from "./chunk-5NUATPB2.js";
+} from "./chunk-WGXPQ2Y2.js";
 import {
   HttpClient,
   HttpEventType
-} from "./chunk-YIM3TNOW.js";
-import "./chunk-EGNWGIYC.js";
+} from "./chunk-XI5EKNQ2.js";
+import "./chunk-RS4JDN4Z.js";
 import {
   CommonModule,
   NgClass,
@@ -58,8 +53,13 @@ import {
   NgStyle,
   NgTemplateOutlet,
   isPlatformBrowser
-} from "./chunk-UO3VZI37.js";
+} from "./chunk-R2OVIKVM.js";
 import "./chunk-APPCZKFW.js";
+import "./chunk-OTTARZB5.js";
+import {
+  P,
+  W
+} from "./chunk-U4LT4ZJN.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -125,11 +125,11 @@ import {
   ɵɵtextInterpolate,
   ɵɵtextInterpolate1,
   ɵɵviewQuery
-} from "./chunk-KVLC47DY.js";
-import "./chunk-HWYXSU2G.js";
+} from "./chunk-QWPRYKF3.js";
 import "./chunk-JRFR6BLO.js";
+import "./chunk-HWYXSU2G.js";
 import "./chunk-MARUHEWW.js";
-import "./chunk-WDMUDEB6.js";
+import "./chunk-3OV72XIM.js";
 
 // node_modules/@primeuix/styles/dist/fileupload/index.mjs
 var style = "\n    .p-fileupload input[type='file'] {\n        display: none;\n    }\n\n    .p-fileupload-advanced {\n        border: 1px solid dt('fileupload.border.color');\n        border-radius: dt('fileupload.border.radius');\n        background: dt('fileupload.background');\n        color: dt('fileupload.color');\n    }\n\n    .p-fileupload-header {\n        display: flex;\n        align-items: center;\n        padding: dt('fileupload.header.padding');\n        background: dt('fileupload.header.background');\n        color: dt('fileupload.header.color');\n        border-style: solid;\n        border-width: dt('fileupload.header.border.width');\n        border-color: dt('fileupload.header.border.color');\n        border-radius: dt('fileupload.header.border.radius');\n        gap: dt('fileupload.header.gap');\n    }\n\n    .p-fileupload-content {\n        border: 1px solid transparent;\n        display: flex;\n        flex-direction: column;\n        gap: dt('fileupload.content.gap');\n        transition: border-color dt('fileupload.transition.duration');\n        padding: dt('fileupload.content.padding');\n    }\n\n    .p-fileupload-content .p-progressbar {\n        width: 100%;\n        height: dt('fileupload.progressbar.height');\n    }\n\n    .p-fileupload-file-list {\n        display: flex;\n        flex-direction: column;\n        gap: dt('fileupload.filelist.gap');\n    }\n\n    .p-fileupload-file {\n        display: flex;\n        flex-wrap: wrap;\n        align-items: center;\n        padding: dt('fileupload.file.padding');\n        border-block-end: 1px solid dt('fileupload.file.border.color');\n        gap: dt('fileupload.file.gap');\n    }\n\n    .p-fileupload-file:last-child {\n        border-block-end: 0;\n    }\n\n    .p-fileupload-file-info {\n        display: flex;\n        flex-direction: column;\n        gap: dt('fileupload.file.info.gap');\n    }\n\n    .p-fileupload-file-thumbnail {\n        flex-shrink: 0;\n    }\n\n    .p-fileupload-file-actions {\n        margin-inline-start: auto;\n    }\n\n    .p-fileupload-highlight {\n        border: 1px dashed dt('fileupload.content.highlight.border.color');\n    }\n\n    .p-fileupload-basic .p-message {\n        margin-block-end: dt('fileupload.basic.gap');\n    }\n\n    .p-fileupload-basic-content {\n        display: flex;\n        flex-wrap: wrap;\n        align-items: center;\n        gap: dt('fileupload.basic.gap');\n    }\n";
