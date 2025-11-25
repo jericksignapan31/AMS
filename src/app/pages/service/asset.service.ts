@@ -14,6 +14,7 @@ export interface Asset {
     purpose?: string;
     qrCode?: string;
     assetCreated?: string;
+    inventoryCustodianSlip?: any;
     // Legacy fields for backward compatibility
     id?: number;
     PropertyNo?: string;
@@ -196,6 +197,12 @@ export class AssetService {
 
     deleteMaintenanceRequest(id: string): Observable<void> {
         return this.http.delete<void>(`${this.baseApiUrl}/MaintenanceRequests/${id}`);
+    }
+
+    // ICS Data methods
+    getAssetInventoryCustodianSlip(assetId: string): Observable<any> {
+        console.log('📡 Fetching ICS from:', `${this.baseApiUrl}/assets/${assetId}/inventoryCustodianSlip`);
+        return this.http.get<any>(`${this.baseApiUrl}/assets/${assetId}/inventoryCustodianSlip`).pipe(tap((data) => console.log('✅ ICS API Response:', data)));
     }
 
     // User methods

@@ -191,7 +191,7 @@ interface ExportColumn {
                             <div *ngIf="getInvCustlipsForAsset(asset).length > 0; else noInvCustlips">
                                 <div class="grid gap-4">
                                     <div *ngFor="let invCustlip of getInvCustlipsForAsset(asset); let i = index" class="col-12 md:col-6 lg:col-4">
-                                        <div class="card border-1 border-gray-200 h-full">
+                                        <div class="card border border-gray-200 h-full">
                                             <div class="card-header bg-primary-50 p-3 border-bottom-1 border-200">
                                                 <h6 class="m-0 text-primary font-semibold">
                                                     <i class="pi pi-box mr-2"></i>
@@ -208,7 +208,7 @@ interface ExportColumn {
                                                     <div class="col-6">
                                                         <strong>Color:</strong>
                                                         <span class="inline-flex align-items-center gap-1">
-                                                            <span class="w-1rem h-1rem border-circle border-1 border-gray-300" [style.background-color]="getColorCode(invCustlip.color_id)"></span>
+                                                            <span class="w-1rem h-1rem border-circle border border-gray-300" [style.background-color]="getColorCode(invCustlip.color_id)"></span>
                                                             {{ getColorName(invCustlip.color_id) }}
                                                         </span>
                                                     </div>
@@ -601,6 +601,9 @@ interface ExportColumn {
     providers: [MessageService, AssetService, ConfirmationService]
 })
 export class Crud implements OnInit {
+getColorCode(arg0: string|undefined) {
+throw new Error('Method not implemented.');
+}
     assetDialog: boolean = false;
     qrCodeViewerDialog: boolean = false;
     invCustlipDialog: boolean = false;
@@ -1339,14 +1342,14 @@ export class Crud implements OnInit {
     // Helper methods for stepper
     getBrandName(brandId?: string | number): string {
         if (!brandId) return '';
-        const brand = this.brands.find((b: Brand) => b.brand_id === String(brandId));
-        return brand?.BrandName || '';
+        const brand = this.brands.find((b: Brand) => b.brandId === String(brandId));
+        return brand?.brandName || '';
     }
 
     getColorName(colorId?: string | number): string {
         if (!colorId) return '';
-        const color = this.colors.find((c: Color) => c.color_id === String(colorId));
-        return color?.Description || '';
+        const color = this.colors.find((c: Color) => c.colorId === String(colorId));
+        return color?.description || '';
     }
 
     closeStepper() {
@@ -1471,12 +1474,6 @@ export class Crud implements OnInit {
         }
 
         return this.invCustlips.filter((invCustlip) => invCustlip.InvNo === asset.PropertyNo);
-    }
-
-    getColorCode(colorId?: string | number): string {
-        if (!colorId) return '#cccccc';
-        const color = this.colors.find((c: Color) => c.color_id === String(colorId));
-        return color?.ColorCode || '#cccccc';
     }
 
     getSpecsArray(specs: any): { key: string; value: any }[] {

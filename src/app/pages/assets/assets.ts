@@ -43,6 +43,51 @@ import Swal from 'sweetalert2';
         FileUploadModule
     ],
     providers: [MessageService],
+    styles: [
+        `
+            :host ::ng-deep {
+                .expand-btn {
+                    transition: transform 0.3s ease-in-out;
+                }
+
+                .expand-btn.expanded {
+                    transform: rotate(90deg);
+                }
+
+                .expansion-row {
+                    animation: slideDown 0.3s ease-out;
+                }
+
+                .expansion-content {
+                    animation: fadeIn 0.3s ease-out;
+                }
+
+                @keyframes slideDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                    }
+                    to {
+                        opacity: 1;
+                    }
+                }
+
+                .animate-expand {
+                    animation: slideDown 0.3s ease-out;
+                }
+            }
+        `
+    ],
     template: `
         <p-toast />
 
@@ -103,7 +148,7 @@ import Swal from 'sweetalert2';
                 <tr>
                     <td style="width: 3rem"><p-tableCheckbox [value]="item" /></td>
                     <td style="width: 3rem">
-                        <p-button type="button" [icon]="expandedAssets.includes(item) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="p-button-rounded p-button-text p-button-sm" (onClick)="toggleExpand(item)"> </p-button>
+                        <button type="button" pButton pRipple icon="pi pi-chevron-right" class="p-button-rounded p-button-text p-button-sm expand-btn" [class.expanded]="isRowExpanded(item.assetId)" (click)="toggleExpand(item)"></button>
                     </td>
                     <td>{{ item.propertyNumber }}</td>
                     <td>{{ item.assetName }}</td>
@@ -125,86 +170,55 @@ import Swal from 'sweetalert2';
                         </div>
                     </td>
                 </tr>
-            </ng-template>
+                <!-- Manual Expansion Row -->
+                <tr *ngIf="isRowExpanded(item.assetId)" class="expansion-row bg-blue-50 border-l-4 border-blue-500">
+                    <td colspan="10" class="p-0">
+                        <div class="expansion-content animate-expand p-8 bg-linear-to-r from-blue-50 to-indigo-50 shadow-inner">
+                            <!-- Header with Asset Info -->
+                            <div class="mb-6 pb-6 border-b-2 border-blue-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h4 class="text-lg font-bold text-blue-600 flex items-center gap-2">
+                                            <i class="pi pi-file-pdf text-2xl text-red-500"></i>
+                                            Inventory Custodian Slip Details
+                                        </h4>
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            Asset: <span class="font-semibold text-gray-800">{{ item.assetName }}</span>
+                                        </p>
+                                        <p class="text-sm text-gray-600">
+                                            Property Number: <span class="font-semibold text-gray-800">{{ item.propertyNumber }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs text-gray-500 mb-1">ICS No:</p>
+                                        <p class="text-xl font-bold text-blue-600">{{ item.inventoryCustodianSlip?.icsNo || 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <ng-template pTemplate="rowexpansion" let-item>
-                <tr *ngIf="expandedAssets.includes(item)">
-                    <td colspan="10" class="p-4">
-                        <div class="bg-gray-50 p-6 rounded border border-gray-200">
-                            <h5 class="text-lg font-bold mb-4 text-primary">Inventory Custodian Slip Details</h5>
+                            <!-- ICS Data Table with Enhanced Styling -->
+                            <div class="overflow-x-auto">
+                                <table class="w-full border-collapse">
+                                    <thead>
+                                        <tr class="bg-blue-100 border-b-2 border-blue-300">
+                                            <th class="px-4 py-3 text-left font-bold text-gray-700 text-sm">Field</th>
+                                            <th class="px-4 py-3 text-left font-bold text-gray-700 text-sm">Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ng-container *ngFor="let rowData of getIcsTableData(item.inventoryCustodianSlip); let odd = odd">
+                                            <tr [class]="odd ? 'bg-white' : 'bg-blue-50'" class="border-b border-gray-200 hover:bg-blue-100 transition-colors">
+                                                <td class="px-4 py-3 font-semibold text-gray-700 text-sm w-1/3">{{ rowData.field }}</td>
+                                                <td class="px-4 py-3 text-gray-800 text-sm">{{ rowData.value }}</td>
+                                            </tr>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </div>
 
-                            <div class="grid grid-cols-12 gap-4">
-                                <!-- ICS Information -->
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">ICS No</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.icsNo || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Quantity</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.quantity || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Unit of Measure</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.uoM || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Unit Cost</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.unitCost || 'N/A' }}</p>
-                                </div>
-
-                                <!-- Description and Specs -->
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Description</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.description || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Specifications</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.specifications || 'N/A' }}</p>
-                                </div>
-
-                                <!-- Dimensions -->
-                                <div class="col-span-4">
-                                    <p class="text-sm text-gray-600">Height</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.height || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-4">
-                                    <p class="text-sm text-gray-600">Width</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.width || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-4">
-                                    <p class="text-sm text-gray-600">Length</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.length || 'N/A' }}</p>
-                                </div>
-
-                                <!-- Additional Details -->
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Package</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.package || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Material</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.material || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Serial Number</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.serialNumber || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Model Number</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.modelNumber || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Estimated Useful Life</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.estimatedUsefullLife || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Brand</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.brand || 'N/A' }}</p>
-                                </div>
-                                <div class="col-span-6">
-                                    <p class="text-sm text-gray-600">Color</p>
-                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.color || 'N/A' }}</p>
-                                </div>
+                            <!-- Footer Actions -->
+                            <div class="mt-6 pt-4 border-t-2 border-blue-200 flex justify-end gap-2">
+                                <button (click)="toggleExpand(item)" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors text-sm font-semibold">Close</button>
                             </div>
                         </div>
                     </td>
@@ -374,7 +388,7 @@ export class AssetsComponent implements OnInit {
     filteredAssets: Asset[] = [];
     selectedAssets: Asset[] = [];
     expandedAssets: Asset[] = [];
-    expandedRows: { [key: string]: boolean } = {};
+    expandedRowIds: Set<string> = new Set();
     searchValue: string = '';
     loading: boolean = true;
 
@@ -600,24 +614,98 @@ export class AssetsComponent implements OnInit {
         }
     }
 
-    toggleExpand(asset: Asset) {
-        const index = this.expandedAssets.findIndex((a) => a.assetId === asset.assetId);
-        if (index > -1) {
-            this.expandedAssets.splice(index, 1);
-            console.log('📂 Row Collapsed');
-            console.log(`   Asset: ${asset.assetName} (ID: ${asset.assetId})`);
-            console.log(`   Property Number: ${asset.propertyNumber}`);
-            console.log(`   Total Expanded Rows: ${this.expandedAssets.length}`);
-        } else {
-            this.expandedAssets.push(asset);
-            console.log('📂 Row Expanded');
-            console.log(`   Asset: ${asset.assetName} (ID: ${asset.assetId})`);
-            console.log(`   Property Number: ${asset.propertyNumber}`);
-            console.log(`   Category: ${asset.category}`);
-            console.log(`   Found Cluster: ${asset.foundCluster}`);
-            console.log(`   Full Asset Data:`, asset);
-            console.log(`   Total Expanded Rows: ${this.expandedAssets.length}`);
+    onRowExpandEvent(event: any) {
+        const asset = event.data as Asset;
+        console.log('📂 Row Expanded - assetId:', asset.assetId);
+        console.log(`   Asset: ${asset.assetName}`);
+
+        // Fetch ICS data for this specific asset
+        if (asset.assetId && !asset.inventoryCustodianSlip?.icsNo) {
+            this.assetService.getAssetInventoryCustodianSlip(asset.assetId).subscribe({
+                next: (icsData) => {
+                    console.log(`📋 ICS Data fetched for ${asset.assetName}:`, icsData);
+                    // Update the asset object with ICS data
+                    asset.inventoryCustodianSlip = icsData;
+                    console.log('✅ Asset updated with ICS data:', asset);
+                },
+                error: (error) => {
+                    console.error(`❌ Error fetching ICS for ${asset.assetName}:`, error);
+                }
+            });
         }
+    }
+
+    onRowCollapseEvent(event: any) {
+        const asset = event.data as Asset;
+        console.log('📁 Row Collapsed - assetId:', asset.assetId);
+    }
+
+    // Manual expand/collapse toggle
+    toggleExpand(asset: Asset) {
+        if (!asset.assetId) return;
+
+        if (this.expandedRowIds.has(asset.assetId)) {
+            // Collapse
+            this.expandedRowIds.delete(asset.assetId);
+            console.log('📁 Row Collapsed:', asset.assetId);
+        } else {
+            // Expand - first fetch ICS data if not already loaded
+            this.expandedRowIds.add(asset.assetId);
+            console.log('📂 Row Expanded:', asset.assetId);
+
+            if (!asset.inventoryCustodianSlip?.icsNo) {
+                console.log('🔄 Fetching ICS data for:', asset.assetName);
+                this.assetService.getAssetInventoryCustodianSlip(asset.assetId).subscribe({
+                    next: (icsData) => {
+                        console.log(`📋 ICS Data fetched for ${asset.assetName}:`, icsData);
+                        asset.inventoryCustodianSlip = icsData;
+                        console.log('✅ Asset updated with ICS data:', asset);
+                    },
+                    error: (error) => {
+                        console.error(`❌ Error fetching ICS for ${asset.assetName}:`, error);
+                    }
+                });
+            }
+        }
+    }
+
+    isRowExpanded(assetId: string | undefined): boolean {
+        if (!assetId) return false;
+        return this.expandedRowIds.has(assetId);
+    }
+
+    getIcsTableData(icsData: any): any[] {
+        if (!icsData) return [];
+
+        const tableData: any[] = [];
+        const fields = [
+            { key: 'inventoryCustodianSlipId', label: 'Inventory Custodian Slip ID' },
+            { key: 'icsNo', label: 'ICS No' },
+            { key: 'quantity', label: 'Quantity' },
+            { key: 'uoM', label: 'Unit of Measure' },
+            { key: 'unitCost', label: 'Unit Cost' },
+            { key: 'description', label: 'Description' },
+            { key: 'specifications', label: 'Specifications' },
+            { key: 'height', label: 'Height' },
+            { key: 'width', label: 'Width' },
+            { key: 'length', label: 'Length' },
+            { key: 'package', label: 'Package' },
+            { key: 'material', label: 'Material' },
+            { key: 'serialNumber', label: 'Serial Number' },
+            { key: 'modelNumber', label: 'Model Number' },
+            { key: 'estimatedUsefullLife', label: 'Estimated Useful Life' }
+        ];
+
+        fields.forEach((field) => {
+            if (icsData[field.key] !== undefined && icsData[field.key] !== null) {
+                tableData.push({
+                    field: field.label,
+                    value: icsData[field.key]
+                });
+            }
+        });
+
+        return tableData;
     }
 
     onQRCodeSelect(event: any) {
