@@ -87,6 +87,7 @@ import Swal from 'sweetalert2';
             <ng-template #header>
                 <tr>
                     <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
+                    <th style="width: 3rem">Expand</th>
                     <th pSortableColumn="propertyNumber" style="min-width: 12rem">Property Number<p-sortIcon field="propertyNumber" /></th>
                     <th pSortableColumn="assetName" style="min-width: 15rem">Asset Name<p-sortIcon field="assetName" /></th>
                     <th pSortableColumn="category" style="min-width: 12rem">Category<p-sortIcon field="category" /></th>
@@ -101,6 +102,9 @@ import Swal from 'sweetalert2';
             <ng-template #body let-item>
                 <tr>
                     <td style="width: 3rem"><p-tableCheckbox [value]="item" /></td>
+                    <td style="width: 3rem">
+                        <p-button type="button" [icon]="expandedAssets.includes(item) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="p-button-rounded p-button-text p-button-sm" (onClick)="toggleExpand(item)"> </p-button>
+                    </td>
                     <td>{{ item.propertyNumber }}</td>
                     <td>{{ item.assetName }}</td>
                     <td>{{ item.category }}</td>
@@ -118,6 +122,90 @@ import Swal from 'sweetalert2';
                             <p-button type="button" icon="pi pi-eye" class="p-button-rounded p-button-info" (click)="view(item)" pTooltip="View" tooltipPosition="top"></p-button>
                             <p-button type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning" (click)="edit(item)" pTooltip="Edit" tooltipPosition="top"></p-button>
                             <p-button type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="delete(item)" pTooltip="Delete" tooltipPosition="top"></p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="rowexpansion" let-item>
+                <tr *ngIf="expandedAssets.includes(item)">
+                    <td colspan="10" class="p-4">
+                        <div class="bg-gray-50 p-6 rounded border border-gray-200">
+                            <h5 class="text-lg font-bold mb-4 text-primary">Inventory Custodian Slip Details</h5>
+
+                            <div class="grid grid-cols-12 gap-4">
+                                <!-- ICS Information -->
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">ICS No</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.icsNo || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Quantity</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.quantity || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Unit of Measure</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.uoM || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Unit Cost</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.unitCost || 'N/A' }}</p>
+                                </div>
+
+                                <!-- Description and Specs -->
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Description</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.description || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Specifications</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.specifications || 'N/A' }}</p>
+                                </div>
+
+                                <!-- Dimensions -->
+                                <div class="col-span-4">
+                                    <p class="text-sm text-gray-600">Height</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.height || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-4">
+                                    <p class="text-sm text-gray-600">Width</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.width || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-4">
+                                    <p class="text-sm text-gray-600">Length</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.length || 'N/A' }}</p>
+                                </div>
+
+                                <!-- Additional Details -->
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Package</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.package || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Material</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.material || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Serial Number</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.serialNumber || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Model Number</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.modelNumber || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Estimated Useful Life</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.estimatedUsefullLife || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Brand</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.brand || 'N/A' }}</p>
+                                </div>
+                                <div class="col-span-6">
+                                    <p class="text-sm text-gray-600">Color</p>
+                                    <p class="font-semibold">{{ item.inventoryCustodianSlip?.color || 'N/A' }}</p>
+                                </div>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -285,6 +373,8 @@ export class AssetsComponent implements OnInit {
     assets: Asset[] = [];
     filteredAssets: Asset[] = [];
     selectedAssets: Asset[] = [];
+    expandedAssets: Asset[] = [];
+    expandedRows: { [key: string]: boolean } = {};
     searchValue: string = '';
     loading: boolean = true;
 
@@ -493,7 +583,41 @@ export class AssetsComponent implements OnInit {
     }
 
     onSelectionChange(event: any) {
-        console.log('Selected assets:', this.selectedAssets);
+        console.log('✅ Selection Changed');
+        console.log('📊 Total Selected:', this.selectedAssets.length);
+
+        if (this.selectedAssets.length === 0) {
+            console.log('❌ No assets selected');
+        } else {
+            console.log('📋 Selected Assets:');
+            this.selectedAssets.forEach((asset, index) => {
+                console.log(`  ${index + 1}. Asset ID: ${asset.assetId}`);
+                console.log(`     - Name: ${asset.assetName}`);
+                console.log(`     - Property Number: ${asset.propertyNumber}`);
+                console.log(`     - Category: ${asset.category}`);
+            });
+            console.log('Full Selected Data:', this.selectedAssets);
+        }
+    }
+
+    toggleExpand(asset: Asset) {
+        const index = this.expandedAssets.findIndex((a) => a.assetId === asset.assetId);
+        if (index > -1) {
+            this.expandedAssets.splice(index, 1);
+            console.log('📂 Row Collapsed');
+            console.log(`   Asset: ${asset.assetName} (ID: ${asset.assetId})`);
+            console.log(`   Property Number: ${asset.propertyNumber}`);
+            console.log(`   Total Expanded Rows: ${this.expandedAssets.length}`);
+        } else {
+            this.expandedAssets.push(asset);
+            console.log('📂 Row Expanded');
+            console.log(`   Asset: ${asset.assetName} (ID: ${asset.assetId})`);
+            console.log(`   Property Number: ${asset.propertyNumber}`);
+            console.log(`   Category: ${asset.category}`);
+            console.log(`   Found Cluster: ${asset.foundCluster}`);
+            console.log(`   Full Asset Data:`, asset);
+            console.log(`   Total Expanded Rows: ${this.expandedAssets.length}`);
+        }
     }
 
     onQRCodeSelect(event: any) {
