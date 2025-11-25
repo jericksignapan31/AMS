@@ -1,26 +1,26 @@
 import {
-  Bind
-} from "./chunk-DZVJ6T43.js";
-import {
   BaseComponent,
   PARENT_INSTANCE
-} from "./chunk-XO53NIKL.js";
+} from "./chunk-G3TTX4VE.js";
 import {
   BaseStyle
-} from "./chunk-JS5TRDC5.js";
+} from "./chunk-SUSYHND3.js";
 import {
   PrimeTemplate,
   SharedModule
-} from "./chunk-OBXYEWG2.js";
-import "./chunk-OTTARZB5.js";
-import "./chunk-U4LT4ZJN.js";
+} from "./chunk-VVQ6QSXN.js";
+import {
+  Bind
+} from "./chunk-246XFSKK.js";
 import {
   CommonModule,
   NgClass,
   NgIf,
   NgTemplateOutlet
-} from "./chunk-UO3VZI37.js";
+} from "./chunk-R2OVIKVM.js";
 import "./chunk-APPCZKFW.js";
+import "./chunk-OTTARZB5.js";
+import "./chunk-U4LT4ZJN.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -59,11 +59,11 @@ import {
   ɵɵtemplate,
   ɵɵtext,
   ɵɵtextInterpolate
-} from "./chunk-KVLC47DY.js";
-import "./chunk-HWYXSU2G.js";
+} from "./chunk-QWPRYKF3.js";
 import "./chunk-JRFR6BLO.js";
+import "./chunk-HWYXSU2G.js";
 import "./chunk-MARUHEWW.js";
-import "./chunk-WDMUDEB6.js";
+import "./chunk-3OV72XIM.js";
 
 // node_modules/@primeuix/styles/dist/tag/index.mjs
 var style = "\n    .p-tag {\n        display: inline-flex;\n        align-items: center;\n        justify-content: center;\n        background: dt('tag.primary.background');\n        color: dt('tag.primary.color');\n        font-size: dt('tag.font.size');\n        font-weight: dt('tag.font.weight');\n        padding: dt('tag.padding');\n        border-radius: dt('tag.border.radius');\n        gap: dt('tag.gap');\n    }\n\n    .p-tag-icon {\n        font-size: dt('tag.icon.size');\n        width: dt('tag.icon.size');\n        height: dt('tag.icon.size');\n    }\n\n    .p-tag-rounded {\n        border-radius: dt('tag.rounded.border.radius');\n    }\n\n    .p-tag-success {\n        background: dt('tag.success.background');\n        color: dt('tag.success.color');\n    }\n\n    .p-tag-info {\n        background: dt('tag.info.background');\n        color: dt('tag.info.color');\n    }\n\n    .p-tag-warn {\n        background: dt('tag.warn.background');\n        color: dt('tag.warn.color');\n    }\n\n    .p-tag-danger {\n        background: dt('tag.danger.background');\n        color: dt('tag.danger.color');\n    }\n\n    .p-tag-secondary {\n        background: dt('tag.secondary.background');\n        color: dt('tag.secondary.color');\n    }\n\n    .p-tag-contrast {\n        background: dt('tag.contrast.background');\n        color: dt('tag.contrast.color');\n    }\n";

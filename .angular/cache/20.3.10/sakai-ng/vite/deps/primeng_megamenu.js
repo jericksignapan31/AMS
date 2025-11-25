@@ -1,43 +1,55 @@
 import {
-  Badge,
-  BadgeModule
-} from "./chunk-GUENRAWO.js";
-import {
   Tooltip,
   TooltipModule
-} from "./chunk-7QCMWT6U.js";
+} from "./chunk-43YKQOQC.js";
 import {
-  RouterLink,
-  RouterLinkActive,
-  RouterModule
-} from "./chunk-WQM3D4A2.js";
-import {
-  Ripple
-} from "./chunk-IJXLZWW5.js";
+  Badge,
+  BadgeModule
+} from "./chunk-BP4O654K.js";
+import "./chunk-P6SMTJBG.js";
 import {
   zindexutils
-} from "./chunk-UQLQBFGK.js";
-import "./chunk-P6SMTJBG.js";
+} from "./chunk-CMVOE67Z.js";
+import {
+  Ripple
+} from "./chunk-SO3S43CI.js";
 import {
   AngleDownIcon,
   AngleRightIcon,
   BarsIcon
-} from "./chunk-AMDLI4KP.js";
-import "./chunk-2EPOXNOS.js";
-import {
-  Bind
-} from "./chunk-DZVJ6T43.js";
+} from "./chunk-3Y3Y7EMA.js";
+import "./chunk-XBOFUGXY.js";
 import {
   BaseComponent,
   PARENT_INSTANCE
-} from "./chunk-XO53NIKL.js";
+} from "./chunk-G3TTX4VE.js";
 import {
   BaseStyle
-} from "./chunk-JS5TRDC5.js";
+} from "./chunk-SUSYHND3.js";
 import {
   PrimeTemplate,
   SharedModule
-} from "./chunk-OBXYEWG2.js";
+} from "./chunk-VVQ6QSXN.js";
+import {
+  Bind
+} from "./chunk-246XFSKK.js";
+import {
+  RouterLink,
+  RouterLinkActive,
+  RouterModule
+} from "./chunk-JQU33M2K.js";
+import "./chunk-WGXPQ2Y2.js";
+import "./chunk-XI5EKNQ2.js";
+import "./chunk-RS4JDN4Z.js";
+import {
+  CommonModule,
+  NgForOf,
+  NgIf,
+  NgStyle,
+  NgTemplateOutlet,
+  isPlatformBrowser
+} from "./chunk-R2OVIKVM.js";
+import "./chunk-APPCZKFW.js";
 import "./chunk-OTTARZB5.js";
 import {
   J,
@@ -50,18 +62,6 @@ import {
   s3 as s2,
   z2 as z
 } from "./chunk-U4LT4ZJN.js";
-import "./chunk-5NUATPB2.js";
-import "./chunk-YIM3TNOW.js";
-import "./chunk-EGNWGIYC.js";
-import {
-  CommonModule,
-  NgForOf,
-  NgIf,
-  NgStyle,
-  NgTemplateOutlet,
-  isPlatformBrowser
-} from "./chunk-UO3VZI37.js";
-import "./chunk-APPCZKFW.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -126,11 +126,11 @@ import {
   ɵɵtextInterpolate,
   ɵɵtextInterpolate1,
   ɵɵviewQuery
-} from "./chunk-KVLC47DY.js";
-import "./chunk-HWYXSU2G.js";
+} from "./chunk-QWPRYKF3.js";
 import "./chunk-JRFR6BLO.js";
+import "./chunk-HWYXSU2G.js";
 import "./chunk-MARUHEWW.js";
-import "./chunk-WDMUDEB6.js";
+import "./chunk-3OV72XIM.js";
 
 // node_modules/@primeuix/styles/dist/megamenu/index.mjs
 var style = "\n    .p-megamenu {\n        position: relative;\n        display: flex;\n        align-items: center;\n        background: dt('megamenu.background');\n        border: 1px solid dt('megamenu.border.color');\n        border-radius: dt('megamenu.border.radius');\n        color: dt('megamenu.color');\n        gap: dt('megamenu.gap');\n    }\n\n    .p-megamenu-start,\n    .p-megamenu-end {\n        display: flex;\n        align-items: center;\n    }\n\n    .p-megamenu-root-list {\n        margin: 0;\n        padding: 0;\n        list-style: none;\n        outline: 0 none;\n        align-items: center;\n        display: flex;\n        flex-wrap: wrap;\n        gap: dt('megamenu.gap');\n    }\n\n    .p-megamenu-root-list > .p-megamenu-item > .p-megamenu-item-content {\n        border-radius: dt('megamenu.base.item.border.radius');\n    }\n\n    .p-megamenu-root-list > .p-megamenu-item > .p-megamenu-item-content > .p-megamenu-item-link {\n        padding: dt('megamenu.base.item.padding');\n    }\n\n    .p-megamenu-item-content {\n        transition:\n            background dt('megamenu.transition.duration'),\n            color dt('megamenu.transition.duration');\n        border-radius: dt('megamenu.item.border.radius');\n        color: dt('megamenu.item.color');\n    }\n\n    .p-megamenu-item-link {\n        cursor: pointer;\n        display: flex;\n        align-items: center;\n        text-decoration: none;\n        overflow: hidden;\n        position: relative;\n        color: inherit;\n        padding: dt('megamenu.item.padding');\n        gap: dt('megamenu.item.gap');\n        user-select: none;\n        outline: 0 none;\n    }\n\n    .p-megamenu-item-label {\n        line-height: 1;\n    }\n\n    .p-megamenu-item-icon {\n        color: dt('megamenu.item.icon.color');\n    }\n\n    .p-megamenu-submenu-icon {\n        color: dt('megamenu.submenu.icon.color');\n        font-size: dt('megamenu.submenu.icon.size');\n        width: dt('megamenu.submenu.icon.size');\n        height: dt('megamenu.submenu.icon.size');\n    }\n\n    .p-megamenu-item.p-focus > .p-megamenu-item-content {\n        color: dt('megamenu.item.focus.color');\n        background: dt('megamenu.item.focus.background');\n    }\n\n    .p-megamenu-item.p-focus > .p-megamenu-item-content .p-megamenu-item-icon {\n        color: dt('megamenu.item.icon.focus.color');\n    }\n\n    .p-megamenu-item.p-focus > .p-megamenu-item-content .p-megamenu-submenu-icon {\n        color: dt('megamenu.submenu.icon.focus.color');\n    }\n\n    .p-megamenu-item:not(.p-disabled) > .p-megamenu-item-content:hover {\n        color: dt('megamenu.item.focus.color');\n        background: dt('megamenu.item.focus.background');\n    }\n\n    .p-megamenu-item:not(.p-disabled) > .p-megamenu-item-content:hover .p-megamenu-item-icon {\n        color: dt('megamenu.item.icon.focus.color');\n    }\n\n    .p-megamenu-item:not(.p-disabled) > .p-megamenu-item-content:hover .p-megamenu-submenu-icon {\n        color: dt('megamenu.submenu.icon.focus.color');\n    }\n\n    .p-megamenu-item-active > .p-megamenu-item-content {\n        color: dt('megamenu.item.active.color');\n        background: dt('megamenu.item.active.background');\n    }\n\n    .p-megamenu-item-active > .p-megamenu-item-content .p-megamenu-item-icon {\n        color: dt('megamenu.item.icon.active.color');\n    }\n\n    .p-megamenu-item-active > .p-megamenu-item-content .p-megamenu-submenu-icon {\n        color: dt('megamenu.submenu.icon.active.color');\n    }\n\n    .p-megamenu-overlay {\n        display: none;\n        position: absolute;\n        width: auto;\n        z-index: 1;\n        left: 0;\n        min-width: 100%;\n        padding: dt('megamenu.overlay.padding');\n        background: dt('megamenu.overlay.background');\n        color: dt('megamenu.overlay.color');\n        border: 1px solid dt('megamenu.overlay.border.color');\n        border-radius: dt('megamenu.overlay.border.radius');\n        box-shadow: dt('megamenu.overlay.shadow');\n    }\n\n    .p-megamenu-overlay:dir(rtl) {\n        left: auto;\n        right: 0;\n    }\n\n    .p-megamenu-root-list > .p-megamenu-item-active > .p-megamenu-overlay {\n        display: block;\n    }\n\n    .p-megamenu-submenu {\n        margin: 0;\n        list-style: none;\n        padding: dt('megamenu.submenu.padding');\n        min-width: 12.5rem;\n        display: flex;\n        flex-direction: column;\n        gap: dt('megamenu.submenu.gap');\n    }\n\n    .p-megamenu-submenu-label {\n        padding: dt('megamenu.submenu.label.padding');\n        color: dt('megamenu.submenu.label.color');\n        font-weight: dt('megamenu.submenu.label.font.weight');\n        background: dt('megamenu.submenu.label.background');\n    }\n\n    .p-megamenu-separator {\n        border-block-start: 1px solid dt('megamenu.separator.border.color');\n    }\n\n    .p-megamenu-horizontal {\n        align-items: center;\n        padding: dt('megamenu.horizontal.orientation.padding');\n    }\n\n    .p-megamenu-horizontal .p-megamenu-root-list {\n        display: flex;\n        align-items: center;\n        flex-wrap: wrap;\n        gap: dt('megamenu.horizontal.orientation.gap');\n    }\n\n    .p-megamenu-horizontal .p-megamenu-end {\n        margin-left: auto;\n        align-self: center;\n    }\n\n    .p-megamenu-horizontal .p-megamenu-end:dir(rtl) {\n        margin-left: 0;\n        margin-right: auto;\n    }\n\n    .p-megamenu-vertical {\n        display: inline-flex;\n        min-width: 12.5rem;\n        flex-direction: column;\n        align-items: stretch;\n        padding: dt('megamenu.vertical.orientation.padding');\n    }\n\n    .p-megamenu-vertical .p-megamenu-root-list {\n        align-items: stretch;\n        flex-direction: column;\n        gap: dt('megamenu.vertical.orientation.gap');\n    }\n\n    .p-megamenu-vertical .p-megamenu-root-list > .p-megamenu-item-active > .p-megamenu-overlay {\n        left: 100%;\n        top: 0;\n    }\n\n    .p-megamenu-vertical .p-megamenu-root-list > .p-megamenu-item-active > .p-megamenu-overlay:dir(rtl) {\n        left: auto;\n        right: 100%;\n    }\n\n    .p-megamenu-vertical .p-megamenu-root-list > .p-megamenu-item > .p-megamenu-item-content .p-megamenu-submenu-icon {\n        margin-left: auto;\n    }\n\n    .p-megamenu-vertical .p-megamenu-root-list > .p-megamenu-item > .p-megamenu-item-content .p-megamenu-submenu-icon:dir(rtl) {\n        margin-left: 0;\n        margin-right: auto;\n        transform: rotate(180deg);\n    }\n\n    .p-megamenu-grid {\n        display: flex;\n    }\n\n    .p-megamenu-col-2,\n    .p-megamenu-col-3,\n    .p-megamenu-col-4,\n    .p-megamenu-col-6,\n    .p-megamenu-col-12 {\n        flex: 0 0 auto;\n        padding: dt('megamenu.overlay.gap');\n    }\n\n    .p-megamenu-col-2 {\n        width: 16.6667%;\n    }\n\n    .p-megamenu-col-3 {\n        width: 25%;\n    }\n\n    .p-megamenu-col-4 {\n        width: 33.3333%;\n    }\n\n    .p-megamenu-col-6 {\n        width: 50%;\n    }\n\n    .p-megamenu-col-12 {\n        width: 100%;\n    }\n\n    .p-megamenu-button {\n        display: none;\n        justify-content: center;\n        align-items: center;\n        cursor: pointer;\n        width: dt('megamenu.mobile.button.size');\n        height: dt('megamenu.mobile.button.size');\n        position: relative;\n        color: dt('megamenu.mobile.button.color');\n        border: 0 none;\n        background: transparent;\n        border-radius: dt('megamenu.mobile.button.border.radius');\n        transition:\n            background dt('megamenu.transition.duration'),\n            color dt('megamenu.transition.duration'),\n            outline-color dt('megamenu.transition.duration'),\n            box-shadow dt('megamenu.transition.duration');\n        outline-color: transparent;\n    }\n\n    .p-megamenu-button:hover {\n        color: dt('megamenu.mobile.button.hover.color');\n        background: dt('megamenu.mobile.button.hover.background');\n    }\n\n    .p-megamenu-button:focus-visible {\n        box-shadow: dt('megamenu.mobile.button.focus.ring.shadow');\n        outline: dt('megamenu.mobile.button.focus.ring.width') dt('megamenu.mobile.button.focus.ring.style') dt('megamenu.mobile.button.focus.ring.color');\n        outline-offset: dt('megamenu.mobile.button.focus.ring.offset');\n    }\n\n    .p-megamenu-mobile {\n        display: flex;\n    }\n\n    .p-megamenu-mobile .p-megamenu-button {\n        display: flex;\n    }\n\n    .p-megamenu-mobile .p-megamenu-root-list {\n        position: absolute;\n        display: none;\n        flex-direction: column;\n        top: 100%;\n        left: 0;\n        z-index: 1;\n        width: 100%;\n        padding: dt('megamenu.submenu.padding');\n        gap: dt('megamenu.submenu.gap');\n        background: dt('megamenu.overlay.background');\n        border: 1px solid dt('megamenu.overlay.border.color');\n        box-shadow: dt('megamenu.overlay.shadow');\n    }\n\n    .p-megamenu-mobile .p-megamenu-root-list:dir(rtl) {\n        left: auto;\n        right: 0;\n    }\n\n    .p-megamenu-mobile-active .p-megamenu-root-list {\n        display: block;\n    }\n\n    .p-megamenu-mobile .p-megamenu-root-list .p-megamenu-item {\n        width: 100%;\n        position: static;\n    }\n\n    .p-megamenu-mobile .p-megamenu-overlay {\n        position: static;\n        border: 0 none;\n        border-radius: 0;\n        box-shadow: none;\n    }\n\n    .p-megamenu-mobile .p-megamenu-grid {\n        flex-wrap: wrap;\n        overflow: auto;\n        max-height: 90%;\n    }\n\n    .p-megamenu-mobile .p-megamenu-root-list > .p-megamenu-item > .p-megamenu-item-content .p-megamenu-submenu-icon {\n        margin-left: auto;\n        transition: transform 0.2s;\n    }\n\n    .p-megamenu-mobile .p-megamenu-root-list > .p-megamenu-item > .p-megamenu-item-content .p-megamenu-submenu-icon:dir(rtl) {\n        margin-left: 0;\n        margin-right: auto;\n    }\n\n    .p-megamenu-mobile .p-megamenu-root-list > .p-megamenu-item-active > .p-megamenu-item-content .p-megamenu-submenu-icon {\n        transform: rotate(-180deg);\n    }\n";

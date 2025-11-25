@@ -1,22 +1,22 @@
 import {
-  Bind
-} from "./chunk-DZVJ6T43.js";
-import {
   BaseComponent,
   PARENT_INSTANCE
-} from "./chunk-XO53NIKL.js";
+} from "./chunk-G3TTX4VE.js";
 import {
   BaseStyle
-} from "./chunk-JS5TRDC5.js";
+} from "./chunk-SUSYHND3.js";
 import {
   SharedModule
-} from "./chunk-OBXYEWG2.js";
-import "./chunk-OTTARZB5.js";
-import "./chunk-U4LT4ZJN.js";
+} from "./chunk-VVQ6QSXN.js";
+import {
+  Bind
+} from "./chunk-246XFSKK.js";
 import {
   CommonModule
-} from "./chunk-UO3VZI37.js";
+} from "./chunk-R2OVIKVM.js";
 import "./chunk-APPCZKFW.js";
+import "./chunk-OTTARZB5.js";
+import "./chunk-U4LT4ZJN.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -38,14 +38,14 @@ import {
   ɵɵdefineNgModule,
   ɵɵgetInheritedFactory,
   ɵɵstyleMap
-} from "./chunk-KVLC47DY.js";
-import "./chunk-HWYXSU2G.js";
+} from "./chunk-QWPRYKF3.js";
 import "./chunk-JRFR6BLO.js";
+import "./chunk-HWYXSU2G.js";
 import "./chunk-MARUHEWW.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-WDMUDEB6.js";
+} from "./chunk-3OV72XIM.js";
 
 // node_modules/@primeuix/styles/dist/skeleton/index.mjs
 var style = "\n    .p-skeleton {\n        display: block;\n        overflow: hidden;\n        background: dt('skeleton.background');\n        border-radius: dt('skeleton.border.radius');\n    }\n\n    .p-skeleton::after {\n        content: '';\n        animation: p-skeleton-animation 1.2s infinite;\n        height: 100%;\n        left: 0;\n        position: absolute;\n        right: 0;\n        top: 0;\n        transform: translateX(-100%);\n        z-index: 1;\n        background: linear-gradient(90deg, rgba(255, 255, 255, 0), dt('skeleton.animation.background'), rgba(255, 255, 255, 0));\n    }\n\n    [dir='rtl'] .p-skeleton::after {\n        animation-name: p-skeleton-animation-rtl;\n    }\n\n    .p-skeleton-circle {\n        border-radius: 50%;\n    }\n\n    .p-skeleton-animation-none::after {\n        animation: none;\n    }\n\n    @keyframes p-skeleton-animation {\n        from {\n            transform: translateX(-100%);\n        }\n        to {\n            transform: translateX(100%);\n        }\n    }\n\n    @keyframes p-skeleton-animation-rtl {\n        from {\n            transform: translateX(100%);\n        }\n        to {\n            transform: translateX(-100%);\n        }\n    }\n";

@@ -1,18 +1,24 @@
 import {
-  Bind,
-  BindModule
-} from "./chunk-DZVJ6T43.js";
-import {
   BaseComponent,
   PARENT_INSTANCE
-} from "./chunk-XO53NIKL.js";
+} from "./chunk-G3TTX4VE.js";
 import {
   BaseStyle
-} from "./chunk-JS5TRDC5.js";
+} from "./chunk-SUSYHND3.js";
 import {
   PrimeTemplate,
   SharedModule
-} from "./chunk-OBXYEWG2.js";
+} from "./chunk-VVQ6QSXN.js";
+import {
+  Bind,
+  BindModule
+} from "./chunk-246XFSKK.js";
+import {
+  CommonModule,
+  NgTemplateOutlet,
+  isPlatformBrowser
+} from "./chunk-R2OVIKVM.js";
+import "./chunk-APPCZKFW.js";
 import "./chunk-OTTARZB5.js";
 import {
   P,
@@ -20,12 +26,6 @@ import {
   W,
   s3 as s
 } from "./chunk-U4LT4ZJN.js";
-import {
-  CommonModule,
-  NgTemplateOutlet,
-  isPlatformBrowser
-} from "./chunk-UO3VZI37.js";
-import "./chunk-APPCZKFW.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -69,11 +69,11 @@ import {
   ɵɵrestoreView,
   ɵɵtemplate,
   ɵɵviewQuery
-} from "./chunk-KVLC47DY.js";
-import "./chunk-HWYXSU2G.js";
+} from "./chunk-QWPRYKF3.js";
 import "./chunk-JRFR6BLO.js";
+import "./chunk-HWYXSU2G.js";
 import "./chunk-MARUHEWW.js";
-import "./chunk-WDMUDEB6.js";
+import "./chunk-3OV72XIM.js";
 
 // node_modules/@primeuix/styles/dist/scrollpanel/index.mjs
 var style = "\n    .p-scrollpanel-content-container {\n        overflow: hidden;\n        width: 100%;\n        height: 100%;\n        position: relative;\n        z-index: 1;\n        float: left;\n    }\n\n    .p-scrollpanel-content {\n        height: calc(100% + calc(2 * dt('scrollpanel.bar.size')));\n        width: calc(100% + calc(2 * dt('scrollpanel.bar.size')));\n        padding-inline: 0 calc(2 * dt('scrollpanel.bar.size'));\n        padding-block: 0 calc(2 * dt('scrollpanel.bar.size'));\n        position: relative;\n        overflow: auto;\n        box-sizing: border-box;\n        scrollbar-width: none;\n    }\n\n    .p-scrollpanel-content::-webkit-scrollbar {\n        display: none;\n    }\n\n    .p-scrollpanel-bar {\n        position: relative;\n        border-radius: dt('scrollpanel.bar.border.radius');\n        z-index: 2;\n        cursor: pointer;\n        opacity: 0;\n        outline-color: transparent;\n        background: dt('scrollpanel.bar.background');\n        border: 0 none;\n        transition:\n            outline-color dt('scrollpanel.transition.duration'),\n            opacity dt('scrollpanel.transition.duration');\n    }\n\n    .p-scrollpanel-bar:focus-visible {\n        box-shadow: dt('scrollpanel.bar.focus.ring.shadow');\n        outline: dt('scrollpanel.barfocus.ring.width') dt('scrollpanel.bar.focus.ring.style') dt('scrollpanel.bar.focus.ring.color');\n        outline-offset: dt('scrollpanel.barfocus.ring.offset');\n    }\n\n    .p-scrollpanel-bar-y {\n        width: dt('scrollpanel.bar.size');\n        inset-block-start: 0;\n    }\n\n    .p-scrollpanel-bar-x {\n        height: dt('scrollpanel.bar.size');\n        inset-block-end: 0;\n    }\n\n    .p-scrollpanel-hidden {\n        visibility: hidden;\n    }\n\n    .p-scrollpanel:hover .p-scrollpanel-bar,\n    .p-scrollpanel:active .p-scrollpanel-bar {\n        opacity: 1;\n    }\n\n    .p-scrollpanel-grabbed {\n        user-select: none;\n    }\n";
