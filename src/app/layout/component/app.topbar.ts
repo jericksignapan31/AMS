@@ -267,11 +267,59 @@ export class AppTopbar {
     async searchAsset() {
         if (!this.scanResult) return;
 
+        console.log(`\n🔍 ========== QR CODE SCANNED ==========`);
+        console.log(`📱 Scanned Value: "${this.scanResult}"`);
+        console.log(`⏰ Timestamp: ${new Date().toLocaleTimeString()}`);
+
         try {
+            console.log(`\n📡 ========== CALLING GET /api/assets ==========`);
             const assets = await this.assetService.getAssets().toPromise();
-            const foundAsset = assets?.find((asset) => asset.QrCode === this.scanResult || asset.PropertyNo === this.scanResult);
+
+            console.log(`\n✅ ========== GET /api/assets RESPONSE ==========`);
+            console.log(`📊 Total Assets: ${assets?.length || 0}`);
+            console.log(`\n📋 FULL RESPONSE DATA:`);
+            console.log(JSON.stringify(assets, null, 2));
+
+            console.log(`\n🔍 ========== COMPARING SCANNED VALUE AGAINST ALL ASSETS ==========`);
+            console.log(`Looking for match with: "${this.scanResult}"\n`);
+
+            let foundAsset: any = null;
+
+            // Compare each asset's propertyNumber and qrCode with scanned value
+            assets?.forEach((asset, index) => {
+                console.log(`Asset #${index + 1}:`);
+                console.log(`   assetId: ${asset.assetId || 'N/A'}`);
+                console.log(`   propertyNumber: ${asset.propertyNumber || 'N/A'}`);
+                console.log(`   qrCode: ${asset.qrCode || 'N/A'}`);
+                console.log(`   assetName: ${asset.assetName || 'N/A'}`);
+
+                // Check if propertyNumber matches
+                if (asset.propertyNumber === this.scanResult || asset.propertyNumber?.toString() === this.scanResult?.toString()) {
+                    console.log(`   ✅ MATCH FOUND (propertyNumber)!`);
+                    foundAsset = asset;
+                }
+
+                // Check if qrCode matches
+                if (asset.qrCode === this.scanResult || asset.qrCode?.toString() === this.scanResult?.toString()) {
+                    console.log(`   ✅ MATCH FOUND (qrCode)!`);
+                    foundAsset = asset;
+                }
+
+                console.log('');
+            });
 
             if (foundAsset) {
+                console.log(`\n✨ ========== MATCH FOUND - COMPLETE ASSET DATA ==========`);
+                console.log(`🆔 Asset ID: ${foundAsset.assetId}`);
+                console.log(`📋 Property Number: ${foundAsset.propertyNumber}`);
+                console.log(`📝 Asset Name: ${foundAsset.assetName}`);
+                console.log(`🏷️ Category: ${foundAsset.category}`);
+                console.log(`📍 Found Cluster: ${foundAsset.foundCluster}`);
+                console.log(`👤 Issued To: ${foundAsset.issuedTo}`);
+                console.log(`📌 QR Code: ${foundAsset.qrCode}`);
+                console.log(`\n📊 FULL ASSET OBJECT:`);
+                console.log(JSON.stringify(foundAsset, null, 2));
+
                 this.closeQRScanner();
 
                 // Show success message with asset details
@@ -279,12 +327,13 @@ export class AppTopbar {
                     title: 'Asset Found!',
                     html: `
                         <div class="text-left">
-                            <p><strong>Property No:</strong> ${foundAsset.PropertyNo}</p>
-                            <p><strong>Asset Name:</strong> ${foundAsset.AssetName}</p>
-                            <p><strong>Category:</strong> ${foundAsset.Category}</p>
-                            <p><strong>Location:</strong> ${foundAsset.FoundCluster}</p>
-                            <p><strong>Issued To:</strong> ${foundAsset.IssuedTo}</p>
-                            <p><strong>Status:</strong> ${foundAsset.Status_id}</p>
+                            <p><strong>Asset ID:</strong> ${foundAsset.assetId}</p>
+                            <p><strong>Property Number:</strong> ${foundAsset.propertyNumber}</p>
+                            <p><strong>Asset Name:</strong> ${foundAsset.assetName}</p>
+                            <p><strong>Category:</strong> ${foundAsset.category}</p>
+                            <p><strong>Location:</strong> ${foundAsset.foundCluster}</p>
+                            <p><strong>Issued To:</strong> ${foundAsset.issuedTo}</p>
+                            <p><strong>Purpose:</strong> ${foundAsset.purpose}</p>
                         </div>
                     `,
                     icon: 'success',
@@ -297,15 +346,23 @@ export class AppTopbar {
                     }
                 });
             } else {
+                console.log(`\n❌ ========== NO MATCH FOUND ==========`);
+                console.log(`Scanned value "${this.scanResult}" does not match any asset`);
+                console.log(`\n📋 Available values in database:`);
+                assets?.forEach((asset, idx) => {
+                    console.log(`   ${idx + 1}. propertyNumber: "${asset.propertyNumber || 'N/A'}" | qrCode: "${asset.qrCode || 'N/A'}"`);
+                });
+
                 Swal.fire({
                     title: 'Asset Not Found',
-                    text: `No asset found with QR code: ${this.scanResult}`,
+                    text: `No asset found with value: ${this.scanResult}`,
                     icon: 'warning',
                     confirmButtonText: 'OK'
                 });
             }
+            console.log(`\n========== END ==========\n`);
         } catch (error) {
-            console.error('Error searching asset:', error);
+            console.error('❌ Error searching asset:', error);
             Swal.fire({
                 title: 'Search Error',
                 text: 'Failed to search for asset. Please try again.',
