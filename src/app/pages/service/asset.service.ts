@@ -209,6 +209,14 @@ export class AssetService {
         return this.http.get<any>(`${this.baseApiUrl}/assets/${assetId}/inventoryCustodianSlip`).pipe(tap((data) => console.log('✅ ICS API Response:', data)));
     }
 
+    // QR Code upload method
+    uploadQrCode(assetId: string, file: File): Observable<any> {
+        const formData = new FormData();
+        formData.append('file', file);
+        console.log(`📡 Uploading QR code to: ${this.baseApiUrl}/storage/qr-code/${assetId}`);
+        return this.http.post<any>(`${this.baseApiUrl}/storage/qr-code/${assetId}`, formData).pipe(tap((response) => console.log('✅ QR Code upload successful:', response)));
+    }
+
     // User methods
     getUsers(): Observable<any[]> {
         return this.http.get<any[]>(`${this.baseApiUrl}/users`);

@@ -16,6 +16,7 @@ import { SelectModule } from 'primeng/select';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 import { FileUploadModule } from 'primeng/fileupload';
+import { StepperModule } from 'primeng/stepper';
 import { MessageService } from 'primeng/api';
 import { AssetService, Asset, Program, Supplier, Location, Color, Brand, Status } from '../service/asset.service';
 import jsQR from 'jsqr';
@@ -41,7 +42,8 @@ import Swal from 'sweetalert2';
         SelectModule,
         InputNumberModule,
         TextareaModule,
-        FileUploadModule
+        FileUploadModule,
+        StepperModule
     ],
     providers: [MessageService],
     styles: [
@@ -244,147 +246,170 @@ import Swal from 'sweetalert2';
             </ng-template>
         </p-table>
 
-        <!-- New Asset Dialog -->
-        <p-dialog [(visible)]="assetDialog" [style]="{ width: '800px' }" header="Create New Asset" [modal]="true" [closable]="true">
+        <!-- New Asset Dialog with Stepper -->
+        <p-dialog [(visible)]="assetDialog" [style]="{ width: '900px' }" header="Create New Asset & Inventory Custodian Slip" [modal]="true" [closable]="false">
             <ng-template #content>
-                <div class="grid grid-cols-12 gap-4">
-                    <!-- Asset Details -->
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Asset Name *</label>
-                        <input pInputText [(ngModel)]="newAsset.assetName" placeholder="Enter asset name" class="w-full" />
+                <!-- Manual Stepper Header -->
+                <div class="flex justify-center gap-4 mb-6 pb-4 border-b">
+                    <div class="flex items-center gap-2">
+                        <div [class]="'w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ' + (currentStep >= 0 ? 'bg-primary' : 'bg-gray-300')">1</div>
+                        <span [class]="currentStep >= 0 ? 'text-primary font-bold' : 'text-gray-500'">Asset Details</span>
                     </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Property Number *</label>
-                        <input pInputText [(ngModel)]="newAsset.propertyNumber" placeholder="Enter property number" class="w-full" />
+                    <div [class]="'w-12 h-1 mt-3 ' + (currentStep >= 1 ? 'bg-primary' : 'bg-gray-300')"></div>
+                    <div class="flex items-center gap-2">
+                        <div [class]="'w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ' + (currentStep >= 1 ? 'bg-primary' : 'bg-gray-300')">2</div>
+                        <span [class]="currentStep >= 1 ? 'text-primary font-bold' : 'text-gray-500'">ICS Details</span>
                     </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Category *</label>
-                        <p-select [(ngModel)]="newAsset.category" [options]="categoryOptions" placeholder="Select category" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Found Cluster</label>
-                        <input pInputText [(ngModel)]="newAsset.foundCluster" placeholder="Enter found cluster" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Purpose</label>
-                        <textarea pTextarea [(ngModel)]="newAsset.purpose" placeholder="Enter purpose" rows="3" class="w-full"></textarea>
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Issued To</label>
-                        <input pInputText [(ngModel)]="newAsset.issuedTo" placeholder="Enter person/department" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">QR Code Image *</label>
-                        <p-fileUpload
-                            name="qrCodeImage"
-                            [auto]="false"
-                            accept="image/*"
-                            maxFileSize="5000000"
-                            (onSelect)="onQRCodeSelect($event)"
-                            [customUpload]="true"
-                            [showUploadButton]="false"
-                            [showCancelButton]="false"
-                            chooseLabel="Upload QR Code Image"
-                        >
-                        </p-fileUpload>
-                        <div *ngIf="newAsset.qrCode" class="mt-2">
-                            <p class="text-sm text-green-600">✓ Scanned QR Code: {{ newAsset.qrCode }}</p>
+                </div>
+
+                <!-- Step Content -->
+                <div [ngSwitch]="currentStep">
+                    <!-- Step 1: Asset Details -->
+                    <div *ngSwitchCase="0" class="step-content">
+                        <div class="grid grid-cols-12 gap-4 mt-4">
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Asset Name *</label>
+                                <input pInputText [(ngModel)]="newAsset.assetName" placeholder="Enter asset name" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Property Number *</label>
+                                <input pInputText [(ngModel)]="newAsset.propertyNumber" placeholder="Enter property number" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Category *</label>
+                                <p-select [(ngModel)]="newAsset.category" [options]="categoryOptions" placeholder="Select category" class="w-full" appendTo="body" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Found Cluster</label>
+                                <input pInputText [(ngModel)]="newAsset.foundCluster" placeholder="Enter found cluster" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Purpose</label>
+                                <textarea pTextarea [(ngModel)]="newAsset.purpose" placeholder="Enter purpose" rows="3" class="w-full"></textarea>
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Issued To</label>
+                                <input pInputText [(ngModel)]="newAsset.issuedTo" placeholder="Enter person/department" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Status</label>
+                                <p-select [(ngModel)]="newAsset.status" [options]="statuses" optionLabel="statusName" optionValue="statusId" placeholder="Select status" class="w-full" appendTo="body" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Program</label>
+                                <p-select [(ngModel)]="newAsset.program" [options]="programs" optionLabel="programName" optionValue="programId" placeholder="Select program" class="w-full" appendTo="body" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Supplier</label>
+                                <p-select [(ngModel)]="newAsset.supplier" [options]="suppliers" optionLabel="supplierName" optionValue="supplierId" placeholder="Select supplier" class="w-full" appendTo="body" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Location</label>
+                                <p-select [(ngModel)]="newAsset.location" [options]="locations" optionLabel="locationName" optionValue="locationId" placeholder="Select location" class="w-full" appendTo="body" />
+                            </div>
                         </div>
                     </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Status</label>
-                        <p-select [(ngModel)]="newAsset.status" [options]="statuses" optionLabel="statusName" optionValue="statusId" placeholder="Select status" class="w-full" />
-                    </div>
 
-                    <!-- Reference Data -->
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Program</label>
-                        <p-select [(ngModel)]="newAsset.program" [options]="programs" optionLabel="programName" optionValue="programId" placeholder="Select program" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Supplier</label>
-                        <p-select [(ngModel)]="newAsset.supplier" [options]="suppliers" optionLabel="supplierName" optionValue="supplierId" placeholder="Select supplier" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Location</label>
-                        <p-select [(ngModel)]="newAsset.location" [options]="locations" optionLabel="locationName" optionValue="locationId" placeholder="Select location" class="w-full" />
-                    </div>
-
-                    <!-- Inventory Custodian Slip Details -->
-                    <div class="col-span-12">
-                        <h5 class="text-primary font-bold">Inventory Custodian Slip Details</h5>
-                    </div>
-
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">ICS No</label>
-                        <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.icsNo" placeholder="ICS number" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Quantity *</label>
-                        <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.quantity" [useGrouping]="false" placeholder="Enter quantity" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Unit of Measure *</label>
-                        <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.uoM" placeholder="UoM (e.g., pcs, set)" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Unit Cost</label>
-                        <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.unitCost" mode="currency" currency="PHP" placeholder="Unit cost" class="w-full" />
-                    </div>
-                    <div class="col-span-12">
-                        <label class="block font-bold mb-2">Description</label>
-                        <textarea pTextarea [(ngModel)]="newAsset.inventoryCustodianSlip.description" placeholder="Description" rows="3" class="w-full"></textarea>
-                    </div>
-                    <div class="col-span-12">
-                        <label class="block font-bold mb-2">Specifications</label>
-                        <textarea pTextarea [(ngModel)]="newAsset.inventoryCustodianSlip.specifications" placeholder="Specifications" rows="2" class="w-full"></textarea>
-                    </div>
-                    <div class="col-span-4">
-                        <label class="block font-bold mb-2">Height</label>
-                        <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.height" [useGrouping]="false" placeholder="Height" class="w-full" />
-                    </div>
-                    <div class="col-span-4">
-                        <label class="block font-bold mb-2">Width</label>
-                        <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.width" [useGrouping]="false" placeholder="Width" class="w-full" />
-                    </div>
-                    <div class="col-span-4">
-                        <label class="block font-bold mb-2">Length</label>
-                        <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.length" [useGrouping]="false" placeholder="Length" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Package</label>
-                        <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.package" placeholder="Package" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Material</label>
-                        <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.material" placeholder="Material" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Serial Number</label>
-                        <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.serialNumber" placeholder="Serial number" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Model Number</label>
-                        <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.modelNumber" placeholder="Model number" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Estimated Useful Life</label>
-                        <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.estimatedUsefullLife" placeholder="e.g., 5 years" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Brand</label>
-                        <p-select [(ngModel)]="newAsset.inventoryCustodianSlip.brand" [options]="brands" optionLabel="brandName" optionValue="brandId" placeholder="Select brand" class="w-full" />
-                    </div>
-                    <div class="col-span-6">
-                        <label class="block font-bold mb-2">Color</label>
-                        <p-select [(ngModel)]="newAsset.inventoryCustodianSlip.color" [options]="colors" optionLabel="colorName" optionValue="colorId" placeholder="Select color" class="w-full" />
+                    <!-- Step 2: Inventory Custodian Slip Details -->
+                    <div *ngSwitchCase="1" class="step-content">
+                        <div class="grid grid-cols-12 gap-4 mt-4">
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">ICS No</label>
+                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.icsNo" placeholder="ICS number" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Quantity *</label>
+                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.quantity" [useGrouping]="false" placeholder="Enter quantity" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Unit of Measure *</label>
+                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.uoM" placeholder="UoM (e.g., pcs, set)" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Unit Cost</label>
+                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.unitCost" mode="currency" currency="PHP" placeholder="Unit cost" class="w-full" />
+                            </div>
+                            <div class="col-span-12">
+                                <label class="block font-bold mb-2">Description</label>
+                                <textarea pTextarea [(ngModel)]="newAsset.inventoryCustodianSlip.description" placeholder="Description" rows="3" class="w-full"></textarea>
+                            </div>
+                            <div class="col-span-12">
+                                <label class="block font-bold mb-2">Specifications</label>
+                                <textarea pTextarea [(ngModel)]="newAsset.inventoryCustodianSlip.specifications" placeholder="Specifications" rows="2" class="w-full"></textarea>
+                            </div>
+                            <div class="col-span-4">
+                                <label class="block font-bold mb-2">Height</label>
+                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.height" [useGrouping]="false" placeholder="Height" class="w-full" />
+                            </div>
+                            <div class="col-span-4">
+                                <label class="block font-bold mb-2">Width</label>
+                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.width" [useGrouping]="false" placeholder="Width" class="w-full" />
+                            </div>
+                            <div class="col-span-4">
+                                <label class="block font-bold mb-2">Length</label>
+                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.length" [useGrouping]="false" placeholder="Length" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Package</label>
+                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.package" placeholder="Package" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Material</label>
+                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.material" placeholder="Material" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Serial Number</label>
+                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.serialNumber" placeholder="Serial number" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Model Number</label>
+                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.modelNumber" placeholder="Model number" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Estimated Useful Life</label>
+                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.estimatedUsefullLife" placeholder="e.g., 5 years" class="w-full" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Brand</label>
+                                <p-select [(ngModel)]="newAsset.inventoryCustodianSlip.brand" [options]="brands" optionLabel="brandName" optionValue="brandId" placeholder="Select brand" class="w-full" appendTo="body" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block font-bold mb-2">Color</label>
+                                <p-select [(ngModel)]="newAsset.inventoryCustodianSlip.color" [options]="colors" optionLabel="colorName" optionValue="colorId" placeholder="Select color" class="w-full" appendTo="body" />
+                            </div>
+                            <div class="col-span-12">
+                                <label class="block font-bold mb-2">QR Code Image *</label>
+                                <p-fileUpload
+                                    name="qrCodeImage"
+                                    [auto]="false"
+                                    accept="image/*"
+                                    maxFileSize="5000000"
+                                    (onSelect)="onQRCodeSelect($event)"
+                                    [customUpload]="true"
+                                    [showUploadButton]="false"
+                                    [showCancelButton]="false"
+                                    chooseLabel="Upload QR Code Image"
+                                >
+                                </p-fileUpload>
+                                <div *ngIf="newAsset.qrCode" class="mt-3 flex items-center gap-2">
+                                    <i class="pi pi-check-circle text-green-600 text-xl"></i>
+                                    <p class="text-sm text-green-600">Scanned: {{ newAsset.qrCode.substring(0, 50) }}...</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </ng-template>
 
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (click)="closeDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveNewAsset()" />
+                <div class="flex justify-between w-full">
+                    <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (click)="closeDialog()" />
+                    <div class="flex gap-2">
+                        <p-button *ngIf="currentStep > 0" label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="previousStep()" />
+                        <p-button *ngIf="currentStep < 1" label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextStep()" />
+                        <p-button *ngIf="currentStep === 1" label="Save Asset" icon="pi pi-check" (onClick)="saveNewAsset()" />
+                    </div>
+                </div>
             </ng-template>
         </p-dialog>
     `
@@ -402,6 +427,7 @@ export class AssetsComponent implements OnInit {
 
     // Dialog and form
     assetDialog: boolean = false;
+    currentStep: number = 0;
     newAsset: any = this.getEmptyAsset();
 
     // Reference data
@@ -736,6 +762,7 @@ export class AssetsComponent implements OnInit {
         console.log('📋 Statuses in dropdown:', this.statuses);
         console.log('📋 Colors in dropdown:', this.colors);
         this.assetDialog = true;
+        this.currentStep = 0;
         this.newAsset = this.getEmptyAsset();
     }
 
@@ -816,7 +843,20 @@ export class AssetsComponent implements OnInit {
 
     closeDialog() {
         this.assetDialog = false;
+        this.currentStep = 0;
         this.newAsset = this.getEmptyAsset();
+    }
+
+    nextStep() {
+        if (this.currentStep < 1) {
+            this.currentStep++;
+        }
+    }
+
+    previousStep() {
+        if (this.currentStep > 0) {
+            this.currentStep--;
+        }
     }
 
     saveNewAsset() {
@@ -830,27 +870,63 @@ export class AssetsComponent implements OnInit {
             return;
         }
 
-        if (!this.newAsset.qrCode || this.newAsset.qrCode.trim() === '') {
-            this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'QR Code cannot be empty' });
+        if (!this.newAsset.qrCodeImage) {
+            this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'QR Code file must be uploaded' });
             return;
         }
 
-        // Create a copy and remove qrCodeImage before sending
+        // Create a copy and remove qrCodeImage and qrCode before sending to API
         const assetToSend = { ...this.newAsset };
-        delete assetToSend.qrCodeImage; // Remove the file object before sending
+        delete assetToSend.qrCodeImage; // Remove the file object
+        delete assetToSend.qrCode; // Remove the scanned QR code text - NOT needed in asset creation
 
-        console.log('Saving new asset:', assetToSend);
+        console.log('📤 Step 1: Creating asset (without QR code):', assetToSend);
 
+        // Step 1: Create the asset first
         this.assetService.createAsset(assetToSend).subscribe({
             next: (response: Asset) => {
-                console.log('✅ Asset created successfully:', response);
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Asset created successfully' });
-                this.assetDialog = false;
-                this.newAsset = this.getEmptyAsset();
-                this.loadAssets();
+                console.log('✅ Step 1 Complete: Asset created successfully:', response);
+
+                // Extract assetId from response
+                const assetId = String(response.assetId || response.id);
+                if (!assetId || assetId === 'undefined') {
+                    console.error('❌ No assetId returned from asset creation');
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to get asset ID from response' });
+                    return;
+                }
+
+                console.log(`📤 Step 2: Uploading QR code to asset ${assetId}`);
+
+                // Step 2: Upload QR code to the new asset
+                this.assetService.uploadQrCode(assetId, this.newAsset.qrCodeImage).subscribe({
+                    next: (qrResponse: any) => {
+                        console.log('✅ Step 2 Complete: QR Code uploaded successfully:', qrResponse);
+                        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Asset created and QR code uploaded successfully' });
+
+                        // Close dialog and refresh
+                        this.assetDialog = false;
+                        this.newAsset = this.getEmptyAsset();
+                        this.currentStep = 0; // Reset stepper
+                        this.loadAssets();
+                    },
+                    error: (qrError: any) => {
+                        console.error('❌ Step 2 Failed: Error uploading QR code:', qrError);
+                        this.messageService.add({
+                            severity: 'warn',
+                            summary: 'Partial Success',
+                            detail: 'Asset created but failed to upload QR code: ' + (qrError?.error?.message || qrError?.message)
+                        });
+
+                        // Still close dialog but show warning
+                        this.assetDialog = false;
+                        this.newAsset = this.getEmptyAsset();
+                        this.currentStep = 0;
+                        this.loadAssets();
+                    }
+                });
             },
             error: (error: any) => {
-                console.error('❌ Error creating asset:', error);
+                console.error('❌ Step 1 Failed: Error creating asset:', error);
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create asset: ' + (error?.error?.message || error?.message) });
             }
         });
