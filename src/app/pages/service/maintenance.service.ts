@@ -117,4 +117,11 @@ export class MaintenanceService {
         console.log('📡 Creating Maintenance Request:', url, body);
         return this.http.post<any>(url, body);
     }
+
+    // Get Maintenance Requests (list)
+    getMaintenanceRequests(): Observable<any[]> {
+        const url = `${this.baseApiUrl}/maintenance-requests`;
+        console.log('📡 Fetching Maintenance Requests:', url);
+        return this.http.get<any[]>(url);
+    }
 }
