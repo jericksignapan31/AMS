@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +20,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { StepperModule } from 'primeng/stepper';
 import { MessageService } from 'primeng/api';
 import { AssetService, Asset, Program, Supplier, Location, Color, Brand, Status } from '../service/asset.service';
+import { MaintenanceService, MaintenanceRequestPayload } from '../service/maintenance.service';
 import jsQR from 'jsqr';
 import Swal from 'sweetalert2';
 
@@ -170,6 +172,7 @@ import Swal from 'sweetalert2';
                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(item)" />
                             <p-button icon="pi pi-pencil" severity="secondary" [rounded]="true" [text]="true" (onClick)="edit(item)" />
                             <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (onClick)="delete(item)" />
+                            <p-button icon="pi pi-wrench" label="Request" severity="help" [rounded]="true" [text]="true" (onClick)="openRequestDialog(item)" />
                         </div>
                     </td>
                 </tr>
@@ -401,6 +404,41 @@ import Swal from 'sweetalert2';
                 </div>
             </ng-template>
         </p-dialog>
+
+        <!-- Request Maintenance Dialog -->
+        <p-dialog [(visible)]="requestDialog" [style]="{ width: '650px' }" header="Request Maintenance" [modal]="true" [closable]="true" (onHide)="closeRequestDialog()">
+            <ng-template #content>
+                <div class="grid grid-cols-12 gap-4 mt-2">
+                    <div class="col-span-12">
+                        <label class="block font-bold mb-2">maintenanceName *</label>
+                        <input pInputText [(ngModel)]="maintenanceRequest.maintenanceName" placeholder="Maintenance title / name" class="w-full" />
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block font-bold mb-2">maintenanceType (ID) *</label>
+                        <p-select [(ngModel)]="maintenanceRequest.maintenanceType" [options]="maintenanceTypesOptions" optionLabel="label" optionValue="value" placeholder="Select type" class="w-full" appendTo="body" />
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block font-bold mb-2">serviceMaintenance (ID) *</label>
+                        <p-select [(ngModel)]="maintenanceRequest.serviceMaintenance" [options]="serviceMaintenancesOptions" optionLabel="label" optionValue="value" placeholder="Select service" class="w-full" appendTo="body" />
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block font-bold mb-2">asset (ID) *</label>
+                        <input pInputText [(ngModel)]="maintenanceRequest.asset" [value]="requestAsset?.assetId" class="w-full" />
+                        <small class="text-gray-500">Selected: {{ requestAsset?.assetName }}</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block font-bold mb-2">priorityLevel (ID) *</label>
+                        <p-select [(ngModel)]="maintenanceRequest.priorityLevel" [options]="priorityLevelsOptions" optionLabel="label" optionValue="value" placeholder="Select priority" class="w-full" appendTo="body" />
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #footer>
+                <div class="flex justify-end gap-2 w-full">
+                    <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (onClick)="closeRequestDialog()" />
+                    <p-button label="Submit Request" icon="pi pi-check" (onClick)="submitMaintenanceRequest()" />
+                </div>
+            </ng-template>
+        </p-dialog>
     `
 })
 export class AssetsComponent implements OnInit {
@@ -419,6 +457,15 @@ export class AssetsComponent implements OnInit {
     currentStep: number = 0;
     newAsset: any = this.getEmptyAsset();
 
+    // Request maintenance dialog state
+    requestDialog: boolean = false;
+    requestAsset: Asset | null = null;
+    maintenanceRequest: { maintenanceName: string; maintenanceType: string; serviceMaintenance: string; asset: string; priorityLevel: string } = { maintenanceName: '', maintenanceType: '', serviceMaintenance: '', asset: '', priorityLevel: '' };
+    // Dropdown option arrays (label/value)
+    maintenanceTypesOptions: { label: string; value: string }[] = [];
+    serviceMaintenancesOptions: { label: string; value: string }[] = [];
+    priorityLevelsOptions: { label: string; value: string }[] = [];
+
     // Reference data
     programs: Program[] = [];
     suppliers: Supplier[] = [];
@@ -433,7 +480,9 @@ export class AssetsComponent implements OnInit {
 
     constructor(
         private assetService: AssetService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private maintenanceService: MaintenanceService,
+        private router: Router
     ) {}
 
     getEmptyAsset() {
@@ -474,6 +523,7 @@ export class AssetsComponent implements OnInit {
     ngOnInit() {
         this.loadAssets();
         this.loadReferenceData();
+        this.loadMaintenanceDialogOptions();
     }
 
     loadReferenceData() {
@@ -578,6 +628,39 @@ export class AssetsComponent implements OnInit {
             error: (error) => {
                 console.error('❌ Error loading brands:', error);
                 console.error('Status:', error?.status, 'Message:', error?.message);
+            }
+        });
+    }
+
+    loadMaintenanceDialogOptions() {
+        // Maintenance Types
+        this.maintenanceService.getMaintenanceTypes().subscribe({
+            next: (types) => {
+                this.maintenanceTypesOptions = (types || []).map((t: any) => ({ label: t.maintenanceTypeName, value: t.maintenanceTypeId }));
+            },
+            error: (error) => {
+                console.error('Failed to load maintenance types:', error);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load maintenance types' });
+            }
+        });
+        // Service Maintenances
+        this.maintenanceService.getServiceMaintenances().subscribe({
+            next: (services) => {
+                this.serviceMaintenancesOptions = (services || []).map((s: any) => ({ label: s.serviceName, value: s.serviceMaintenanceId }));
+            },
+            error: (error) => {
+                console.error('Failed to load service maintenances:', error);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load service maintenances' });
+            }
+        });
+        // Priority Levels
+        this.maintenanceService.getPriorityLevels().subscribe({
+            next: (levels) => {
+                this.priorityLevelsOptions = (levels || []).map((p: any) => ({ label: p.priorityLevelName, value: p.priorityLevelId }));
+            },
+            error: (error) => {
+                console.error('Failed to load priority levels:', error);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load priority levels' });
             }
         });
     }
@@ -848,6 +931,41 @@ export class AssetsComponent implements OnInit {
         }
     }
 
+    // Request Maintenance Handlers
+    openRequestDialog(asset: Asset) {
+        this.requestAsset = asset;
+        this.maintenanceRequest = { maintenanceName: '', maintenanceType: '', serviceMaintenance: '', asset: String(asset.assetId || ''), priorityLevel: '' };
+        this.requestDialog = true;
+    }
+
+    closeRequestDialog() {
+        this.requestDialog = false;
+        this.requestAsset = null;
+    }
+
+    submitMaintenanceRequest() {
+        if (!this.requestAsset?.assetId) {
+            this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'Missing asset ID' });
+            return;
+        }
+        if (!this.maintenanceRequest.maintenanceName || !this.maintenanceRequest.priorityLevel || !this.maintenanceRequest.maintenanceType || !this.maintenanceRequest.asset || !this.maintenanceRequest.serviceMaintenance) {
+            this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'All fields are required' });
+            return;
+        }
+
+        const payload: MaintenanceRequestPayload = { ...this.maintenanceRequest };
+
+        this.maintenanceService.createMaintenanceRequest(payload).subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'success', summary: 'Request Created', detail: 'Maintenance request submitted' });
+                this.closeRequestDialog();
+            },
+            error: (error) => {
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to submit maintenance request: ' + (error?.error?.message || error?.message) });
+            }
+        });
+    }
+
     saveNewAsset() {
         if (!this.newAsset.assetName || !this.newAsset.propertyNumber || !this.newAsset.category) {
             this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'Asset Name, Property Number, and Category are required' });
@@ -936,6 +1054,14 @@ export class AssetsComponent implements OnInit {
     deleteSelected() {
         if (!this.selectedAssets || this.selectedAssets.length === 0) return;
         this.messageService.add({ severity: 'warn', summary: 'Delete', detail: `Delete ${this.selectedAssets.length} asset(s)?` });
+    }
+
+    requestMaintenance(item: Asset) {
+        if (!item?.assetId) {
+            this.messageService.add({ severity: 'warn', summary: 'Missing ID', detail: 'Asset ID is required to request maintenance' });
+            return;
+        }
+        this.router.navigate(['/requestmaintenance'], { queryParams: { assetId: item.assetId } });
     }
 
     exportCSV() {

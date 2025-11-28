@@ -25,6 +25,14 @@ export interface MaintenanceType {
     maintenanceTypeName: string;
 }
 
+export interface MaintenanceRequestPayload {
+    maintenanceName: string;
+    maintenanceType: string; // ID
+    serviceMaintenance: string; // ID
+    asset: string; // asset ID
+    priorityLevel: string; // ID
+}
+
 @Injectable({ providedIn: 'root' })
 export class MaintenanceService {
     private baseApiUrl = environment.apiUrl;
@@ -68,7 +76,7 @@ export class MaintenanceService {
     }
 
     getPriorityLevels(): Observable<PriorityLevel[]> {
-        const url = `${this.baseApiUrl}/priority-level`;
+        const url = `${this.baseApiUrl}/priority-levels`;
         console.log('📡 Fetching Priority Levels:', url);
         return this.http.get<PriorityLevel[]>(url).pipe(tap((data) => console.log('✅ Priority Levels:', data)));
     }
@@ -101,5 +109,12 @@ export class MaintenanceService {
 
     deleteMaintenanceType(id: string): Observable<void> {
         return this.http.delete<void>(`${this.baseApiUrl}/maintenance-types/${id}`);
+    }
+
+    // Create Maintenance Request
+    createMaintenanceRequest(body: MaintenanceRequestPayload): Observable<any> {
+        const url = `${this.baseApiUrl}/maintenance-requests`;
+        console.log('📡 Creating Maintenance Request:', url, body);
+        return this.http.post<any>(url, body);
     }
 }
