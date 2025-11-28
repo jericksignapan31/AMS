@@ -108,10 +108,10 @@ export class AppMenu implements OnInit {
                 ]
             },
             {
-                label: 'Asset Category',
+                label: 'hierarchy page',
                 items: [
                     {
-                        label: 'Asset Type',
+                        label: 'Asset Properties',
                         icon: 'pi pi-fw pi-bookmark',
                         items: [
                             { label: 'Brand', icon: 'pi pi-fw pi-tag', routerLink: ['/app/pages/assetcategory/brand'] },
@@ -120,6 +120,16 @@ export class AppMenu implements OnInit {
                             { label: 'Supplier', icon: 'pi pi-fw pi-truck', routerLink: ['/app/pages/assetcategory/supplier'] },
                             { label: 'Location', icon: 'pi pi-fw pi-map-marker', routerLink: ['/app/pages/assetcategory/location'] },
                             { label: 'Status', icon: 'pi pi-fw pi-map-marker', routerLink: ['/app/pages/assetcategory/status'] }
+                        ]
+                    },
+                    {
+                        label: 'Maintenance Properties',
+                        icon: 'pi pi-fw pi-bookmark',
+                        items: [
+                            { label: 'Services', icon: 'pi pi-fw pi-tag', routerLink: ['/app/pages/maintenance/services'] },
+                            { label: 'Status', icon: 'pi pi-fw pi-palette', routerLink: ['/app/pages/maintenance/status'] },
+                            { label: 'Priority Level', icon: 'pi pi-fw pi-list', routerLink: ['/app/pages/maintenance/priority-level'] },
+                            { label: 'Types', icon: 'pi pi-fw pi-truck', routerLink: ['/app/pages/maintenance/types'] }
                         ]
                     }
                 ]
