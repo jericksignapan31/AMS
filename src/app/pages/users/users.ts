@@ -24,65 +24,44 @@ import Swal from 'sweetalert2';
     template: `
         <p-toast />
 
-        <p-toolbar styleClass="mb-6">
+        <p-toolbar styleClass="mb-4">
             <ng-template #start>
-                <p-button label="New User" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNewUserDialog()" />
-                <p-button severity="secondary" label="Delete Selected" icon="pi pi-trash" outlined (onClick)="deleteSelectedUsers()" [disabled]="!selectedUsers || !selectedUsers.length" />
+                <div class="flex items-center gap-2">
+                    <p-button label="New" icon="pi pi-plus" severity="secondary" (onClick)="openNewUserDialog()" />
+                    <p-button label="Delete Selected" icon="pi pi-trash" severity="secondary" outlined (onClick)="deleteSelectedUsers()" [disabled]="!selectedUsers.length" />
+                </div>
             </ng-template>
-
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                <div class="flex items-center gap-2">
+                    <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" [(ngModel)]="searchValue" (input)="filterUsers()" placeholder="Search users..." />
+                    </p-iconfield>
+                </div>
             </ng-template>
         </p-toolbar>
-
         <p-table
             #dt
             [value]="filteredUsers"
             [rows]="10"
             [paginator]="true"
-            [globalFilterFields]="['FirstName', 'email']"
-            [tableStyle]="{ 'min-width': '100rem' }"
+            [rowsPerPageOptions]="[10, 20, 30]"
+            [rowHover]="true"
+            [loading]="loading"
+            dataKey="userId"
             [(selection)]="selectedUsers"
             (selectionChange)="onSelectionChange($event)"
-            [rowHover]="true"
-            dataKey="userId"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
             [showCurrentPageReport]="true"
-            [rowsPerPageOptions]="[10, 20, 30]"
+            [tableStyle]="{ 'min-width': '70rem' }"
         >
-            <ng-template #caption>
-                <div class="flex items-center justify-between">
-                    <h5 class="m-0">Users Management</h5>
-                    <div class="flex items-center gap-2">
-                        <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search" />
-                            <input pInputText type="text" [(ngModel)]="searchValue" (input)="filterUsers()" placeholder="Search users..." />
-                        </p-iconfield>
-                    </div>
-                </div>
-            </ng-template>
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 3rem">
-                        <p-tableHeaderCheckbox />
-                    </th>
-                    <th pSortableColumn="FirstName" style="min-width: 15rem">
-                        Name
-                        <p-sortIcon field="FirstName" />
-                    </th>
-                    <th pSortableColumn="email" style="min-width: 15rem">
-                        Email
-                        <p-sortIcon field="email" />
-                    </th>
-                    <th pSortableColumn="Department" style="min-width: 12rem">
-                        Department
-                        <p-sortIcon field="Department" />
-                    </th>
-                    <th pSortableColumn="Campus" style="min-width: 12rem">
-                        Campus
-                        <p-sortIcon field="Campus" />
-                    </th>
-                    <th style="min-width: 10rem">Actions</th>
+                    <th style="width:3rem"><p-tableHeaderCheckbox /></th>
+                    <th pSortableColumn="FirstName" style="min-width:20rem">Name <p-sortIcon field="FirstName" /></th>
+                    <th style="min-width:25rem">ID</th>
+                    <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
             <ng-template #body let-user>
@@ -91,21 +70,19 @@ import Swal from 'sweetalert2';
                         <p-tableCheckbox [value]="user" />
                     </td>
                     <td>{{ user.firstName || user.FirstName }} {{ user.middleName || user.MiddleName || '' }} {{ user.lastName || user.LastName }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.Department || 'N/A' }}</td>
-                    <td>{{ user.Campus || 'N/A' }}</td>
+                    <td>{{ user.userId || user.user_id }}</td>
                     <td>
-                        <div class="action-buttons">
-                            <p-button type="button" icon="pi pi-eye" class="p-button-rounded p-button-info" (click)="viewUser(user)" pTooltip="View" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning" (click)="editUser(user)" pTooltip="Edit" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="deleteUser(user)" pTooltip="Delete" tooltipPosition="top"></p-button>
+                        <div class="flex gap-2">
+                            <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="viewUser(user)" />
+                            <p-button icon="pi pi-pencil" severity="secondary" [rounded]="true" [text]="true" (onClick)="editUser(user)" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (onClick)="deleteUser(user)" />
                         </div>
                     </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 2rem;">No users found</td>
+                    <td colspan="4" class="text-center py-5">No users found</td>
                 </tr>
             </ng-template>
         </p-table>

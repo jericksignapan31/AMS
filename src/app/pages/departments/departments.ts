@@ -24,78 +24,63 @@ import Swal from 'sweetalert2';
     template: `
         <p-toast />
 
-        <p-toolbar styleClass="mb-6">
+        <p-toolbar styleClass="mb-4">
             <ng-template #start>
-                <p-button label="New Department" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNewDepartmentDialog()" />
-                <p-button severity="secondary" label="Delete Selected" icon="pi pi-trash" outlined (onClick)="deleteSelectedDepartments()" [disabled]="!selectedDepartments || !selectedDepartments.length" />
+                <div class="flex items-center gap-2">
+                    <p-button label="New" icon="pi pi-plus" severity="secondary" (onClick)="openNewDepartmentDialog()" />
+                    <p-button label="Delete Selected" icon="pi pi-trash" severity="secondary" outlined (onClick)="deleteSelectedDepartments()" [disabled]="!selectedDepartments.length" />
+                </div>
             </ng-template>
-
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                <div class="flex items-center gap-2">
+                    <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" [(ngModel)]="searchValue" (input)="filterDepartments()" placeholder="Search departments..." />
+                    </p-iconfield>
+                </div>
             </ng-template>
         </p-toolbar>
 
         <p-table
-            #dt
             [value]="filteredDepartments"
             [rows]="10"
             [paginator]="true"
-            [globalFilterFields]="['departmentName', 'campus.campusName']"
-            [tableStyle]="{ 'min-width': '100rem' }"
-            [(selection)]="selectedDepartments"
-            (selectionChange)="onSelectionChange($event)"
+            [rowsPerPageOptions]="[10, 20, 30]"
+            [loading]="loading"
             [rowHover]="true"
             dataKey="departmentId"
+            [(selection)]="selectedDepartments"
+            (selectionChange)="onSelectionChange($event)"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} departments"
             [showCurrentPageReport]="true"
-            [rowsPerPageOptions]="[10, 20, 30]"
+            [tableStyle]="{ 'min-width': '70rem' }"
         >
-            <ng-template #caption>
-                <div class="flex items-center justify-between">
-                    <h5 class="m-0">Departments Management</h5>
-                    <div class="flex items-center gap-2">
-                        <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search" />
-                            <input pInputText type="text" [(ngModel)]="searchValue" (input)="filterDepartments()" placeholder="Search departments..." />
-                        </p-iconfield>
-                    </div>
-                </div>
-            </ng-template>
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 3rem">
-                        <p-tableHeaderCheckbox />
-                    </th>
-                    <th pSortableColumn="departmentName" style="min-width: 15rem">
-                        Department Name
-                        <p-sortIcon field="departmentName" />
-                    </th>
-                    <th pSortableColumn="campus.campusName" style="min-width: 15rem">
-                        Campus Name
-                        <p-sortIcon field="campus.campusName" />
-                    </th>
-                    <th style="min-width: 10rem">Actions</th>
+                    <th style="width:3rem"><p-tableHeaderCheckbox /></th>
+                    <th pSortableColumn="departmentName" style="min-width:20rem">Department <p-sortIcon field="departmentName" /></th>
+                    <th style="min-width:25rem">ID</th>
+                    <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
-            <ng-template #body let-department>
+            <ng-template pTemplate="body" let-department>
                 <tr>
-                    <td style="width: 3rem">
-                        <p-tableCheckbox [value]="department" />
-                    </td>
+                    <td><p-tableCheckbox [value]="department" /></td>
                     <td>{{ department.departmentName }}</td>
-                    <td>{{ department.campus?.campusName || 'N/A' }}</td>
+                    <td>{{ department.departmentId }}</td>
                     <td>
-                        <div class="action-buttons">
-                            <p-button type="button" icon="pi pi-eye" class="p-button-rounded p-button-info" (click)="viewDepartment(department)" pTooltip="View" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning" (click)="editDepartment(department)" pTooltip="Edit" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="deleteDepartment(department)" pTooltip="Delete" tooltipPosition="top"></p-button>
+                        <div class="flex gap-2">
+                            <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="viewDepartment(department)" />
+                            <p-button icon="pi pi-pencil" severity="secondary" [rounded]="true" [text]="true" (onClick)="editDepartment(department)" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (onClick)="deleteDepartment(department)" />
                         </div>
                     </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="4" style="text-align: center; padding: 2rem;">No departments found</td>
+                    <td colspan="4" class="text-center py-5">No departments found</td>
                 </tr>
             </ng-template>
         </p-table>

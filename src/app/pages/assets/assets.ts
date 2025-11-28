@@ -94,13 +94,21 @@ import Swal from 'sweetalert2';
     template: `
         <p-toast />
 
-        <p-toolbar styleClass="mb-6">
+        <p-toolbar styleClass="mb-4">
             <ng-template #start>
-                <p-button label="New Asset" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
-                <p-button severity="secondary" label="Delete Selected" icon="pi pi-trash" outlined (onClick)="deleteSelected()" [disabled]="!selectedAssets || !selectedAssets.length" />
+                <div class="flex items-center gap-2">
+                    <p-button label="New" icon="pi pi-plus" severity="secondary" (onClick)="openNew()" />
+                    <p-button label="Delete Selected" icon="pi pi-trash" severity="secondary" outlined (onClick)="deleteSelected()" [disabled]="!selectedAssets.length" />
+                </div>
             </ng-template>
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                <div class="flex items-center gap-2">
+                    <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" [(ngModel)]="searchValue" (input)="filter()" placeholder="Search assets..." />
+                    </p-iconfield>
+                </div>
             </ng-template>
         </p-toolbar>
 
@@ -109,41 +117,25 @@ import Swal from 'sweetalert2';
             [value]="assets"
             [rows]="10"
             [paginator]="true"
-            [globalFilterFields]="['propertyNumber', 'assetName', 'category', 'foundCluster', 'issuedTo']"
-            [tableStyle]="{ 'min-width': '100rem' }"
-            [(selection)]="selectedAssets"
-            (selectionChange)="onSelectionChange($event)"
-            [rowHover]="true"
-            dataKey="assetId"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assets"
-            [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
             [loading]="loading"
+            [rowHover]="true"
+            dataKey="assetId"
+            [(selection)]="selectedAssets"
+            (selectionChange)="onSelectionChange($event)"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assets"
+            [showCurrentPageReport]="true"
+            [tableStyle]="{ 'min-width': '70rem' }"
         >
-            <ng-template #caption>
-                <div class="flex items-center justify-between">
-                    <h5 class="m-0">Asset Management</h5>
-                    <div class="flex items-center gap-2">
-                        <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search" />
-                            <input pInputText type="text" [(ngModel)]="searchValue" (input)="filter()" placeholder="Search assets..." />
-                        </p-iconfield>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
-                    <th style="width: 3rem">Expand</th>
-                    <th pSortableColumn="propertyNumber" style="min-width: 12rem">Property Number<p-sortIcon field="propertyNumber" /></th>
-                    <th pSortableColumn="assetName" style="min-width: 15rem">Asset Name<p-sortIcon field="assetName" /></th>
-                    <th pSortableColumn="category" style="min-width: 12rem">Category<p-sortIcon field="category" /></th>
-                    <th pSortableColumn="foundCluster" style="min-width: 12rem">Found Cluster<p-sortIcon field="foundCluster" /></th>
-                    <th pSortableColumn="issuedTo" style="min-width: 10rem">Issued To<p-sortIcon field="issuedTo" /></th>
-                    <th pSortableColumn="purpose" style="min-width: 12rem">Purpose<p-sortIcon field="purpose" /></th>
-                    <th style="min-width: 8rem">QR Code</th>
-                    <th style="min-width: 10rem">Actions</th>
+                    <th style="width:3rem"><p-tableHeaderCheckbox /></th>
+                    <th style="width:3rem">Expand</th>
+                    <th pSortableColumn="assetName" style="min-width:18rem">Asset <p-sortIcon field="assetName" /></th>
+                    <th style="min-width:14rem">Property #</th>
+                    <th style="min-width:20rem">ID</th>
+                    <th style="min-width:12rem">QR Code</th>
+                    <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
 
@@ -153,12 +145,9 @@ import Swal from 'sweetalert2';
                     <td style="width: 3rem">
                         <button type="button" pButton pRipple icon="pi pi-chevron-right" class="p-button-rounded p-button-text p-button-sm expand-btn" [class.expanded]="isRowExpanded(item.assetId)" (click)="toggleExpand(item)"></button>
                     </td>
-                    <td>{{ item.propertyNumber }}</td>
                     <td>{{ item.assetName }}</td>
-                    <td>{{ item.category }}</td>
-                    <td>{{ item.foundCluster }}</td>
-                    <td>{{ item.issuedTo || 'Not assigned' }}</td>
-                    <td>{{ item.purpose }}</td>
+                    <td>{{ item.propertyNumber }}</td>
+                    <td>{{ item.assetId }}</td>
                     <td>
                         <div *ngIf="item.qrCode" class="inline-block">
                             <!-- Display QR Code as image if it's base64 or URL, otherwise as text -->
@@ -177,10 +166,10 @@ import Swal from 'sweetalert2';
                         <span *ngIf="!item.qrCode" class="text-gray-400">N/A</span>
                     </td>
                     <td>
-                        <div class="action-buttons flex gap-2">
-                            <p-button type="button" icon="pi pi-eye" class="p-button-rounded p-button-info" (click)="view(item)" pTooltip="View" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning" (click)="edit(item)" pTooltip="Edit" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="delete(item)" pTooltip="Delete" tooltipPosition="top"></p-button>
+                        <div class="flex gap-2">
+                            <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(item)" />
+                            <p-button icon="pi pi-pencil" severity="secondary" [rounded]="true" [text]="true" (onClick)="edit(item)" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (onClick)="delete(item)" />
                         </div>
                     </td>
                 </tr>
@@ -241,7 +230,7 @@ import Swal from 'sweetalert2';
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 2rem;">No assets found</td>
+                    <td colspan="7" class="text-center py-5">No assets found</td>
                 </tr>
             </ng-template>
         </p-table>
