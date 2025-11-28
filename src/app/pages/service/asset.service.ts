@@ -135,19 +135,55 @@ export class AssetService {
         console.log('📡 Fetching locations from:', `${this.baseApiUrl}/locations`);
         return this.http.get<Location[]>(`${this.baseApiUrl}/locations`).pipe(tap((data) => console.log('✅ getLocations API Response:', data)));
     }
+    createLocation(body: Partial<Location>): Observable<Location> {
+        return this.http.post<Location>(`${this.baseApiUrl}/locations`, body);
+    }
+    updateLocation(id: string, body: Partial<Location>): Observable<Location> {
+        return this.http.put<Location>(`${this.baseApiUrl}/locations/${id}`, body);
+    }
+    deleteLocation(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseApiUrl}/locations/${id}`);
+    }
 
     getSuppliers(): Observable<Supplier[]> {
         console.log('📡 Fetching suppliers from:', `${this.baseApiUrl}/suppliers`);
         return this.http.get<Supplier[]>(`${this.baseApiUrl}/suppliers`).pipe(tap((data) => console.log('✅ getSuppliers API Response:', data)));
+    }
+    createSupplier(body: Partial<Supplier>): Observable<Supplier> {
+        return this.http.post<Supplier>(`${this.baseApiUrl}/suppliers`, body);
+    }
+    updateSupplier(id: string, body: Partial<Supplier>): Observable<Supplier> {
+        return this.http.put<Supplier>(`${this.baseApiUrl}/suppliers/${id}`, body);
+    }
+    deleteSupplier(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseApiUrl}/suppliers/${id}`);
     }
 
     getPrograms(): Observable<Program[]> {
         console.log('📡 Fetching programs from:', `${this.baseApiUrl}/programs`);
         return this.http.get<Program[]>(`${this.baseApiUrl}/programs`).pipe(tap((data) => console.log('✅ getPrograms API Response:', data)));
     }
+    createProgram(body: Partial<Program>): Observable<Program> {
+        return this.http.post<Program>(`${this.baseApiUrl}/programs`, body);
+    }
+    updateProgram(id: string, body: Partial<Program>): Observable<Program> {
+        return this.http.put<Program>(`${this.baseApiUrl}/programs/${id}`, body);
+    }
+    deleteProgram(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseApiUrl}/programs/${id}`);
+    }
 
     getStatuses(): Observable<Status[]> {
         return this.http.get<Status[]>(`${this.baseApiUrl}/status`).pipe(tap((data) => console.log('getStatuses API Response:', data)));
+    }
+    createStatus(body: Partial<Status>): Observable<Status> {
+        return this.http.post<Status>(`${this.baseApiUrl}/status`, body);
+    }
+    updateStatus(id: string, body: Partial<Status>): Observable<Status> {
+        return this.http.put<Status>(`${this.baseApiUrl}/status/${id}`, body);
+    }
+    deleteStatus(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseApiUrl}/status/${id}`);
     }
 
     // InvCustlips methods
@@ -176,10 +212,28 @@ export class AssetService {
         console.log('📡 Fetching colors from:', `${this.baseApiUrl}/colors`);
         return this.http.get<Color[]>(`${this.baseApiUrl}/colors`).pipe(tap((data) => console.log('✅ getColors API Response:', data)));
     }
+    createColor(body: Partial<Color>): Observable<Color> {
+        return this.http.post<Color>(`${this.baseApiUrl}/colors`, body);
+    }
+    updateColor(id: string, body: Partial<Color>): Observable<Color> {
+        return this.http.put<Color>(`${this.baseApiUrl}/colors/${id}`, body);
+    }
+    deleteColor(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseApiUrl}/colors/${id}`);
+    }
 
     getBrands(): Observable<Brand[]> {
         console.log('📡 Fetching brands from:', `${this.baseApiUrl}/brands`);
         return this.http.get<Brand[]>(`${this.baseApiUrl}/brands`).pipe(tap((data) => console.log('✅ getBrands API Response:', data)));
+    }
+    createBrand(body: Partial<Brand>): Observable<Brand> {
+        return this.http.post<Brand>(`${this.baseApiUrl}/brands`, body);
+    }
+    updateBrand(id: string, body: Partial<Brand>): Observable<Brand> {
+        return this.http.put<Brand>(`${this.baseApiUrl}/brands/${id}`, body);
+    }
+    deleteBrand(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseApiUrl}/brands/${id}`);
     }
 
     // Maintenance Request methods

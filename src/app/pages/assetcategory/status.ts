@@ -22,75 +22,62 @@ import Swal from 'sweetalert2';
     providers: [MessageService],
     template: `
         <p-toast />
-
-        <p-toolbar styleClass="mb-6">
+        <p-toolbar styleClass="mb-4">
             <ng-template #start>
-                <p-button label="New Status" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNewDialog()" />
-                <p-button severity="secondary" label="Delete Selected" icon="pi pi-trash" outlined (onClick)="deleteSelected()" [disabled]="!selectedItems || !selectedItems.length" />
+                <div class="flex items-center gap-2">
+                    <p-button label="New" icon="pi pi-plus" severity="secondary" (onClick)="openNewDialog()" />
+                    <p-button label="Delete Selected" icon="pi pi-trash" severity="secondary" outlined (onClick)="deleteSelected()" [disabled]="!selectedItems.length" />
+                </div>
             </ng-template>
-
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                <div class="flex items-center gap-2">
+                    <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" [(ngModel)]="searchValue" (input)="filter()" placeholder="Search statuses..." />
+                    </p-iconfield>
+                </div>
             </ng-template>
         </p-toolbar>
-
         <p-table
-            #dt
             [value]="filteredItems"
             [rows]="10"
             [paginator]="true"
-            [globalFilterFields]="['statusName']"
-            [tableStyle]="{ 'min-width': '100rem' }"
-            [(selection)]="selectedItems"
-            (selectionChange)="onSelectionChange($event)"
-            [rowHover]="true"
-            dataKey="id"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} statuses"
-            [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
             [loading]="loading"
+            [rowHover]="true"
+            dataKey="statusId"
+            [(selection)]="selectedItems"
+            (selectionChange)="onSelectionChange($event)"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} statuses"
+            [showCurrentPageReport]="true"
+            [tableStyle]="{ 'min-width': '70rem' }"
         >
-            <ng-template #caption>
-                <div class="flex items-center justify-between">
-                    <h5 class="m-0">Status Management</h5>
-                    <div class="flex items-center gap-2">
-                        <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search" />
-                            <input pInputText type="text" [(ngModel)]="searchValue" (input)="filter()" placeholder="Search statuses..." />
-                        </p-iconfield>
-                    </div>
-                </div>
-            </ng-template>
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 3rem">
-                        <p-tableHeaderCheckbox />
-                    </th>
-                    <th pSortableColumn="statusName" style="min-width: 15rem">
-                        Status Name
-                        <p-sortIcon field="statusName" />
-                    </th>
-                    <th style="min-width: 10rem">Actions</th>
+                    <th style="width:3rem"><p-tableHeaderCheckbox /></th>
+                    <th pSortableColumn="statusName" style="min-width:20rem">Status <p-sortIcon field="statusName" /></th>
+                    <th style="min-width:25rem">ID</th>
+                    <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
-            <ng-template #body let-item>
+            <ng-template pTemplate="body" let-row>
                 <tr>
-                    <td style="width: 3rem">
-                        <p-tableCheckbox [value]="item" />
-                    </td>
-                    <td>{{ item.statusName }}</td>
+                    <td><p-tableCheckbox [value]="row" /></td>
+                    <td>{{ row.statusName }}</td>
+                    <td>{{ row.statusId }}</td>
                     <td>
-                        <div class="action-buttons">
-                            <p-button type="button" icon="pi pi-eye" class="p-button-rounded p-button-info" (click)="view(item)" pTooltip="View" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning" (click)="edit(item)" pTooltip="Edit" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="delete(item)" pTooltip="Delete" tooltipPosition="top"></p-button>
+                        <div class="flex gap-2">
+                            <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />
+                            <p-button icon="pi pi-pencil" severity="secondary" [rounded]="true" [text]="true" (onClick)="edit(row)" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (onClick)="delete(row)" />
                         </div>
                     </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="4" style="text-align: center; padding: 2rem;">No statuses found</td>
+                    <td colspan="4" class="text-center py-5">No statuses found</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -151,27 +138,28 @@ export class StatusComponent implements OnInit {
     openNewDialog() {
         Swal.fire({
             title: 'New Status',
-            html: `
-                <div style="text-align: left;">
-                    <label style="display: block; margin-bottom: 8px;">Status Name</label>
-                    <input type="text" id="statusName" class="swal2-input" placeholder="Enter status name" />
-                </div>
-            `,
+            html: `<input type="text" id="statusName" class="swal2-input" placeholder="Status Name" />`,
             confirmButtonText: 'Create',
             cancelButtonText: 'Cancel',
             showCancelButton: true,
             preConfirm: () => {
-                const statusName = (document.getElementById('statusName') as HTMLInputElement)?.value;
+                const statusName = (document.getElementById('statusName') as HTMLInputElement)?.value.trim();
                 if (!statusName) {
                     Swal.showValidationMessage('Status name is required');
                     return false;
                 }
                 return { statusName };
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Status created successfully' });
-                this.loadItems();
+        }).then((res) => {
+            if (res.isConfirmed && res.value) {
+                this.assetService.createStatus(res.value).subscribe({
+                    next: (created) => {
+                        this.items.push(created);
+                        this.filteredItems = [...this.items];
+                        this.messageService.add({ severity: 'success', summary: 'Created', detail: 'Status created' });
+                    },
+                    error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Create failed' })
+                });
             }
         });
     }
@@ -191,27 +179,29 @@ export class StatusComponent implements OnInit {
     edit(item: Status) {
         Swal.fire({
             title: 'Edit Status',
-            html: `
-                <div style="text-align: left;">
-                    <label style="display: block; margin-bottom: 8px;">Status Name</label>
-                    <input type="text" id="statusName" class="swal2-input" value="${item.statusName || ''}" />
-                </div>
-            `,
+            html: `<input type="text" id="statusName" class="swal2-input" value="${item.statusName}" />`,
             confirmButtonText: 'Update',
             cancelButtonText: 'Cancel',
             showCancelButton: true,
             preConfirm: () => {
-                const statusName = (document.getElementById('statusName') as HTMLInputElement)?.value;
+                const statusName = (document.getElementById('statusName') as HTMLInputElement)?.value.trim();
                 if (!statusName) {
                     Swal.showValidationMessage('Status name is required');
                     return false;
                 }
                 return { statusName };
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Status updated successfully' });
-                this.loadItems();
+        }).then((res) => {
+            if (res.isConfirmed && res.value) {
+                this.assetService.updateStatus(item.statusId!, res.value).subscribe({
+                    next: (updated) => {
+                        const idx = this.items.findIndex((s) => s.statusId === updated.statusId);
+                        if (idx > -1) this.items[idx] = updated;
+                        this.filteredItems = [...this.items];
+                        this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Status updated' });
+                    },
+                    error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Update failed' })
+                });
             }
         });
     }
@@ -219,50 +209,58 @@ export class StatusComponent implements OnInit {
     delete(item: Status) {
         Swal.fire({
             title: 'Delete Status',
-            text: `Are you sure you want to delete "${item.statusName}"?`,
+            text: `Delete "${item.statusName}"?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Status deleted successfully' });
-                this.loadItems();
+            confirmButtonText: 'Delete'
+        }).then((res) => {
+            if (res.isConfirmed) {
+                this.assetService.deleteStatus(item.statusId!).subscribe({
+                    next: () => {
+                        this.items = this.items.filter((s) => s.statusId !== item.statusId);
+                        this.filteredItems = [...this.items];
+                        this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Status deleted' });
+                    },
+                    error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Delete failed' })
+                });
             }
         });
     }
 
     deleteSelected() {
-        if (!this.selectedItems || this.selectedItems.length === 0) return;
-
+        if (!this.selectedItems?.length) return;
         Swal.fire({
             title: 'Delete Selected',
             text: `Delete ${this.selectedItems.length} status(es)?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Statuses deleted successfully' });
-                this.loadItems();
-                this.selectedItems = [];
+            confirmButtonText: 'Delete'
+        }).then((res) => {
+            if (res.isConfirmed) {
+                const ids = this.selectedItems.map((s) => s.statusId!);
+                Promise.all(ids.map((id) => this.assetService.deleteStatus(id).toPromise()))
+                    .then(() => {
+                        this.items = this.items.filter((s) => !ids.includes(s.statusId!));
+                        this.filteredItems = [...this.items];
+                        this.selectedItems = [];
+                        this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Selected statuses deleted' });
+                    })
+                    .catch(() => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Bulk delete failed' }));
             }
         });
     }
 
     exportCSV() {
-        let csv = 'Status Name\n';
+        let csv = 'Status Name,ID\n';
         this.items.forEach((item) => {
-            csv += `"${item.statusName}"\n`;
+            csv += `${(item.statusName || '').replace(/,/g, ';')},${item.statusId}\n`;
         });
-
         const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = 'statuses.csv';
         a.click();
-        window.URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
     }
 }

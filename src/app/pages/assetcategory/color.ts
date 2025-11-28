@@ -23,74 +23,62 @@ import Swal from 'sweetalert2';
     providers: [MessageService],
     template: `
         <p-toast />
-
-        <p-toolbar styleClass="mb-6">
+        <p-toolbar styleClass="mb-4">
             <ng-template #start>
-                <p-button label="New Color" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNewDialog()" />
-                <p-button severity="secondary" label="Delete Selected" icon="pi pi-trash" outlined (onClick)="deleteSelected()" [disabled]="!selectedItems || !selectedItems.length" />
+                <div class="flex items-center gap-2">
+                    <p-button label="New" icon="pi pi-plus" severity="secondary" (onClick)="openNewDialog()" />
+                    <p-button label="Delete Selected" icon="pi pi-trash" severity="secondary" outlined (onClick)="deleteSelected()" [disabled]="!selectedItems.length" />
+                </div>
             </ng-template>
-
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                <div class="flex items-center gap-2">
+                    <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" [(ngModel)]="searchValue" (input)="filter()" placeholder="Search colors..." />
+                    </p-iconfield>
+                </div>
             </ng-template>
         </p-toolbar>
-
         <p-table
             [value]="filteredItems"
             [rows]="10"
             [paginator]="true"
-            [globalFilterFields]="['colorName']"
-            [tableStyle]="{ 'min-width': '100rem' }"
-            [(selection)]="selectedItems"
-            (selectionChange)="onSelectionChange($event)"
-            [rowHover]="true"
-            dataKey="colorId"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} colors"
-            [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
             [loading]="loading"
+            [rowHover]="true"
+            dataKey="colorId"
+            [(selection)]="selectedItems"
+            (selectionChange)="onSelectionChange($event)"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} colors"
+            [showCurrentPageReport]="true"
+            [tableStyle]="{ 'min-width': '70rem' }"
         >
-            <ng-template #caption>
-                <div class="flex items-center justify-between">
-                    <h5 class="m-0">Color Management</h5>
-                    <div class="flex items-center gap-2">
-                        <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search" />
-                            <input pInputText type="text" [(ngModel)]="searchValue" (input)="filter()" placeholder="Search colors..." />
-                        </p-iconfield>
-                    </div>
-                </div>
-            </ng-template>
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 3rem">
-                        <p-tableHeaderCheckbox />
-                    </th>
-                    <th pSortableColumn="colorName" style="min-width: 15rem">
-                        Color Name
-                        <p-sortIcon field="colorName" />
-                    </th>
-                    <th style="min-width: 10rem">Actions</th>
+                    <th style="width:3rem"><p-tableHeaderCheckbox /></th>
+                    <th pSortableColumn="colorName" style="min-width:20rem">Color <p-sortIcon field="colorName" /></th>
+                    <th style="min-width:25rem">ID</th>
+                    <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
-            <ng-template #body let-item>
+            <ng-template pTemplate="body" let-row>
                 <tr>
-                    <td style="width: 3rem">
-                        <p-tableCheckbox [value]="item" />
-                    </td>
-                    <td>{{ item.colorName }}</td>
+                    <td><p-tableCheckbox [value]="row" /></td>
+                    <td>{{ row.colorName }}</td>
+                    <td>{{ row.colorId }}</td>
                     <td>
-                        <div class="action-buttons">
-                            <p-button type="button" icon="pi pi-eye" class="p-button-rounded p-button-info" (click)="view(item)" pTooltip="View" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning" (click)="edit(item)" pTooltip="Edit" tooltipPosition="top"></p-button>
-                            <p-button type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="delete(item)" pTooltip="Delete" tooltipPosition="top"></p-button>
+                        <div class="flex gap-2">
+                            <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />
+                            <p-button icon="pi pi-pencil" severity="secondary" [rounded]="true" [text]="true" (onClick)="edit(row)" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (onClick)="delete(row)" />
                         </div>
                     </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="3" style="text-align: center; padding: 2rem;">No colors found</td>
+                    <td colspan="4" class="text-center py-5">No colors found</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -146,44 +134,57 @@ export class ColorComponent implements OnInit {
             cancelButtonText: 'Cancel',
             showCancelButton: true,
             preConfirm: () => {
-                const name = (document.getElementById('colorName') as HTMLInputElement)?.value;
-                if (!name) {
+                const colorName = (document.getElementById('colorName') as HTMLInputElement)?.value.trim();
+                if (!colorName) {
                     Swal.showValidationMessage('Color name is required');
                     return false;
                 }
-                return { name };
+                return { colorName };
             }
         }).then((result) => {
-            if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Color created successfully' });
-                this.loadItems();
+            if (result.isConfirmed && result.value) {
+                this.assetService.createColor(result.value).subscribe({
+                    next: (created) => {
+                        this.items.push(created);
+                        this.filteredItems = [...this.items];
+                        this.messageService.add({ severity: 'success', summary: 'Created', detail: 'Color created' });
+                    },
+                    error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Create failed' })
+                });
             }
         });
     }
 
     view(item: any) {
-        Swal.fire({ title: 'View Color', html: `<strong>Name:</strong> ${item.name}`, icon: 'info' });
+        Swal.fire({ title: 'Color', html: `<strong>Name:</strong> ${item.colorName}`, icon: 'info' });
     }
 
     edit(item: any) {
         Swal.fire({
             title: 'Edit Color',
-            html: `<input type="text" id="colorName" class="swal2-input" value="${item.name}" />`,
+            html: `<input type="text" id="colorName" class="swal2-input" value="${item.colorName}" />`,
             confirmButtonText: 'Update',
             cancelButtonText: 'Cancel',
             showCancelButton: true,
             preConfirm: () => {
-                const name = (document.getElementById('colorName') as HTMLInputElement)?.value;
-                if (!name) {
+                const colorName = (document.getElementById('colorName') as HTMLInputElement)?.value.trim();
+                if (!colorName) {
                     Swal.showValidationMessage('Color name is required');
                     return false;
                 }
-                return { name };
+                return { colorName };
             }
         }).then((result) => {
-            if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Color updated successfully' });
-                this.loadItems();
+            if (result.isConfirmed && result.value) {
+                this.assetService.updateColor(item.colorId, result.value).subscribe({
+                    next: (updated) => {
+                        const idx = this.items.findIndex((c) => c.colorId === updated.colorId);
+                        if (idx > -1) this.items[idx] = updated;
+                        this.filteredItems = [...this.items];
+                        this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Color updated' });
+                    },
+                    error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Update failed' })
+                });
             }
         });
     }
@@ -191,50 +192,58 @@ export class ColorComponent implements OnInit {
     delete(item: any) {
         Swal.fire({
             title: 'Delete Color',
-            text: `Are you sure you want to delete "${item.name}"?`,
+            text: `Delete "${item.colorName}"?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Color deleted successfully' });
-                this.loadItems();
+            confirmButtonText: 'Delete'
+        }).then((res) => {
+            if (res.isConfirmed) {
+                this.assetService.deleteColor(item.colorId).subscribe({
+                    next: () => {
+                        this.items = this.items.filter((c) => c.colorId !== item.colorId);
+                        this.filteredItems = [...this.items];
+                        this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Color deleted' });
+                    },
+                    error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Delete failed' })
+                });
             }
         });
     }
 
     deleteSelected() {
-        if (!this.selectedItems || this.selectedItems.length === 0) return;
-
+        if (!this.selectedItems?.length) return;
         Swal.fire({
             title: 'Delete Selected',
             text: `Delete ${this.selectedItems.length} color(s)?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Colors deleted successfully' });
-                this.loadItems();
-                this.selectedItems = [];
+            confirmButtonText: 'Delete'
+        }).then((res) => {
+            if (res.isConfirmed) {
+                const ids = this.selectedItems.map((c) => c.colorId);
+                Promise.all(ids.map((id) => this.assetService.deleteColor(id).toPromise()))
+                    .then(() => {
+                        this.items = this.items.filter((c) => !ids.includes(c.colorId));
+                        this.filteredItems = [...this.items];
+                        this.selectedItems = [];
+                        this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Selected colors deleted' });
+                    })
+                    .catch(() => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Bulk delete failed' }));
             }
         });
     }
 
     exportCSV() {
-        let csv = 'Color Name,Created Date\n';
+        let csv = 'Color Name,ID\n';
         this.items.forEach((item) => {
-            csv += `${item.name},${new Date(item.createdAt).toLocaleDateString()}\n`;
+            csv += `${(item.colorName || '').replace(/,/g, ';')},${item.colorId}\n`;
         });
-
         const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = 'colors.csv';
         a.click();
-        window.URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
     }
 }
