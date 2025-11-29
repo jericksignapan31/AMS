@@ -59,8 +59,9 @@ import Swal from 'sweetalert2';
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width:3rem"><p-tableHeaderCheckbox /></th>
-                    <th pSortableColumn="FirstName" style="min-width:20rem">Name <p-sortIcon field="FirstName" /></th>
                     <th style="min-width:25rem">ID</th>
+
+                    <th pSortableColumn="FirstName" style="min-width:20rem">Name <p-sortIcon field="FirstName" /></th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
@@ -69,8 +70,9 @@ import Swal from 'sweetalert2';
                     <td style="width: 3rem">
                         <p-tableCheckbox [value]="user" />
                     </td>
-                    <td>{{ user.firstName || user.FirstName }} {{ user.middleName || user.MiddleName || '' }} {{ user.lastName || user.LastName }}</td>
                     <td>{{ user.userId || user.user_id }}</td>
+
+                    <td>{{ user.firstName || user.FirstName }} {{ user.middleName || user.MiddleName || '' }} {{ user.lastName || user.LastName }}</td>
                     <td>
                         <div class="flex gap-2">
                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="viewUser(user)" />
@@ -470,10 +472,6 @@ export class UsersComponent implements OnInit {
         const isCampusAdmin = this.currentUserRole === 'CampusAdmin';
         const campusAdminCampusId = loggedInUserData.campus?.campusId || loggedInUserData.campusId || '';
         const campusAdminCampusName = loggedInUserData.campus?.campusName || loggedInUserData.campusName || '';
-
-        console.log('CampusAdmin creating user:', isCampusAdmin);
-        console.log('CampusAdmin Campus ID:', campusAdminCampusId);
-        console.log('CampusAdmin Campus Name:', campusAdminCampusName);
 
         // Filter departments for CampusAdmin (only their campus departments)
         const filteredDepartments = isCampusAdmin ? this.departments.filter((dept: any) => dept.campus?.campusId === campusAdminCampusId) : this.departments;

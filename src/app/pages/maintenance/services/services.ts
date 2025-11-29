@@ -56,18 +56,18 @@ import { MaintenanceService, ServiceMaintenance } from '../../service/maintenanc
                     <th style="width:3rem">
                         <p-tableHeaderCheckbox />
                     </th>
+                    <th style="min-width:25rem">ID</th>
                     <th pSortableColumn="serviceName" style="min-width:20rem">Service Name <p-sortIcon field="serviceName" /></th>
                     <th style="min-width:35rem">Description</th>
-                    <th style="min-width:25rem">ID</th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td><p-tableCheckbox [value]="row" /></td>
+                    <td>{{ row.serviceMaintenanceId }}</td>
                     <td>{{ row.serviceName }}</td>
                     <td>{{ row.serviceDescription }}</td>
-                    <td>{{ row.serviceMaintenanceId }}</td>
                     <td>
                         <div class="flex gap-2">
                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />

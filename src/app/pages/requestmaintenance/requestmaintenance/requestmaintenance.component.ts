@@ -79,18 +79,18 @@ import { TooltipModule } from 'primeng/tooltip';
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width:3rem"><p-tableHeaderCheckbox /></th>
+                    <th style="min-width:25rem">ID</th>
                     <th pSortableColumn="maintenanceName" style="min-width:20rem">Maintenance Name <p-sortIcon field="maintenanceName" /></th>
                     <th style="min-width:15rem">Status</th>
-                    <th style="min-width:25rem">ID</th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td><p-tableCheckbox [value]="row" /></td>
+                    <td>{{ row.requestId }}</td>
                     <td>{{ row.maintenanceName }}</td>
                     <td><p-tag [value]="row.maintenanceStatus?.requestStatusName" /></td>
-                    <td>{{ row.requestId }}</td>
                     <td>
                         <div class="flex gap-2">
                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />

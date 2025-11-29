@@ -56,16 +56,16 @@ import Swal from 'sweetalert2';
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width:3rem"><p-tableHeaderCheckbox /></th>
-                    <th pSortableColumn="statusName" style="min-width:20rem">Status <p-sortIcon field="statusName" /></th>
                     <th style="min-width:25rem">ID</th>
+                    <th pSortableColumn="statusName" style="min-width:20rem">Status <p-sortIcon field="statusName" /></th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td><p-tableCheckbox [value]="row" /></td>
-                    <td>{{ row.statusName }}</td>
                     <td>{{ row.statusId }}</td>
+                    <td>{{ row.statusName }}</td>
                     <td>
                         <div class="flex gap-2">
                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />

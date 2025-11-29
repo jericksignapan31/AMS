@@ -133,9 +133,9 @@ import Swal from 'sweetalert2';
                 <tr>
                     <th style="width:3rem"><p-tableHeaderCheckbox /></th>
                     <th style="width:3rem">Expand</th>
+                    <th style="min-width:20rem">ID</th>
                     <th pSortableColumn="assetName" style="min-width:18rem">Asset <p-sortIcon field="assetName" /></th>
                     <th style="min-width:14rem">Property #</th>
-                    <th style="min-width:20rem">ID</th>
                     <th style="min-width:12rem">QR Code</th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
@@ -147,9 +147,9 @@ import Swal from 'sweetalert2';
                     <td style="width: 3rem">
                         <button type="button" pButton pRipple icon="pi pi-chevron-right" class="p-button-rounded p-button-text p-button-sm expand-btn" [class.expanded]="isRowExpanded(item.assetId)" (click)="toggleExpand(item)"></button>
                     </td>
+                    <td>{{ item.assetId }}</td>
                     <td>{{ item.assetName }}</td>
                     <td>{{ item.propertyNumber }}</td>
-                    <td>{{ item.assetId }}</td>
                     <td>
                         <div *ngIf="item.qrCode" class="inline-block">
                             <!-- Display QR Code as image if it's base64 or URL, otherwise as text -->

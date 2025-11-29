@@ -130,16 +130,16 @@ abstract class AssetCategoryBase implements OnInit {
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width:3rem"><p-tableHeaderCheckbox /></th>
-                    <th pSortableColumn="programName" style="min-width:20rem">Program <p-sortIcon field="programName" /></th>
                     <th style="min-width:25rem">ID</th>
+                    <th pSortableColumn="programName" style="min-width:20rem">Program <p-sortIcon field="programName" /></th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td><p-tableCheckbox [value]="row" /></td>
-                    <td>{{ row.programName }}</td>
                     <td>{{ row.programId }}</td>
+                    <td>{{ row.programName }}</td>
                     <td>
                         <div class="flex gap-2">
                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />
@@ -321,16 +321,16 @@ export class ProgramComponent extends AssetCategoryBase {
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width:3rem"><p-tableHeaderCheckbox /></th>
-                    <th pSortableColumn="supplierName" style="min-width:20rem">Supplier <p-sortIcon field="supplierName" /></th>
                     <th style="min-width:25rem">ID</th>
+                    <th pSortableColumn="supplierName" style="min-width:20rem">Supplier <p-sortIcon field="supplierName" /></th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td><p-tableCheckbox [value]="row" /></td>
-                    <td>{{ row.supplierName }}</td>
                     <td>{{ row.supplierId }}</td>
+                    <td>{{ row.supplierName }}</td>
                     <td>
                         <div class="flex gap-2">
                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />
@@ -512,16 +512,16 @@ export class SupplierComponent extends AssetCategoryBase {
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width:3rem"><p-tableHeaderCheckbox /></th>
-                    <th pSortableColumn="locationName" style="min-width:20rem">Location <p-sortIcon field="locationName" /></th>
                     <th style="min-width:25rem">ID</th>
+                    <th pSortableColumn="locationName" style="min-width:20rem">Location <p-sortIcon field="locationName" /></th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td><p-tableCheckbox [value]="row" /></td>
-                    <td>{{ row.locationName }}</td>
                     <td>{{ row.locationId }}</td>
+                    <td>{{ row.locationName }}</td>
                     <td>
                         <div class="flex gap-2">
                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />
