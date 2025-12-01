@@ -124,4 +124,32 @@ export class MaintenanceService {
         console.log('📡 Fetching Maintenance Requests:', url);
         return this.http.get<any[]>(url);
     }
+
+    // Approve Maintenance Request
+    approveMaintenanceRequest(approvalData: any): Observable<any> {
+        const url = `${this.baseApiUrl}/maintenance-approvals`;
+        console.log('📡 Approving Maintenance Request:', url, approvalData);
+        return this.http.post<any>(url, approvalData);
+    }
+
+    // Complete Maintenance Approval
+    completeMaintenanceApproval(id: string, completionData: any): Observable<any> {
+        const url = `${this.baseApiUrl}/maintenance-approvals/${id}`;
+        console.log('📡 Completing Maintenance Approval:', url, completionData);
+        return this.http.patch<any>(url, completionData);
+    }
+
+    // Get Maintenance Approval Details
+    getMaintenanceApproval(id: string): Observable<any> {
+        const url = `${this.baseApiUrl}/maintenance-approvals/${id}`;
+        console.log('📡 Fetching Maintenance Approval:', url);
+        return this.http.get<any>(url);
+    }
+
+    // Get All Maintenance Approvals
+    getMaintenanceApprovals(): Observable<any[]> {
+        const url = `${this.baseApiUrl}/maintenance-approvals`;
+        console.log('📡 Fetching Maintenance Approvals:', url);
+        return this.http.get<any[]>(url);
+    }
 }
