@@ -71,8 +71,7 @@ import { TabsModule } from 'primeng/tabs';
             <p-tablist>
                 <p-tab value="0">Pending</p-tab>
                 <p-tab value="1">Approved</p-tab>
-                <p-tab value="2">Completed Requests</p-tab>
-                <p-tab value="3">Completed Approvals</p-tab>
+                <p-tab value="3">Completed</p-tab>
             </p-tablist>
             <p-tabpanels>
                 <!-- Pending Tab -->
