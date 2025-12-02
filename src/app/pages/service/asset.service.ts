@@ -86,6 +86,19 @@ export interface Brand {
     brandName?: string;
 }
 
+export interface Laboratory {
+    laboratoryId?: string;
+    laboratoryName?: string;
+    capacity?: string;
+    campus?: {
+        campusId?: string;
+        campusName?: string;
+        campusDirector?: string;
+        campusCreated?: string;
+        campusUpdated?: string;
+    };
+}
+
 export interface MaintenanceRequest {
     maintenance_request_id?: string;
     assets_id?: string;
@@ -234,6 +247,12 @@ export class AssetService {
     }
     deleteBrand(id: string): Observable<void> {
         return this.http.delete<void>(`${this.baseApiUrl}/brands/${id}`);
+    }
+
+    // Laboratory methods
+    getLaboratories(): Observable<Laboratory[]> {
+        console.log('📡 Fetching laboratories from:', `${this.baseApiUrl}/laboratory`);
+        return this.http.get<Laboratory[]>(`${this.baseApiUrl}/laboratory`).pipe(tap((data) => console.log('✅ getLaboratories API Response:', data)));
     }
 
     // Maintenance Request methods

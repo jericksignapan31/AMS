@@ -19,7 +19,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { FileUploadModule } from 'primeng/fileupload';
 import { StepperModule } from 'primeng/stepper';
 import { MessageService } from 'primeng/api';
-import { AssetService, Asset, Program, Supplier, Location, Color, Brand, Status } from '../service/asset.service';
+import { AssetService, Asset, Program, Supplier, Location, Color, Brand, Status, Laboratory } from '../service/asset.service';
 import { MaintenanceService, MaintenanceRequestPayload } from '../service/maintenance.service';
 import jsQR from 'jsqr';
 import Swal from 'sweetalert2';
@@ -296,8 +296,8 @@ import Swal from 'sweetalert2';
                                 <p-select [(ngModel)]="newAsset.supplier" [options]="suppliers" optionLabel="supplierName" optionValue="supplierId" placeholder="Select supplier" class="w-full" appendTo="body" />
                             </div>
                             <div class="col-span-6">
-                                <label class="block font-bold mb-2">Location</label>
-                                <p-select [(ngModel)]="newAsset.location" [options]="locations" optionLabel="locationName" optionValue="locationId" placeholder="Select location" class="w-full" appendTo="body" />
+                                <label class="block font-bold mb-2">Laboratory</label>
+                                <p-select [(ngModel)]="newAsset.laboratory" [options]="laboratories" optionLabel="laboratoryName" optionValue="laboratoryId" placeholder="Select laboratory" class="w-full" appendTo="body" />
                             </div>
                         </div>
                     </div>
@@ -470,6 +470,7 @@ export class AssetsComponent implements OnInit {
     programs: Program[] = [];
     suppliers: Supplier[] = [];
     locations: Location[] = [];
+    laboratories: Laboratory[] = [];
     statuses: Status[] = [];
     colors: Color[] = [];
     brands: Brand[] = [];
@@ -498,7 +499,7 @@ export class AssetsComponent implements OnInit {
             program: '',
             status: '',
             supplier: '',
-            location: '',
+            laboratory: '',
             inventoryCustodianSlip: {
                 icsNo: '',
                 quantity: 0,
@@ -627,6 +628,23 @@ export class AssetsComponent implements OnInit {
             },
             error: (error) => {
                 console.error('❌ Error loading brands:', error);
+                console.error('Status:', error?.status, 'Message:', error?.message);
+            }
+        });
+
+        this.assetService.getLaboratories().subscribe({
+            next: (data) => {
+                console.log('✅ Laboratories API Response:', data);
+                console.log('📊 Laboratories count:', data?.length || 0);
+                if (data && data.length > 0) {
+                    console.log('🏷️ First laboratory:', data[0]);
+                    console.log('🏷️ Laboratory fields:', Object.keys(data[0]));
+                }
+                this.laboratories = data || [];
+                console.log('📦 this.laboratories assigned:', this.laboratories);
+            },
+            error: (error) => {
+                console.error('❌ Error loading laboratories:', error);
                 console.error('Status:', error?.status, 'Message:', error?.message);
             }
         });
@@ -830,7 +848,7 @@ export class AssetsComponent implements OnInit {
         console.log('🔓 Opening New Asset dialog...');
         console.log('📋 Programs in dropdown:', this.programs);
         console.log('📋 Suppliers in dropdown:', this.suppliers);
-        console.log('📋 Locations in dropdown:', this.locations);
+        console.log('📋 Laboratories in dropdown:', this.laboratories);
         console.log('📋 Statuses in dropdown:', this.statuses);
         console.log('📋 Colors in dropdown:', this.colors);
         this.assetDialog = true;
