@@ -50,7 +50,6 @@ export class AppMenu implements OnInit {
             },
             error: (error) => {
                 console.error('Error loading user profile:', error);
-                // Fallback to localStorage if API fails
                 const storedUser = localStorage.getItem('currentUser');
                 if (storedUser) {
                     this.currentUser = JSON.parse(storedUser);
