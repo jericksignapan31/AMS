@@ -11,6 +11,7 @@ import { MaintenanceServicesComponent } from './maintenance/services/services';
 import { MaintenanceStatusComponent } from './maintenance/status/maintenance-status';
 import { MaintenancePriorityLevelComponent } from './maintenance/priority-level/maintenance-priority-level';
 import { MaintenanceTypesComponent } from './maintenance/types/maintenance-types';
+import { LabScheduleComponent } from './labschedule/labschedule';
 
 export const pageRoutes: Routes = [
     { path: 'users', component: UsersComponent },
@@ -25,6 +26,7 @@ export const pageRoutes: Routes = [
     { path: 'documentation', component: Documentation },
     { path: 'crud', component: AssetsComponent },
     { path: 'requestmaintenance', component: RequestmaintenanceComponent },
+    { path: 'labschedule', component: LabScheduleComponent },
     { path: '**', redirectTo: '/notfound' }
 ];
 

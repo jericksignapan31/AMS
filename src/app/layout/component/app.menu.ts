@@ -104,6 +104,11 @@ export class AppMenu implements OnInit {
                         label: 'Request Maintenance',
                         icon: 'pi pi-fw pi-wrench',
                         routerLink: ['/app/requestmaintenance']
+                    },
+                    {
+                        label: 'Lab Schedule',
+                        icon: 'pi pi-fw pi-wrench',
+                        routerLink: ['/app/pages/labschedule']
                     }
                 ]
             },
