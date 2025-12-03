@@ -39,7 +39,6 @@ export class AppMenu implements OnInit {
 
     ngOnInit() {
         this.loadUserProfile();
-        this.loadMenuItems();
     }
 
     loadUserProfile() {
@@ -47,12 +46,14 @@ export class AppMenu implements OnInit {
             next: (userData) => {
                 console.log('User profile loaded:', userData);
                 this.currentUser = userData;
+                this.loadMenuItems();
             },
             error: (error) => {
                 console.error('Error loading user profile:', error);
                 const storedUser = localStorage.getItem('currentUser');
                 if (storedUser) {
                     this.currentUser = JSON.parse(storedUser);
+                    this.loadMenuItems();
                 }
             }
         });
@@ -66,16 +67,35 @@ export class AppMenu implements OnInit {
     }
 
     loadMenuItems() {
+        const role = this.currentUser?.role?.toLowerCase();
+
+        switch (role) {
+            case 'superadmin':
+                this.loadSuperAdminMenu();
+                break;
+            case 'campusadmin':
+                this.loadCampusAdminMenu();
+                break;
+            case 'faculty':
+                this.loadFacultyMenu();
+                break;
+            case 'labtech':
+                this.loadLabTechMenu();
+                break;
+            default:
+                this.loadDefaultMenu();
+        }
+    }
+
+    loadSuperAdminMenu() {
         this.model = [
             {
                 label: 'Home',
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/app/dashboard'] }]
             },
-
             {
                 label: 'Pages',
                 icon: 'pi pi-fw pi-briefcase',
-                routerLink: ['/app/pages'],
                 items: [
                     {
                         label: 'Users',
@@ -91,14 +111,57 @@ export class AppMenu implements OnInit {
                         label: 'Departments',
                         icon: 'pi pi-fw pi-building-columns',
                         routerLink: ['/app/pages/departments']
-                    },
+                    }
+                ]
+            }
+        ];
+    }
 
+    loadCampusAdminMenu() {
+        this.model = [
+            {
+                label: 'Home',
+                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/app/dashboard'] }]
+            },
+            {
+                label: 'Pages',
+                icon: 'pi pi-fw pi-briefcase',
+                items: [
+                    {
+                        label: 'Users',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/app/pages/users']
+                    },
+                    {
+                        label: 'Departments',
+                        icon: 'pi pi-fw pi-building-columns',
+                        routerLink: ['/app/pages/departments']
+                    },
+                    {
+                        label: 'Lab Schedule',
+                        icon: 'pi pi-fw pi-calendar',
+                        routerLink: ['/app/pages/labschedule']
+                    }
+                ]
+            }
+        ];
+    }
+
+    loadFacultyMenu() {
+        this.model = [
+            {
+                label: 'Home',
+                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/app/dashboard'] }]
+            },
+            {
+                label: 'Pages',
+                icon: 'pi pi-fw pi-briefcase',
+                items: [
                     {
                         label: 'Assets',
                         icon: 'pi pi-fw pi-pencil',
                         routerLink: ['/app/crud']
                     },
-
                     {
                         label: 'Request Maintenance',
                         icon: 'pi pi-fw pi-wrench',
@@ -106,13 +169,43 @@ export class AppMenu implements OnInit {
                     },
                     {
                         label: 'Lab Schedule',
+                        icon: 'pi pi-fw pi-calendar',
+                        routerLink: ['/app/pages/labschedule']
+                    }
+                ]
+            }
+        ];
+    }
+
+    loadLabTechMenu() {
+        this.model = [
+            {
+                label: 'Home',
+                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/app/dashboard'] }]
+            },
+            {
+                label: 'Pages',
+                icon: 'pi pi-fw pi-briefcase',
+                items: [
+                    {
+                        label: 'Assets',
+                        icon: 'pi pi-fw pi-pencil',
+                        routerLink: ['/app/crud']
+                    },
+                    {
+                        label: 'Request Maintenance',
                         icon: 'pi pi-fw pi-wrench',
+                        routerLink: ['/app/requestmaintenance']
+                    },
+                    {
+                        label: 'Lab Schedule',
+                        icon: 'pi pi-fw pi-calendar',
                         routerLink: ['/app/pages/labschedule']
                     }
                 ]
             },
             {
-                label: 'hierarchy page',
+                label: 'Hierarchy Page',
                 items: [
                     {
                         label: 'Asset Properties',
@@ -137,6 +230,15 @@ export class AppMenu implements OnInit {
                         ]
                     }
                 ]
+            }
+        ];
+    }
+
+    loadDefaultMenu() {
+        this.model = [
+            {
+                label: 'Home',
+                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/app/dashboard'] }]
             }
         ];
     }
