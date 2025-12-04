@@ -5,6 +5,8 @@ import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
 import { UserService } from '../../pages/service/user.service';
 import { AvatarModule } from 'primeng/avatar';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-menu',
@@ -34,11 +36,33 @@ import { AvatarModule } from 'primeng/avatar';
 export class AppMenu implements OnInit {
     model: MenuItem[] = [];
     currentUser: any = null;
+    laboratories: any[] = [];
 
-    constructor(private userService: UserService) {}
+    constructor(
+        private userService: UserService,
+        private http: HttpClient
+    ) {}
 
     ngOnInit() {
         this.loadUserProfile();
+        this.loadLaboratories();
+    }
+
+    loadLaboratories() {
+        const apiUrl = `${environment.apiUrl}/laboratories`;
+        console.log('📡 Fetching laboratories from:', apiUrl);
+
+        this.http.get<any[]>(apiUrl).subscribe({
+            next: (data: any[]) => {
+                console.log('✅ Laboratories loaded:', data);
+                this.laboratories = data || [];
+                // Reload menu items to include laboratories
+                this.loadUserProfile();
+            },
+            error: (error: any) => {
+                console.error('❌ Error loading laboratories:', error);
+            }
+        });
     }
 
     loadUserProfile() {
@@ -227,6 +251,11 @@ export class AppMenu implements OnInit {
                             { label: 'Priority Level', icon: 'pi pi-fw pi-list', routerLink: ['/app/pages/maintenance/priority-level'] },
                             { label: 'Types', icon: 'pi pi-fw pi-truck', routerLink: ['/app/pages/maintenance/types'] }
                         ]
+                    },
+                    {
+                        label: 'Laboratories',
+                        icon: 'pi pi-fw pi-building',
+                        items: this.getLaboratoryMenuItems()
                     }
                 ]
             }
@@ -240,5 +269,13 @@ export class AppMenu implements OnInit {
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/app/dashboard'] }]
             }
         ];
+    }
+
+    getLaboratoryMenuItems(): MenuItem[] {
+        return (this.laboratories || []).map((lab) => ({
+            label: lab.laboratoryName,
+            icon: 'pi pi-fw pi-flask',
+            routerLink: ['/app/pages/laboratory', lab.laboratoryId]
+        }));
     }
 }
