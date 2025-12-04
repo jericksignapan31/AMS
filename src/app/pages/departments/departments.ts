@@ -103,21 +103,17 @@ export class DepartmentsComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        console.log('DepartmentsComponent initialized');
         this.loadDepartments();
         this.loadCampuses();
     }
 
     loadDepartments() {
-        console.log('Loading departments...');
         this.loading = true;
         this.userService.getDepartments().subscribe({
             next: (response: any) => {
-                console.log('Departments loaded:', response);
                 this.departments = Array.isArray(response) ? response : response.data || [];
                 this.filteredDepartments = [...this.departments];
                 this.loading = false;
-                console.log('Departments set:', this.departments);
             },
             error: (error) => {
                 console.error('Error loading departments:', error);
@@ -132,12 +128,9 @@ export class DepartmentsComponent implements OnInit {
     }
 
     loadCampuses() {
-        console.log('Loading campuses...');
         this.userService.getCampuses().subscribe({
             next: (response: any) => {
-                console.log('Campuses loaded:', response);
                 this.campuses = Array.isArray(response) ? response : response.data || [];
-                console.log('Campuses set:', this.campuses);
             },
             error: (error) => {
                 console.error('Error loading campuses:', error);
@@ -156,13 +149,8 @@ export class DepartmentsComponent implements OnInit {
     }
 
     onSelectionChange(event: any) {
-        console.log('Selection changed:', event);
-        console.log('Selected departments:', this.selectedDepartments);
         if (this.selectedDepartments && this.selectedDepartments.length > 0) {
-            console.log(
-                'Selected department IDs:',
-                this.selectedDepartments.map((d: any) => d.departmentId)
-            );
+           
         }
     }
 
@@ -250,7 +238,6 @@ export class DepartmentsComponent implements OnInit {
 
     deleteDepartment(department: any) {
         const departmentId = department.departmentId;
-        console.log('Deleting single department:', departmentId, 'Full department object:', department);
 
         Swal.fire({
             title: 'Confirm Delete',
@@ -265,7 +252,6 @@ export class DepartmentsComponent implements OnInit {
             if (result.isConfirmed) {
                 this.userService.deleteDepartment(departmentId).subscribe({
                     next: () => {
-                        console.log('Department deleted successfully:', departmentId);
                         Swal.fire({
                             title: 'Deleted!',
                             text: 'Department has been deleted successfully.',
@@ -367,12 +353,10 @@ export class DepartmentsComponent implements OnInit {
 
                 this.selectedDepartments.forEach((department) => {
                     const departmentId = department.departmentId;
-                    console.log('Deleting department:', departmentId);
 
                     this.userService.deleteDepartment(departmentId).subscribe({
                         next: () => {
                             deletedCount++;
-                            console.log(`Department deleted: ${departmentId} (${deletedCount}/${this.selectedDepartments.length})`);
                             if (deletedCount + failedCount === this.selectedDepartments.length) {
                                 this.selectedDepartments = [];
                                 this.loadDepartments();

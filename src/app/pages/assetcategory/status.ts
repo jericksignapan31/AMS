@@ -96,21 +96,15 @@ export class StatusComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        console.log('🎯 StatusComponent initialized');
         this.loadItems();
     }
 
     loadItems() {
         this.loading = true;
-        console.log('🔍 Starting to load statuses...');
-        console.log('📡 Endpoint: GET /api/status');
 
         this.assetService.getStatuses().subscribe({
             next: (data) => {
-                console.log('✅ Status API Response:', data);
-                console.log('📊 Number of statuses loaded:', data?.length || 0);
                 if (data && data.length > 0) {
-                    console.log('📋 First status:', data[0]);
                 }
                 this.items = data || [];
                 this.filteredItems = [...this.items];
@@ -132,7 +126,6 @@ export class StatusComponent implements OnInit {
     }
 
     onSelectionChange(event: any) {
-        console.log('Selected items:', this.selectedItems);
     }
 
     openNewDialog() {

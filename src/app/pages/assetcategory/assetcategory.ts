@@ -55,7 +55,6 @@ abstract class AssetCategoryBase implements OnInit {
     }
 
     onSelectionChange(event: any) {
-        console.log('Selected items:', this.selectedItems);
     }
 
     openNewDialog() {}
@@ -168,7 +167,6 @@ export class ProgramComponent extends AssetCategoryBase {
         this.loading = true;
         this.assetService.getPrograms().subscribe({
             next: (data) => {
-                console.log('Program API Response:', data);
                 this.items = data || [];
                 this.filteredItems = [...this.items];
                 this.loading = false;
@@ -359,7 +357,6 @@ export class SupplierComponent extends AssetCategoryBase {
         this.loading = true;
         this.assetService.getSuppliers().subscribe({
             next: (data) => {
-                console.log('Supplier API Response:', data);
                 this.items = data || [];
                 this.filteredItems = [...this.items];
                 this.loading = false;
@@ -550,7 +547,6 @@ export class LocationComponent extends AssetCategoryBase {
         this.loading = true;
         this.assetService.getLocations().subscribe({
             next: (data) => {
-                console.log('Location API Response:', data);
                 this.items = data || [];
                 this.filteredItems = [...this.items];
                 this.loading = false;

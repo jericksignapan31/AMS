@@ -105,7 +105,6 @@ export class BrandComponent implements OnInit {
         this.loading = true;
         this.assetService.getBrands().subscribe({
             next: (data) => {
-                console.log('Brand API Response:', data);
                 this.items = data || [];
                 this.filteredItems = [...this.items];
                 this.loading = false;
@@ -123,7 +122,6 @@ export class BrandComponent implements OnInit {
     }
 
     onSelectionChange(event: any) {
-        console.log('Selected items:', this.selectedItems);
     }
 
     openNewDialog() {

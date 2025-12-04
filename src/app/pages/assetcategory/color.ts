@@ -105,7 +105,6 @@ export class ColorComponent implements OnInit {
         this.loading = true;
         this.assetService.getColors().subscribe({
             next: (data) => {
-                console.log('Color API Response:', data);
                 this.items = data || [];
                 this.filteredItems = [...this.items];
                 this.loading = false;
@@ -123,7 +122,6 @@ export class ColorComponent implements OnInit {
     }
 
     onSelectionChange(event: any) {
-        console.log('Selected items:', this.selectedItems);
     }
 
     openNewDialog() {

@@ -216,7 +216,6 @@ export class AppTopbar {
             // Start continuous scanning
             await this.codeReader.decodeFromVideoDevice(null, this.videoElement.nativeElement, (result, err) => {
                 if (result) {
-                    console.log('QR Code detected:', result.getText());
                     this.onQRCodeDetected(result.getText());
                     if (this.codeReader) {
                         this.codeReader.reset(); // Stop scanning after first result
@@ -267,58 +266,33 @@ export class AppTopbar {
     async searchAsset() {
         if (!this.scanResult) return;
 
-        console.log(`\n🔍 ========== QR CODE SCANNED ==========`);
-        console.log(`📱 Scanned Value: "${this.scanResult}"`);
-        console.log(`⏰ Timestamp: ${new Date().toLocaleTimeString()}`);
+       
 
         try {
-            console.log(`\n📡 ========== CALLING GET /api/assets ==========`);
             const assets = await this.assetService.getAssets().toPromise();
 
-            console.log(`\n✅ ========== GET /api/assets RESPONSE ==========`);
-            console.log(`📊 Total Assets: ${assets?.length || 0}`);
-            console.log(`\n📋 FULL RESPONSE DATA:`);
-            console.log(JSON.stringify(assets, null, 2));
-
-            console.log(`\n🔍 ========== COMPARING SCANNED VALUE AGAINST ALL ASSETS ==========`);
-            console.log(`Looking for match with: "${this.scanResult}"\n`);
+           
 
             let foundAsset: any = null;
 
             // Compare each asset's propertyNumber and qrCode with scanned value
             assets?.forEach((asset, index) => {
-                console.log(`Asset #${index + 1}:`);
-                console.log(`   assetId: ${asset.assetId || 'N/A'}`);
-                console.log(`   propertyNumber: ${asset.propertyNumber || 'N/A'}`);
-                console.log(`   qrCode: ${asset.qrCode || 'N/A'}`);
-                console.log(`   assetName: ${asset.assetName || 'N/A'}`);
+              
 
                 // Check if propertyNumber matches
                 if (asset.propertyNumber === this.scanResult || asset.propertyNumber?.toString() === this.scanResult?.toString()) {
-                    console.log(`   ✅ MATCH FOUND (propertyNumber)!`);
                     foundAsset = asset;
                 }
 
                 // Check if qrCode matches
                 if (asset.qrCode === this.scanResult || asset.qrCode?.toString() === this.scanResult?.toString()) {
-                    console.log(`   ✅ MATCH FOUND (qrCode)!`);
                     foundAsset = asset;
                 }
 
-                console.log('');
             });
 
             if (foundAsset) {
-                console.log(`\n✨ ========== MATCH FOUND - COMPLETE ASSET DATA ==========`);
-                console.log(`🆔 Asset ID: ${foundAsset.assetId}`);
-                console.log(`📋 Property Number: ${foundAsset.propertyNumber}`);
-                console.log(`📝 Asset Name: ${foundAsset.assetName}`);
-                console.log(`🏷️ Category: ${foundAsset.category}`);
-                console.log(`📍 Found Cluster: ${foundAsset.foundCluster}`);
-                console.log(`👤 Issued To: ${foundAsset.issuedTo}`);
-                console.log(`📌 QR Code: ${foundAsset.qrCode}`);
-                console.log(`\n📊 FULL ASSET OBJECT:`);
-                console.log(JSON.stringify(foundAsset, null, 2));
+              
 
                 this.closeQRScanner();
 
@@ -346,11 +320,8 @@ export class AppTopbar {
                     }
                 });
             } else {
-                console.log(`\n❌ ========== NO MATCH FOUND ==========`);
-                console.log(`Scanned value "${this.scanResult}" does not match any asset`);
-                console.log(`\n📋 Available values in database:`);
+               
                 assets?.forEach((asset, idx) => {
-                    console.log(`   ${idx + 1}. propertyNumber: "${asset.propertyNumber || 'N/A'}" | qrCode: "${asset.qrCode || 'N/A'}"`);
                 });
 
                 Swal.fire({
@@ -360,9 +331,7 @@ export class AppTopbar {
                     confirmButtonText: 'OK'
                 });
             }
-            console.log(`\n========== END ==========\n`);
         } catch (error) {
-            console.error('❌ Error searching asset:', error);
             Swal.fire({
                 title: 'Search Error',
                 text: 'Failed to search for asset. Please try again.',

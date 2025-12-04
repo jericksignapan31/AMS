@@ -528,18 +528,14 @@ export class AssetsComponent implements OnInit {
     }
 
     loadReferenceData() {
-        console.log('🔍 Starting to load reference data...');
 
         this.assetService.getPrograms().subscribe({
             next: (data) => {
-                console.log('✅ Programs API Response:', data);
-                console.log('📊 Programs count:', data?.length || 0);
+              
                 if (data && data.length > 0) {
-                    console.log('🏷️ First program:', data[0]);
-                    console.log('🏷️ Program fields:', Object.keys(data[0]));
+                 
                 }
                 this.programs = data || [];
-                console.log('📦 this.programs assigned:', this.programs);
             },
             error: (error) => {
                 console.error('❌ Error loading programs:', error);
@@ -549,14 +545,11 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getSuppliers().subscribe({
             next: (data) => {
-                console.log('✅ Suppliers API Response:', data);
-                console.log('📊 Suppliers count:', data?.length || 0);
+            
                 if (data && data.length > 0) {
-                    console.log('🏷️ First supplier:', data[0]);
-                    console.log('🏷️ Supplier fields:', Object.keys(data[0]));
+                 
                 }
                 this.suppliers = data || [];
-                console.log('📦 this.suppliers assigned:', this.suppliers);
             },
             error: (error) => {
                 console.error('❌ Error loading suppliers:', error);
@@ -566,14 +559,11 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getLocations().subscribe({
             next: (data) => {
-                console.log('✅ Locations API Response:', data);
-                console.log('📊 Locations count:', data?.length || 0);
+             
                 if (data && data.length > 0) {
-                    console.log('🏷️ First location:', data[0]);
-                    console.log('🏷️ Location fields:', Object.keys(data[0]));
+                  
                 }
                 this.locations = data || [];
-                console.log('📦 this.locations assigned:', this.locations);
             },
             error: (error) => {
                 console.error('❌ Error loading locations:', error);
@@ -583,14 +573,11 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getStatuses().subscribe({
             next: (data) => {
-                console.log('✅ Statuses API Response:', data);
-                console.log('📊 Statuses count:', data?.length || 0);
+             
                 if (data && data.length > 0) {
-                    console.log('🏷️ First status:', data[0]);
-                    console.log('🏷️ Status fields:', Object.keys(data[0]));
+                  
                 }
                 this.statuses = data || [];
-                console.log('📦 this.statuses assigned:', this.statuses);
             },
             error: (error) => {
                 console.error('❌ Error loading statuses:', error);
@@ -600,14 +587,11 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getColors().subscribe({
             next: (data) => {
-                console.log('✅ Colors API Response:', data);
-                console.log('📊 Colors count:', data?.length || 0);
+          
                 if (data && data.length > 0) {
-                    console.log('🏷️ First color:', data[0]);
-                    console.log('🏷️ Color fields:', Object.keys(data[0]));
+                  
                 }
                 this.colors = data || [];
-                console.log('📦 this.colors assigned:', this.colors);
             },
             error: (error) => {
                 console.error('❌ Error loading colors:', error);
@@ -617,14 +601,11 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getBrands().subscribe({
             next: (data) => {
-                console.log('✅ Brands API Response:', data);
-                console.log('📊 Brands count:', data?.length || 0);
+           
                 if (data && data.length > 0) {
-                    console.log('🏷️ First brand:', data[0]);
-                    console.log('🏷️ Brand fields:', Object.keys(data[0]));
+                  
                 }
                 this.brands = data || [];
-                console.log('📦 this.brands assigned:', this.brands);
             },
             error: (error) => {
                 console.error('❌ Error loading brands:', error);
@@ -634,14 +615,11 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getLaboratories().subscribe({
             next: (data) => {
-                console.log('✅ Laboratories API Response:', data);
-                console.log('📊 Laboratories count:', data?.length || 0);
+             
                 if (data && data.length > 0) {
-                    console.log('🏷️ First laboratory:', data[0]);
-                    console.log('🏷️ Laboratory fields:', Object.keys(data[0]));
+                  
                 }
                 this.laboratories = data || [];
-                console.log('📦 this.laboratories assigned:', this.laboratories);
             },
             error: (error) => {
                 console.error('❌ Error loading laboratories:', error);
@@ -685,24 +663,13 @@ export class AssetsComponent implements OnInit {
 
     loadAssets() {
         this.loading = true;
-        console.log('Starting to load assets from:', 'http://localhost:3000/api/assets');
         this.assetService.getAssets().subscribe({
             next: (data) => {
-                console.log('✅ Assets loaded successfully:', data);
-                console.log('Number of assets:', data?.length || 0);
+               
                 if (data && data.length > 0) {
-                    console.log('First asset:', data[0]);
                     // Log QR code info for all assets
-                    console.log('📦 All Assets with QR Codes:');
                     data.forEach((asset, index) => {
-                        console.log(`Asset #${index + 1}:`, {
-                            assetId: asset.assetId,
-                            propertyNumber: asset.propertyNumber,
-                            assetName: asset.assetName,
-                            qrCode: asset.qrCode,
-                            qrCodeType: asset.qrCode ? (asset.qrCode.startsWith('data:') ? 'Base64' : asset.qrCode.startsWith('http') ? 'URL' : 'Text') : 'None',
-                            qrCodePreview: asset.qrCode ? asset.qrCode.substring(0, 100) : 'No QR Code'
-                        });
+                       
                     });
                 }
                 this.assets = data || [];
@@ -733,36 +700,26 @@ export class AssetsComponent implements OnInit {
     }
 
     onSelectionChange(event: any) {
-        console.log('✅ Selection Changed');
-        console.log('📊 Total Selected:', this.selectedAssets.length);
+      
 
         if (this.selectedAssets.length === 0) {
-            console.log('❌ No assets selected');
         } else {
-            console.log('📋 Selected Assets:');
             this.selectedAssets.forEach((asset, index) => {
-                console.log(`  ${index + 1}. Asset ID: ${asset.assetId}`);
-                console.log(`     - Name: ${asset.assetName}`);
-                console.log(`     - Property Number: ${asset.propertyNumber}`);
-                console.log(`     - Category: ${asset.category}`);
+              
             });
-            console.log('Full Selected Data:', this.selectedAssets);
         }
     }
 
     onRowExpandEvent(event: any) {
         const asset = event.data as Asset;
-        console.log('📂 Row Expanded - assetId:', asset.assetId);
-        console.log(`   Asset: ${asset.assetName}`);
+    
 
         // Fetch ICS data for this specific asset
         if (asset.assetId && !asset.inventoryCustodianSlip?.icsNo) {
             this.assetService.getAssetInventoryCustodianSlip(asset.assetId).subscribe({
                 next: (icsData) => {
-                    console.log(`📋 ICS Data fetched for ${asset.assetName}:`, icsData);
                     // Update the asset object with ICS data
                     asset.inventoryCustodianSlip = icsData;
-                    console.log('✅ Asset updated with ICS data:', asset);
                 },
                 error: (error) => {
                     console.error(`❌ Error fetching ICS for ${asset.assetName}:`, error);
@@ -773,7 +730,6 @@ export class AssetsComponent implements OnInit {
 
     onRowCollapseEvent(event: any) {
         const asset = event.data as Asset;
-        console.log('📁 Row Collapsed - assetId:', asset.assetId);
     }
 
     // Manual expand/collapse toggle
@@ -783,19 +739,14 @@ export class AssetsComponent implements OnInit {
         if (this.expandedRowIds.has(asset.assetId)) {
             // Collapse
             this.expandedRowIds.delete(asset.assetId);
-            console.log('📁 Row Collapsed:', asset.assetId);
         } else {
             // Expand - first fetch ICS data if not already loaded
             this.expandedRowIds.add(asset.assetId);
-            console.log('📂 Row Expanded:', asset.assetId);
 
             if (!asset.inventoryCustodianSlip?.icsNo) {
-                console.log('🔄 Fetching ICS data for:', asset.assetName);
                 this.assetService.getAssetInventoryCustodianSlip(asset.assetId).subscribe({
                     next: (icsData) => {
-                        console.log(`📋 ICS Data fetched for ${asset.assetName}:`, icsData);
                         asset.inventoryCustodianSlip = icsData;
-                        console.log('✅ Asset updated with ICS data:', asset);
                     },
                     error: (error) => {
                         console.error(`❌ Error fetching ICS for ${asset.assetName}:`, error);
@@ -845,12 +796,7 @@ export class AssetsComponent implements OnInit {
     }
 
     openNew() {
-        console.log('🔓 Opening New Asset dialog...');
-        console.log('📋 Programs in dropdown:', this.programs);
-        console.log('📋 Suppliers in dropdown:', this.suppliers);
-        console.log('📋 Laboratories in dropdown:', this.laboratories);
-        console.log('📋 Statuses in dropdown:', this.statuses);
-        console.log('📋 Colors in dropdown:', this.colors);
+    
         this.assetDialog = true;
         this.currentStep = 0;
         this.newAsset = this.getEmptyAsset();
@@ -861,7 +807,6 @@ export class AssetsComponent implements OnInit {
         if (file) {
             // Store the file for later upload
             this.newAsset.qrCodeImage = file;
-            console.log('QR Code file selected:', file.name);
 
             // Read and decode QR code from image
             const reader = new FileReader();
@@ -885,7 +830,6 @@ export class AssetsComponent implements OnInit {
                         const decodedQR = jsQR(imageData.data, img.width, img.height);
 
                         if (decodedQR) {
-                            console.log('✅ QR Code decoded:', decodedQR.data);
                             this.newAsset.qrCode = decodedQR.data;
                             this.messageService.add({
                                 severity: 'success',
@@ -1005,12 +949,10 @@ export class AssetsComponent implements OnInit {
         delete assetToSend.qrCodeImage; // Remove the file object
         delete assetToSend.qrCode; // Remove the scanned QR code text - NOT needed in asset creation
 
-        console.log('📤 Step 1: Creating asset (without QR code):', assetToSend);
 
         // Step 1: Create the asset first
         this.assetService.createAsset(assetToSend).subscribe({
             next: (response: Asset) => {
-                console.log('✅ Step 1 Complete: Asset created successfully:', response);
 
                 // Extract assetId from response
                 const assetId = String(response.assetId || response.id);
@@ -1020,12 +962,10 @@ export class AssetsComponent implements OnInit {
                     return;
                 }
 
-                console.log(`📤 Step 2: Uploading QR code to asset ${assetId}`);
 
                 // Step 2: Upload QR code to the new asset
                 this.assetService.uploadQrCode(assetId, this.newAsset.qrCodeImage).subscribe({
                     next: (qrResponse: any) => {
-                        console.log('✅ Step 2 Complete: QR Code uploaded successfully:', qrResponse);
                         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Asset created and QR code uploaded successfully' });
 
                         // Close dialog and refresh

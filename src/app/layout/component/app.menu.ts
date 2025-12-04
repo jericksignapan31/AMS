@@ -44,7 +44,6 @@ export class AppMenu implements OnInit {
     loadUserProfile() {
         this.userService.getUserProfile().subscribe({
             next: (userData) => {
-                console.log('User profile loaded:', userData);
                 this.currentUser = userData;
                 this.loadMenuItems();
             },
