@@ -17,6 +17,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
 import { DatePickerModule } from 'primeng/datepicker';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-labschedule',
@@ -41,197 +43,7 @@ import { DatePickerModule } from 'primeng/datepicker';
         DatePickerModule
     ],
     providers: [MessageService],
-    styles: [
-        `
-            .lab-schedule-container {
-                padding: 1.5rem;
-                background: #f3f4f6;
-                border-radius: 0.375rem;
-            }
-
-            .schedule-title {
-                font-size: 1.875rem;
-                font-weight: 700;
-                margin-bottom: 1.5rem;
-                color: #1f2937;
-            }
-
-            .schedule-table-wrapper {
-                overflow-x: auto;
-                background: white;
-                border-radius: 0.375rem;
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            }
-
-            .schedule-table {
-                width: 100%;
-                border-collapse: collapse;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
-
-            .schedule-table thead {
-                background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-                color: white;
-                position: sticky;
-                top: 0;
-                z-index: 10;
-            }
-
-            .schedule-table thead th {
-                padding: 1rem;
-                text-align: left;
-                font-weight: 600;
-                font-size: 0.875rem;
-                border-right: 1px solid #e5e7eb;
-            }
-
-            .schedule-table thead th:first-child {
-                min-width: 120px;
-            }
-
-            .schedule-table thead th:last-child {
-                border-right: none;
-            }
-
-            .schedule-table tbody tr {
-                border-bottom: 1px solid #e5e7eb;
-            }
-
-            .schedule-table tbody tr:hover {
-                background-color: #f9fafb;
-            }
-
-            .schedule-table tbody td {
-                padding: 0.5rem;
-                border-right: 1px solid #e5e7eb;
-                position: relative;
-                height: 60px;
-                vertical-align: top;
-            }
-
-            .time-cell {
-                background-color: #f9fafb;
-                font-weight: 600;
-                font-size: 0.8125rem;
-                color: #374151;
-                min-width: 120px;
-                border-right: 2px solid #d1d5db;
-                text-align: center;
-                position: sticky;
-                left: 0;
-                z-index: 5;
-            }
-
-            .schedule-cell {
-                background-color: #fafafa;
-                padding: 0;
-                overflow: hidden;
-                position: relative;
-            }
-
-            .schedule-cell:last-child {
-                border-right: none;
-            }
-
-            .schedule-block {
-                width: 100%;
-                height: 100%;
-                padding: 0.25rem 0.5rem;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                font-size: 0.7rem;
-                font-weight: 600;
-                color: white;
-                cursor: pointer;
-                transition: opacity 0.2s ease;
-                border: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            .schedule-block:hover {
-                opacity: 0.9;
-            }
-
-            .block-title {
-                font-weight: 700;
-                margin-bottom: 0.125rem;
-            }
-
-            .block-info {
-                font-size: 0.65rem;
-                opacity: 0.95;
-            }
-
-            .color-green {
-                background-color: #10b981;
-            }
-            .color-pink {
-                background-color: #ec4899;
-            }
-            .color-gray {
-                background-color: #6b7280;
-            }
-            .color-blue {
-                background-color: #3b82f6;
-            }
-            .color-teal {
-                background-color: #06b6d4;
-            }
-            .color-yellow {
-                background-color: #eab308;
-                color: #1f2937;
-            }
-            .color-indigo {
-                background-color: #4f46e5;
-            }
-
-            @media (max-width: 1024px) {
-                .schedule-table {
-                    font-size: 0.8125rem;
-                }
-                .schedule-table thead th {
-                    padding: 0.75rem 0.5rem;
-                    font-size: 0.8125rem;
-                }
-                .schedule-table tbody td {
-                    padding: 0.375rem;
-                    height: 50px;
-                }
-                .time-cell {
-                    min-width: 100px;
-                    font-size: 0.75rem;
-                }
-            }
-
-            @media (max-width: 768px) {
-                .lab-schedule-container {
-                    padding: 0.75rem;
-                }
-                .schedule-title {
-                    font-size: 1.5rem;
-                    margin-bottom: 1rem;
-                }
-                .schedule-table thead th {
-                    padding: 0.5rem 0.25rem;
-                    font-size: 0.75rem;
-                }
-                .schedule-table tbody td {
-                    padding: 0.25rem;
-                    height: 40px;
-                }
-                .time-cell {
-                    min-width: 80px;
-                    font-size: 0.7rem;
-                }
-                .schedule-block {
-                    font-size: 0.6rem;
-                    padding: 0.125rem 0.25rem;
-                }
-            }
-        `
-    ],
+    styleUrls: ['../../../assets/layout/_labschedule-component.scss'],
     template: `
         <p-toast />
 
@@ -240,6 +52,22 @@ import { DatePickerModule } from 'primeng/datepicker';
                 <div class="flex items-center gap-2">
                     <p-button label="New Schedule" icon="pi pi-plus" severity="secondary" (onClick)="openNew()" />
                     <p-button label="Print" icon="pi pi-print" severity="secondary" outlined />
+                </div>
+            </ng-template>
+            <ng-template #end>
+                <div class="flex items-center gap-2">
+                    <label class="font-semibold mr-2">Filter by Laboratory:</label>
+                    <p-select
+                        [(ngModel)]="selectedLaboratory"
+                        [options]="laboratories"
+                        optionLabel="laboratoryName"
+                        optionValue="laboratoryId"
+                        placeholder="All Laboratories"
+                        [showClear]="true"
+                        styleClass="w-64"
+                        appendTo="body"
+                        (onChange)="onLaboratoryFilterChange()"
+                    />
                 </div>
             </ng-template>
         </p-toolbar>
@@ -316,12 +144,18 @@ export class LabScheduleComponent implements OnInit {
     timeSlots: string[] = [];
     daysOfWeek: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     laboratories: any[] = [];
+    selectedLaboratory: any = null;
 
     // Dialog state
     scheduleDialog: boolean = false;
     newSchedule: any = this.getEmptySchedule();
 
-    constructor(private messageService: MessageService) {}
+    private apiUrl = `${environment.apiUrl}/laboratories`;
+
+    constructor(
+        private messageService: MessageService,
+        private http: HttpClient
+    ) {}
 
     ngOnInit() {
         this.initializeTimeSlots();
@@ -360,13 +194,44 @@ export class LabScheduleComponent implements OnInit {
     }
 
     loadLaboratories() {
-        // TODO: Replace with API call to get laboratories
-        this.laboratories = [
-            { id: '1', name: 'Lab A' },
-            { id: '2', name: 'Lab B' },
-            { id: '3', name: 'Lab C' },
-            { id: '4', name: 'Lab D' }
-        ];
+        console.log('📡 Fetching laboratories from:', this.apiUrl);
+        this.http.get<any[]>(this.apiUrl).subscribe({
+            next: (data: any[]) => {
+                console.log('✅ Laboratories loaded:', data);
+                this.laboratories = data || [];
+                if (this.laboratories.length > 0) {
+                    this.selectedLaboratory = this.laboratories[0];
+                    this.onLaboratoryFilterChange();
+                }
+            },
+            error: (error: any) => {
+                console.error('❌ Error loading laboratories:', error);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to load laboratories: ' + (error?.error?.message || error?.message)
+                });
+            }
+        });
+    }
+
+    onLaboratoryFilterChange() {
+        if (this.selectedLaboratory) {
+            console.log('🔍 Filtering schedule for laboratory:', this.selectedLaboratory);
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Filter Applied',
+                detail: `Showing schedules for: ${this.selectedLaboratory.laboratoryName}`
+            });
+        } else {
+            console.log('🔍 Showing all laboratory schedules');
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Filter Cleared',
+                detail: 'Showing all laboratory schedules'
+            });
+        }
+        this.loadSchedules();
     }
 
     loadSchedules() {
