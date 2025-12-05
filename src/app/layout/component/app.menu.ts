@@ -253,7 +253,7 @@ export class AppMenu implements OnInit {
                         ]
                     },
                     {
-                        label: 'Laboratories',
+                        label: 'Locations',
                         icon: 'pi pi-fw pi-building',
                         items: this.getLaboratoryMenuItems()
                     }

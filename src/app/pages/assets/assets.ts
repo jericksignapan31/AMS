@@ -297,7 +297,7 @@ import Swal from 'sweetalert2';
                             </div>
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Laboratory</label>
-                                <p-select [(ngModel)]="newAsset.laboratory" [options]="laboratories" optionLabel="laboratoryName" optionValue="laboratoryId" placeholder="Select laboratory" class="w-full" appendTo="body" />
+                                <p-select [(ngModel)]="newAsset.laboratories" [options]="laboratories" optionLabel="laboratoryName" optionValue="laboratoryId" placeholder="Select laboratory" class="w-full" appendTo="body" />
                             </div>
                         </div>
                     </div>
@@ -499,7 +499,7 @@ export class AssetsComponent implements OnInit {
             program: '',
             status: '',
             supplier: '',
-            laboratory: '',
+            laboratories: '',
             inventoryCustodianSlip: {
                 icsNo: '',
                 quantity: 0,
@@ -528,12 +528,9 @@ export class AssetsComponent implements OnInit {
     }
 
     loadReferenceData() {
-
         this.assetService.getPrograms().subscribe({
             next: (data) => {
-              
                 if (data && data.length > 0) {
-                 
                 }
                 this.programs = data || [];
             },
@@ -545,9 +542,7 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getSuppliers().subscribe({
             next: (data) => {
-            
                 if (data && data.length > 0) {
-                 
                 }
                 this.suppliers = data || [];
             },
@@ -559,9 +554,7 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getLocations().subscribe({
             next: (data) => {
-             
                 if (data && data.length > 0) {
-                  
                 }
                 this.locations = data || [];
             },
@@ -573,9 +566,7 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getStatuses().subscribe({
             next: (data) => {
-             
                 if (data && data.length > 0) {
-                  
                 }
                 this.statuses = data || [];
             },
@@ -587,9 +578,7 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getColors().subscribe({
             next: (data) => {
-          
                 if (data && data.length > 0) {
-                  
                 }
                 this.colors = data || [];
             },
@@ -601,9 +590,7 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getBrands().subscribe({
             next: (data) => {
-           
                 if (data && data.length > 0) {
-                  
                 }
                 this.brands = data || [];
             },
@@ -615,9 +602,7 @@ export class AssetsComponent implements OnInit {
 
         this.assetService.getLaboratories().subscribe({
             next: (data) => {
-             
                 if (data && data.length > 0) {
-                  
                 }
                 this.laboratories = data || [];
             },
@@ -665,12 +650,9 @@ export class AssetsComponent implements OnInit {
         this.loading = true;
         this.assetService.getAssets().subscribe({
             next: (data) => {
-               
                 if (data && data.length > 0) {
                     // Log QR code info for all assets
-                    data.forEach((asset, index) => {
-                       
-                    });
+                    data.forEach((asset, index) => {});
                 }
                 this.assets = data || [];
                 this.filteredAssets = [...this.assets];
@@ -700,19 +682,14 @@ export class AssetsComponent implements OnInit {
     }
 
     onSelectionChange(event: any) {
-      
-
         if (this.selectedAssets.length === 0) {
         } else {
-            this.selectedAssets.forEach((asset, index) => {
-              
-            });
+            this.selectedAssets.forEach((asset, index) => {});
         }
     }
 
     onRowExpandEvent(event: any) {
         const asset = event.data as Asset;
-    
 
         // Fetch ICS data for this specific asset
         if (asset.assetId && !asset.inventoryCustodianSlip?.icsNo) {
@@ -796,7 +773,6 @@ export class AssetsComponent implements OnInit {
     }
 
     openNew() {
-    
         this.assetDialog = true;
         this.currentStep = 0;
         this.newAsset = this.getEmptyAsset();
@@ -949,11 +925,14 @@ export class AssetsComponent implements OnInit {
         delete assetToSend.qrCodeImage; // Remove the file object
         delete assetToSend.qrCode; // Remove the scanned QR code text - NOT needed in asset creation
 
+        // laboratories field must be a string (laboratory ID)
+        if (!assetToSend.laboratories || typeof assetToSend.laboratories !== 'string') {
+            assetToSend.laboratories = '';
+        }
 
         // Step 1: Create the asset first
         this.assetService.createAsset(assetToSend).subscribe({
             next: (response: Asset) => {
-
                 // Extract assetId from response
                 const assetId = String(response.assetId || response.id);
                 if (!assetId || assetId === 'undefined') {
@@ -961,7 +940,6 @@ export class AssetsComponent implements OnInit {
                     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to get asset ID from response' });
                     return;
                 }
-
 
                 // Step 2: Upload QR code to the new asset
                 this.assetService.uploadQrCode(assetId, this.newAsset.qrCodeImage).subscribe({

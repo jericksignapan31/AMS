@@ -251,8 +251,8 @@ export class AssetService {
 
     // Laboratory methods
     getLaboratories(): Observable<Laboratory[]> {
-        console.log('📡 Fetching laboratories from:', `${this.baseApiUrl}/laboratory`);
-        return this.http.get<Laboratory[]>(`${this.baseApiUrl}/laboratory`).pipe(tap((data) => console.log('✅ getLaboratories API Response:', data)));
+        console.log('📡 Fetching laboratories from:', `${this.baseApiUrl}/laboratories`);
+        return this.http.get<Laboratory[]>(`${this.baseApiUrl}/laboratories`).pipe(tap((data) => console.log('✅ getLaboratories API Response:', data)));
     }
 
     // Maintenance Request methods
