@@ -73,8 +73,6 @@ import { environment } from '../../../environments/environment';
         </p-toolbar>
 
         <div class="lab-schedule-container">
-            <h2 class="schedule-title">Lab Room Schedules</h2>
-
             <div class="schedule-table-wrapper">
                 <table class="schedule-table">
                     <thead>
@@ -107,23 +105,27 @@ import { environment } from '../../../environments/environment';
                 <div class="grid grid-cols-12 gap-4 mt-2">
                     <div class="col-span-12">
                         <label class="block font-bold mb-2">Laboratory *</label>
-                        <p-select [(ngModel)]="newSchedule.laboratory" [options]="laboratories" optionLabel="name" optionValue="id" placeholder="Select laboratory" class="w-full" appendTo="body" />
+                        <p-select [(ngModel)]="newSchedule.laboratory" [options]="laboratories" optionLabel="laboratoryName" optionValue="laboratoryId" placeholder="Select laboratory" class="w-full" appendTo="body" />
+                    </div>
+                    <div class="col-span-12">
+                        <label class="block font-bold mb-2">Instructor</label>
+                        <p-select [(ngModel)]="newSchedule.instructor" [options]="users" optionLabel="firstName" optionValue="userId" placeholder="Select instructor" [showClear]="true" class="w-full" appendTo="body" />
                     </div>
                     <div class="col-span-6">
                         <label class="block font-bold mb-2">Day *</label>
                         <p-select [(ngModel)]="newSchedule.day" [options]="daysOfWeek" placeholder="Select day" class="w-full" appendTo="body" />
                     </div>
                     <div class="col-span-6">
+                        <label class="block font-bold mb-2">Subject *</label>
+                        <p-select [(ngModel)]="newSchedule.activity" [options]="subjects" optionLabel="subjectName" optionValue="subjectId" placeholder="Select subject" class="w-full" appendTo="body" />
+                    </div>
+                    <div class="col-span-6">
                         <label class="block font-bold mb-2">Time *</label>
                         <input pInputText [(ngModel)]="newSchedule.time" type="time" class="w-full" />
                     </div>
-                    <div class="col-span-12">
-                        <label class="block font-bold mb-2">Class/Activity *</label>
-                        <input pInputText [(ngModel)]="newSchedule.activity" placeholder="E.g., CS 101 - Programming 1" class="w-full" />
-                    </div>
-                    <div class="col-span-12">
-                        <label class="block font-bold mb-2">Instructor</label>
-                        <input pInputText [(ngModel)]="newSchedule.instructor" placeholder="Instructor name" class="w-full" />
+                    <div class="col-span-6">
+                        <label class="block font-bold mb-2">End Time *</label>
+                        <input pInputText [(ngModel)]="newSchedule.endTime" type="time" class="w-full" />
                     </div>
                 </div>
             </ng-template>
@@ -144,6 +146,8 @@ export class LabScheduleComponent implements OnInit {
     timeSlots: string[] = [];
     daysOfWeek: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     laboratories: any[] = [];
+    users: any[] = [];
+    subjects: any[] = [];
     selectedLaboratory: any = null;
 
     // Dialog state
@@ -160,6 +164,8 @@ export class LabScheduleComponent implements OnInit {
     ngOnInit() {
         this.initializeTimeSlots();
         this.loadLaboratories();
+        this.loadUsers();
+        this.loadSubjects();
         this.loadSchedules();
     }
 
@@ -187,6 +193,7 @@ export class LabScheduleComponent implements OnInit {
             laboratory: '',
             day: '',
             time: '',
+            endTime: '',
             activity: '',
             instructor: '',
             color: '#1f2937'
@@ -215,9 +222,72 @@ export class LabScheduleComponent implements OnInit {
         });
     }
 
+    loadUsers() {
+        const usersUrl = `${environment.apiUrl}/users`;
+        console.log('📡 Fetching users from:', usersUrl);
+
+        this.http.get<any[]>(usersUrl).subscribe({
+            next: (data: any[]) => {
+                console.log('✅ Users loaded:', data);
+                console.log('📊 Total users:', data?.length || 0);
+
+                if (data && data.length > 0) {
+                    console.log('👤 First user:', data[0]);
+                    console.log('👥 User fields:', Object.keys(data[0]));
+                    console.table(data);
+                }
+
+                this.users = data || [];
+            },
+            error: (error: any) => {
+                console.error('❌ Error loading users:', error);
+                console.error('Error status:', error?.status);
+                console.error('Error message:', error?.message);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to load users: ' + (error?.error?.message || error?.message)
+                });
+            }
+        });
+    }
+
+    loadSubjects() {
+        const subjectsUrl = `${environment.apiUrl}/subjects`;
+        console.log('📡 Fetching subjects from:', subjectsUrl);
+
+        this.http.get<any[]>(subjectsUrl).subscribe({
+            next: (data: any[]) => {
+                console.log('✅ Subjects loaded:', data);
+                console.log('📊 Total subjects:', data?.length || 0);
+
+                if (data && data.length > 0) {
+                    console.log('📚 First subject:', data[0]);
+                    console.log('📚 Subject fields:', Object.keys(data[0]));
+                    console.table(data);
+                }
+
+                this.subjects = data || [];
+            },
+            error: (error: any) => {
+                console.error('❌ Error loading subjects:', error);
+                console.error('Error status:', error?.status);
+                console.error('Error message:', error?.message);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to load subjects: ' + (error?.error?.message || error?.message)
+                });
+            }
+        });
+    }
+
     onLaboratoryFilterChange() {
         if (this.selectedLaboratory) {
             console.log('🔍 Filtering schedule for laboratory:', this.selectedLaboratory);
+            console.log('📋 Laboratory ID:', this.selectedLaboratory.laboratoryId);
             this.messageService.add({
                 severity: 'info',
                 summary: 'Filter Applied',
@@ -235,8 +305,43 @@ export class LabScheduleComponent implements OnInit {
     }
 
     loadSchedules() {
-        // TODO: Replace with API call to get schedules
-        this.schedules = [];
+        if (!this.selectedLaboratory) {
+            console.log('⚠️ No laboratory selected');
+            this.schedules = [];
+            return;
+        }
+
+        const scheduleUrl = `${environment.apiUrl}/laboratories/${this.selectedLaboratory.laboratoryId}/schedules`;
+        console.log('📡 Fetching schedules from:', scheduleUrl);
+
+        this.http.get<any[]>(scheduleUrl).subscribe({
+            next: (data: any[]) => {
+                console.log('✅ Schedules API Response:', data);
+                console.log('📊 Total schedules:', data?.length || 0);
+
+                if (data && data.length > 0) {
+                    console.log('🎯 First schedule:', data[0]);
+                    console.log('📋 Schedule fields:', Object.keys(data[0]));
+                    console.table(data);
+                }
+
+                this.schedules = data || [];
+            },
+            error: (error: any) => {
+                console.error('❌ Error loading schedules:', error);
+                console.error('Error status:', error?.status);
+                console.error('Error message:', error?.message);
+                console.error('Error details:', error?.error);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to load schedules: ' + (error?.error?.message || error?.message)
+                });
+
+                this.schedules = [];
+            }
+        });
     }
 
     openNew() {
@@ -250,24 +355,56 @@ export class LabScheduleComponent implements OnInit {
     }
 
     saveSchedule() {
-        if (!this.newSchedule.laboratory || !this.newSchedule.day || !this.newSchedule.time || !this.newSchedule.activity) {
+        if (!this.newSchedule.laboratory || !this.newSchedule.day || !this.newSchedule.time || !this.newSchedule.endTime || !this.newSchedule.activity) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Validation',
-                detail: 'Laboratory, Day, Time, and Activity are required'
+                detail: 'Laboratory, Day, Start Time, End Time, and Subject are required'
             });
             return;
         }
 
-        console.log('📤 Saving schedule:', this.newSchedule);
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Lab schedule saved successfully'
-        });
+        // Build the payload for the API
+        const payload = {
+            faculty: this.newSchedule.instructor || '',
+            subject: this.newSchedule.activity,
+            startTime: this.newSchedule.time,
+            endTime: this.newSchedule.endTime,
+            dayOfWeek: this.newSchedule.day
+        };
 
-        this.closeDialog();
-        this.loadSchedules();
+        console.log('📤 Saving schedule with payload:', payload);
+        console.log('🔗 Laboratory ID:', this.newSchedule.laboratory);
+
+        const scheduleUrl = `${environment.apiUrl}/laboratories/${this.newSchedule.laboratory}/schedules`;
+        console.log('📡 Posting to:', scheduleUrl);
+
+        this.http.post<any>(scheduleUrl, payload).subscribe({
+            next: (response: any) => {
+                console.log('✅ Schedule created successfully:', response);
+
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Lab schedule created successfully'
+                });
+
+                this.closeDialog();
+                this.loadSchedules();
+            },
+            error: (error: any) => {
+                console.error('❌ Error creating schedule:', error);
+                console.error('Error status:', error?.status);
+                console.error('Error message:', error?.message);
+                console.error('Error details:', error?.error);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to create schedule: ' + (error?.error?.message || error?.message)
+                });
+            }
+        });
     }
 
     view(schedule: any) {
