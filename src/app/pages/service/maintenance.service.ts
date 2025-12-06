@@ -152,4 +152,25 @@ export class MaintenanceService {
         console.log('📡 Fetching Maintenance Approvals:', url);
         return this.http.get<any[]>(url);
     }
+
+    // Get Maintenance Request by ID
+    getMaintenanceRequest(id: string): Observable<any> {
+        const url = `${this.baseApiUrl}/maintenance-requests/${id}`;
+        console.log('📡 Fetching Maintenance Request:', url);
+        return this.http.get<any>(url);
+    }
+
+    // Update Maintenance Request
+    updateMaintenanceRequest(id: string, body: Partial<MaintenanceRequestPayload>): Observable<any> {
+        const url = `${this.baseApiUrl}/maintenance-requests/${id}`;
+        console.log('📡 Updating Maintenance Request:', url, body);
+        return this.http.put<any>(url, body);
+    }
+
+    // Delete Maintenance Request
+    deleteMaintenanceRequest(id: string): Observable<void> {
+        const url = `${this.baseApiUrl}/maintenance-requests/${id}`;
+        console.log('📡 Deleting Maintenance Request:', url);
+        return this.http.delete<void>(url);
+    }
 }

@@ -978,7 +978,25 @@ export class AssetsComponent implements OnInit {
 
     view(item: Asset) {
         console.log('👁️ Viewing asset:', item);
-        this.messageService.add({ severity: 'info', summary: 'View Asset', detail: `Viewing: ${item.AssetName}` });
+        const assetName = item.assetName || item.AssetName || 'Unknown Asset';
+        const html = `
+            <div style="text-align: left;">
+                <p><strong>Asset Name:</strong> ${assetName}</p>
+                <p><strong>Asset ID:</strong> ${item.assetId || 'N/A'}</p>
+                <p><strong>Property Number:</strong> ${item.propertyNumber || item.PropertyNo || 'N/A'}</p>
+                <p><strong>Category:</strong> ${item.category || item.Category || 'N/A'}</p>
+                <p><strong>Found Cluster:</strong> ${item.foundCluster || item.FoundCluster || 'N/A'}</p>
+                <p><strong>Issued To:</strong> ${item.issuedTo || item.IssuedTo || 'N/A'}</p>
+                <p><strong>Purpose:</strong> ${item.purpose || item.Purpose || 'N/A'}</p>
+                <p><strong>Date Acquired:</strong> ${item.assetCreated || item.DateAcquired || 'N/A'}</p>
+            </div>
+        `;
+        Swal.fire({
+            title: 'Asset Details',
+            html,
+            icon: 'info',
+            confirmButtonText: 'Close'
+        });
     }
 
     edit(item: Asset) {

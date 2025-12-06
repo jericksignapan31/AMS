@@ -512,43 +512,89 @@ export class RequestmaintenanceComponent implements OnInit {
     }
 
     view(item: any) {
-        Swal.fire({ title: 'Maintenance Request', html: `<strong>Name:</strong> ${item.maintenanceName}`, icon: 'info' });
+        const requestId = item.maintenanceRequestId || item.id;
+        this.maintenanceService.getMaintenanceRequest(requestId).subscribe({
+            next: (data: any) => {
+                const html = `
+                    <div style="text-align: left;">
+                        <p><strong>Name:</strong> ${data.maintenanceName || 'N/A'}</p>
+                        <p><strong>Type:</strong> ${data.maintenanceTypeName || 'N/A'}</p>
+                        <p><strong>Service:</strong> ${data.serviceMaintenanceName || 'N/A'}</p>
+                        <p><strong>Asset:</strong> ${data.assetName || 'N/A'}</p>
+                        <p><strong>Priority:</strong> ${data.priorityLevelName || 'N/A'}</p>
+                        <p><strong>Description:</strong> ${data.description || 'N/A'}</p>
+                    </div>
+                `;
+                Swal.fire({ title: 'Maintenance Request Details', html, icon: 'info' });
+            },
+            error: (err) => {
+                console.error('Error fetching maintenance request:', err);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load maintenance request details' });
+            }
+        });
     }
 
     edit(item: any) {
-        Swal.fire({
-            title: 'Edit Maintenance Request',
-            html: `<input type="text" id="maintenanceName" class="swal2-input" value="${item.maintenanceName}" />`,
-            confirmButtonText: 'Update',
-            cancelButtonText: 'Cancel',
-            showCancelButton: true,
-            preConfirm: () => {
-                const maintenanceName = (document.getElementById('maintenanceName') as HTMLInputElement)?.value.trim();
-                if (!maintenanceName) {
-                    Swal.showValidationMessage('Maintenance name is required');
-                    return false;
-                }
-                return { maintenanceName };
-            }
-        }).then((result) => {
-            if (result.isConfirmed && result.value) {
-                this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Maintenance request updated' });
-                this.loadItems();
+        const requestId = item.maintenanceRequestId || item.id;
+        this.maintenanceService.getMaintenanceRequest(requestId).subscribe({
+            next: (data: any) => {
+                Swal.fire({
+                    title: 'Edit Maintenance Request',
+                    html: `<input type="text" id="maintenanceName" class="swal2-input" value="${data.maintenanceName || ''}" placeholder="Maintenance Name" />`,
+                    confirmButtonText: 'Update',
+                    cancelButtonText: 'Cancel',
+                    showCancelButton: true,
+                    preConfirm: () => {
+                        const maintenanceName = (document.getElementById('maintenanceName') as HTMLInputElement)?.value.trim();
+                        if (!maintenanceName) {
+                            Swal.showValidationMessage('Maintenance name is required');
+                            return false;
+                        }
+                        return { maintenanceName };
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                        this.maintenanceService.updateMaintenanceRequest(requestId, result.value).subscribe({
+                            next: () => {
+                                this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Maintenance request updated successfully' });
+                                this.loadItems();
+                            },
+                            error: (err) => {
+                                console.error('Error updating maintenance request:', err);
+                                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update maintenance request' });
+                            }
+                        });
+                    }
+                });
+            },
+            error: (err) => {
+                console.error('Error fetching maintenance request:', err);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load maintenance request' });
             }
         });
     }
 
     delete(item: any) {
+        const requestId = item.maintenanceRequestId || item.id;
+        const requestName = item.maintenanceName || 'Maintenance Request';
         Swal.fire({
             title: 'Delete Maintenance Request',
-            text: `Delete "${item.maintenanceName}"?`,
+            text: `Delete "${requestName}"?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Delete'
         }).then((result) => {
             if (result.isConfirmed) {
-                this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Maintenance request deleted' });
-                this.loadItems();
+                this.maintenanceService.deleteMaintenanceRequest(requestId).subscribe({
+                    next: () => {
+                        this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Maintenance request deleted successfully' });
+                        this.loadItems();
+                    },
+                    error: (err) => {
+                        console.error('Error deleting maintenance request:', err);
+                        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete maintenance request' });
+                    }
+                });
             }
         });
     }
