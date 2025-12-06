@@ -57,17 +57,7 @@ import { environment } from '../../../environments/environment';
             <ng-template #end>
                 <div class="flex items-center gap-2">
                     <label class="font-semibold mr-2">Filter by Laboratory:</label>
-                    <p-select
-                        [(ngModel)]="selectedLaboratory"
-                        [options]="laboratories"
-                        optionLabel="laboratoryName"
-                        optionValue="laboratoryId"
-                        placeholder="All Laboratories"
-                        [showClear]="true"
-                        styleClass="w-64"
-                        appendTo="body"
-                        (onChange)="onLaboratoryFilterChange()"
-                    />
+                    <p-select [(ngModel)]="selectedLaboratory" [options]="laboratories" optionLabel="laboratoryName" placeholder="All Laboratories" [showClear]="true" styleClass="w-64" appendTo="body" (onChange)="onLaboratoryFilterChange()" />
                 </div>
             </ng-template>
         </p-toolbar>
@@ -88,10 +78,21 @@ import { environment } from '../../../environments/environment';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let timeSlot of timeSlots">
+                        <tr *ngFor="let timeSlot of timeSlots; let timeIndex = index">
                             <td class="time-cell">{{ timeSlot }}</td>
                             <td *ngFor="let day of daysOfWeek" class="schedule-cell">
-                                <!-- Schedule blocks will be rendered here -->
+                                <div
+                                    *ngFor="let schedule of getSchedulesStartingAtSlot(timeIndex, day)"
+                                    [ngClass]="'schedule-block ' + getScheduleColor(schedule)"
+                                    [style.grid-row]="'span ' + getRowSpan(schedule)"
+                                    [style.height]="getRowSpan(schedule) * 60 + 'px'"
+                                    class="p-3 rounded cursor-pointer hover:opacity-80 transition-opacity text-white flex flex-col items-center justify-center"
+                                    (click)="viewSchedule(schedule)"
+                                >
+                                    <div class="text-sm font-bold">{{ schedule.subject?.subjectCode }}</div>
+                                    <div class="text-xs mt-1">{{ schedule.faculty?.firstName }} {{ schedule.faculty?.lastName }}</div>
+                                    <div class="text-xs mt-1 font-semibold">{{ schedule.startTime }} - {{ schedule.endTime }}</div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -425,6 +426,107 @@ export class LabScheduleComponent implements OnInit {
             severity: 'warn',
             summary: 'Delete Schedule',
             detail: `Delete: ${schedule.activity}?`
+        });
+    }
+
+    // Convert time string (HH:MM) to minutes for comparison
+    timeToMinutes(timeString: string): number {
+        if (!timeString) return 0;
+        const [hours, minutes] = timeString.split(':').map(Number);
+        return hours * 60 + minutes;
+    }
+
+    // Extract time from time slot string (e.g., "07:00 AM" -> 420)
+    timeSlotToMinutes(timeSlot: string): number {
+        const match = timeSlot.match(/(\d{2}):(\d{2})\s(AM|PM)/);
+        if (!match) return 0;
+
+        let hours = parseInt(match[1]);
+        const minutes = parseInt(match[2]);
+        const ampm = match[3];
+
+        if (ampm === 'PM' && hours !== 12) {
+            hours += 12;
+        } else if (ampm === 'AM' && hours === 12) {
+            hours = 0;
+        }
+
+        return hours * 60 + minutes;
+    }
+
+    // Get schedules that START at a specific time slot and day (for card display)
+    getSchedulesStartingAtSlot(timeIndex: number, day: string): any[] {
+        if (!this.schedules || this.schedules.length === 0) {
+            return [];
+        }
+
+        const timeSlot = this.timeSlots[timeIndex];
+        const slotMinutes = this.timeSlotToMinutes(timeSlot);
+
+        return this.schedules.filter((schedule) => {
+            if (schedule.dayOfWeek !== day) {
+                return false;
+            }
+
+            const startMinutes = this.timeToMinutes(schedule.startTime);
+
+            // Only return schedules that START at this time slot
+            return slotMinutes === startMinutes;
+        });
+    }
+
+    // Get schedules that occupy a specific time slot and day
+    getSchedulesForCell(timeIndex: number, day: string): any[] {
+        if (!this.schedules || this.schedules.length === 0) {
+            return [];
+        }
+
+        const timeSlot = this.timeSlots[timeIndex];
+        const slotMinutes = this.timeSlotToMinutes(timeSlot);
+
+        return this.schedules.filter((schedule) => {
+            if (schedule.dayOfWeek !== day) {
+                return false;
+            }
+
+            const startMinutes = this.timeToMinutes(schedule.startTime);
+            const endMinutes = this.timeToMinutes(schedule.endTime);
+
+            // Check if this time slot is within the schedule's start and end time
+            return slotMinutes >= startMinutes && slotMinutes < endMinutes;
+        });
+    }
+
+    // Calculate how many rows a schedule should span (30-min intervals)
+    getRowSpan(schedule: any): number {
+        const startMinutes = this.timeToMinutes(schedule.startTime);
+        const endMinutes = this.timeToMinutes(schedule.endTime);
+        const durationMinutes = endMinutes - startMinutes;
+
+        // Each row is 30 minutes, so divide by 30
+        return Math.ceil(durationMinutes / 30);
+    }
+
+    // Get color class for schedule based on subject
+    getScheduleColor(schedule: any): string {
+        const colors = ['bg-green-500', 'bg-pink-500', 'bg-gray-700', 'bg-blue-600', 'bg-cyan-500', 'bg-yellow-500', 'bg-indigo-600'];
+
+        // Use subject ID to consistently assign the same color
+        if (schedule.subject && schedule.subject.subjectId) {
+            const hashCode = schedule.subject.subjectId.charCodeAt(0);
+            return colors[hashCode % colors.length];
+        }
+
+        return colors[0];
+    }
+
+    // View schedule details
+    viewSchedule(schedule: any) {
+        console.log('👁️ Viewing schedule:', schedule);
+        this.messageService.add({
+            severity: 'info',
+            summary: 'Schedule Details',
+            detail: `${schedule.subject?.subjectName} - ${schedule.faculty?.firstName} ${schedule.faculty?.lastName}`
         });
     }
 }
