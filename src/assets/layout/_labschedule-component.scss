@@ -83,6 +83,10 @@
                     overflow: visible;
                     position: relative;
                     padding: 2px;
+                    display: grid;
+                    grid-auto-rows: 60px;
+                    grid-auto-flow: row;
+                    align-content: start;
 
                     .schedule-block {
                         width: calc(100% - 4px);

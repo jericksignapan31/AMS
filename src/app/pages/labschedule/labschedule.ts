@@ -85,7 +85,7 @@ import { environment } from '../../../environments/environment';
                                     *ngFor="let schedule of getSchedulesStartingAtSlot(timeIndex, day)"
                                     [ngClass]="'schedule-block ' + getScheduleColor(schedule)"
                                     [style.grid-row]="'span ' + getRowSpan(schedule)"
-                                    [style.height.px]="getRowSpan(schedule) * 60"
+                                    [style.min-height.px]="getRowSpan(schedule) * 60"
                                     class="p-3 rounded cursor-pointer hover:opacity-80 transition-opacity text-white flex flex-col items-center justify-center"
                                     (click)="viewSchedule(schedule)"
                                 >
@@ -470,8 +470,11 @@ export class LabScheduleComponent implements OnInit {
 
             const startMinutes = this.timeToMinutes(schedule.startTime);
 
-            // Only return schedules that START at this time slot
-            return slotMinutes === startMinutes;
+            // Round down the schedule start time to the nearest 30-minute interval
+            const roundedStartMinutes = Math.floor(startMinutes / 30) * 30;
+
+            // Only return schedules that START at or before this time slot
+            return slotMinutes === roundedStartMinutes;
         });
     }
 
