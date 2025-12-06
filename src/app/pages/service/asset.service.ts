@@ -139,7 +139,7 @@ export class AssetService {
         return this.http.put<Asset>(`${this.apiUrl}/${id}`, asset);
     }
 
-    deleteAsset(id: number): Observable<void> {
+    deleteAsset(id: string | number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 

@@ -21,6 +21,7 @@ import { StepperModule } from 'primeng/stepper';
 import { MessageService } from 'primeng/api';
 import { AssetService, Asset, Program, Supplier, Location, Color, Brand, Status, Laboratory } from '../service/asset.service';
 import { MaintenanceService, MaintenanceRequestPayload } from '../service/maintenance.service';
+import { environment } from '../../../environments/environment';
 import jsQR from 'jsqr';
 import Swal from 'sweetalert2';
 
@@ -976,15 +977,69 @@ export class AssetsComponent implements OnInit {
     }
 
     view(item: Asset) {
+        console.log('👁️ Viewing asset:', item);
         this.messageService.add({ severity: 'info', summary: 'View Asset', detail: `Viewing: ${item.AssetName}` });
     }
 
     edit(item: Asset) {
+        if (!item || !item.assetId) {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Asset data is missing' });
+            return;
+        }
+        console.log('✏️ Editing asset:', item);
+        this.newAsset = { ...item };
+        this.assetDialog = true;
+        this.currentStep = 0;
         this.messageService.add({ severity: 'info', summary: 'Edit Asset', detail: `Editing: ${item.AssetName}` });
     }
 
     delete(item: Asset) {
-        this.messageService.add({ severity: 'warn', summary: 'Delete Asset', detail: `Delete: ${item.AssetName}?` });
+        if (!item || !item.assetId) {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Asset data is missing' });
+            return;
+        }
+
+        const assetName = item.assetName || item.AssetName || 'Unknown Asset';
+        const assetId = item.assetId;
+
+        console.log('🗑️ Deleting asset:', item);
+        Swal.fire({
+            title: 'Delete Asset?',
+            text: `Are you sure you want to delete ${assetName}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log('✅ Confirmed delete for asset:', assetId);
+
+                // Call DELETE API
+                console.log('📡 Deleting asset with ID:', assetId);
+
+                this.assetService.deleteAsset(assetId as any).subscribe({
+                    next: (response: any) => {
+                        console.log('✅ Asset deleted successfully:', response);
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Deleted',
+                            detail: `Asset ${assetName} deleted successfully`
+                        });
+                        this.loadAssets();
+                    },
+                    error: (error: any) => {
+                        console.error('❌ Error deleting asset:', error);
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Error',
+                            detail: `Failed to delete asset: ${error?.error?.message || error?.message}`
+                        });
+                    }
+                });
+            }
+        });
     }
 
     deleteSelected() {
