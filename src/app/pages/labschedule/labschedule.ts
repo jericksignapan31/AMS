@@ -85,7 +85,7 @@ import { environment } from '../../../environments/environment';
                                     *ngFor="let schedule of getSchedulesStartingAtSlot(timeIndex, day)"
                                     [ngClass]="'schedule-block ' + getScheduleColor(schedule)"
                                     [style.grid-row]="'span ' + getRowSpan(schedule)"
-                                    [style.height]="getRowSpan(schedule) * 60 + 'px'"
+                                    [style.height]="getRowSpan(schedule) * 2 + 'rem'"
                                     class="p-3 rounded cursor-pointer hover:opacity-80 transition-opacity text-white flex flex-col items-center justify-center"
                                     (click)="viewSchedule(schedule)"
                                 >
