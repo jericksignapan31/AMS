@@ -85,7 +85,7 @@ import { environment } from '../../../environments/environment';
                                     *ngFor="let schedule of getSchedulesStartingAtSlot(timeIndex, day)"
                                     [ngClass]="'schedule-block ' + getScheduleColor(schedule)"
                                     [style.grid-row]="'span ' + getRowSpan(schedule)"
-                                    [style.height]="getRowSpan(schedule) * 2 + 'rem'"
+                                    [style.height.px]="getRowSpan(schedule) * 60"
                                     class="p-3 rounded cursor-pointer hover:opacity-80 transition-opacity text-white flex flex-col items-center justify-center"
                                     (click)="viewSchedule(schedule)"
                                 >
@@ -504,7 +504,10 @@ export class LabScheduleComponent implements OnInit {
         const durationMinutes = endMinutes - startMinutes;
 
         // Each row is 30 minutes, so divide by 30
-        return Math.ceil(durationMinutes / 30);
+        const rowSpan = Math.ceil(durationMinutes / 30);
+        console.log(`📏 Schedule: ${schedule.subject?.subjectCode} | Start: ${schedule.startTime} (${startMinutes}min) | End: ${schedule.endTime} (${endMinutes}min) | Duration: ${durationMinutes}min | Rows: ${rowSpan}`);
+
+        return rowSpan;
     }
 
     // Get color class for schedule based on subject
