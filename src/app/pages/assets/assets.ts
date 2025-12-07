@@ -1004,11 +1004,77 @@ export class AssetsComponent implements OnInit {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Asset data is missing' });
             return;
         }
-        console.log('✏️ Editing asset:', item);
-        this.newAsset = { ...item };
-        this.assetDialog = true;
-        this.currentStep = 0;
-        this.messageService.add({ severity: 'info', summary: 'Edit Asset', detail: `Editing: ${item.AssetName}` });
+        const assetId = item.assetId;
+        const assetName = item.assetName || item.AssetName || '';
+        const propertyNumber = item.propertyNumber || item.PropertyNo || '';
+        const category = item.category || item.Category || '';
+        const foundCluster = item.foundCluster || item.FoundCluster || '';
+        const purpose = item.purpose || item.Purpose || '';
+        const issuedTo = item.issuedTo || item.IssuedTo || '';
+        const program = item.Program_id || '';
+        const status = item.Status_id || '';
+        const supplier = item.Supplier_id || '';
+        const location = item.Location_id || '';
+
+        const html = `
+            <div style="display: grid; gap: 10px; text-align: left;">
+                <label>Asset Name: <input type="text" id="assetName" class="swal2-input" value="${assetName}" placeholder="Asset Name" /></label>
+                <label>Property Number: <input type="text" id="propertyNumber" class="swal2-input" value="${propertyNumber}" placeholder="Property Number" /></label>
+                <label>Category: <input type="text" id="category" class="swal2-input" value="${category}" placeholder="Category" /></label>
+                <label>Found Cluster: <input type="text" id="foundCluster" class="swal2-input" value="${foundCluster}" placeholder="Found Cluster" /></label>
+                <label>Purpose: <input type="text" id="purpose" class="swal2-input" value="${purpose}" placeholder="Purpose" /></label>
+                <label>Issued To: <input type="text" id="issuedTo" class="swal2-input" value="${issuedTo}" placeholder="Issued To" /></label>
+                <label>Program: <input type="text" id="program" class="swal2-input" value="${program}" placeholder="Program" /></label>
+                <label>Status: <input type="text" id="status" class="swal2-input" value="${status}" placeholder="Status" /></label>
+                <label>Supplier: <input type="text" id="supplier" class="swal2-input" value="${supplier}" placeholder="Supplier" /></label>
+                <label>Location: <input type="text" id="location" class="swal2-input" value="${location}" placeholder="Location" /></label>
+            </div>
+        `;
+
+        Swal.fire({
+            title: 'Edit Asset',
+            html,
+            confirmButtonText: 'Update',
+            cancelButtonText: 'Cancel',
+            showCancelButton: true,
+            didOpen: () => {
+                // Auto-focus first input
+                (document.getElementById('assetName') as HTMLInputElement)?.focus();
+            },
+            preConfirm: () => {
+                const assetNameVal = (document.getElementById('assetName') as HTMLInputElement)?.value.trim();
+                if (!assetNameVal) {
+                    Swal.showValidationMessage('Asset name is required');
+                    return false;
+                }
+
+                return {
+                    assetName: assetNameVal,
+                    propertyNumber: (document.getElementById('propertyNumber') as HTMLInputElement)?.value.trim(),
+                    category: (document.getElementById('category') as HTMLInputElement)?.value.trim(),
+                    foundCluster: (document.getElementById('foundCluster') as HTMLInputElement)?.value.trim(),
+                    purpose: (document.getElementById('purpose') as HTMLInputElement)?.value.trim(),
+                    issuedTo: (document.getElementById('issuedTo') as HTMLInputElement)?.value.trim(),
+                    Program_id: (document.getElementById('program') as HTMLInputElement)?.value.trim(),
+                    Status_id: (document.getElementById('status') as HTMLInputElement)?.value.trim(),
+                    Supplier_id: (document.getElementById('supplier') as HTMLInputElement)?.value.trim(),
+                    Location_id: (document.getElementById('location') as HTMLInputElement)?.value.trim()
+                };
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                this.assetService.patchAsset(assetId as any, result.value).subscribe({
+                    next: () => {
+                        this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Asset updated successfully' });
+                        this.loadAssets();
+                    },
+                    error: (err) => {
+                        console.error('Error updating asset:', err);
+                        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update asset' });
+                    }
+                });
+            }
+        });
     }
 
     delete(item: Asset) {

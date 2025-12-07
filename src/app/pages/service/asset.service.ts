@@ -139,6 +139,10 @@ export class AssetService {
         return this.http.put<Asset>(`${this.apiUrl}/${id}`, asset);
     }
 
+    patchAsset(id: string | number, asset: Partial<Asset>): Observable<Asset> {
+        return this.http.patch<Asset>(`${this.apiUrl}/${id}`, asset);
+    }
+
     deleteAsset(id: string | number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
