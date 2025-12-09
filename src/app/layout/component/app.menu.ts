@@ -126,6 +126,16 @@ export class AppMenu implements OnInit {
                         routerLink: ['/app/pages/users']
                     },
                     {
+                        label: 'Assets',
+                        icon: 'pi pi-fw pi-pencil',
+                        routerLink: ['/app/crud']
+                    },
+                    {
+                        label: 'Request Maintenance',
+                        icon: 'pi pi-fw pi-wrench',
+                        routerLink: ['/app/requestmaintenance']
+                    },
+                    {
                         label: 'Campuses',
                         icon: 'pi pi-fw pi-building',
                         routerLink: ['/app/pages/campuses']
@@ -134,6 +144,11 @@ export class AppMenu implements OnInit {
                         label: 'Departments',
                         icon: 'pi pi-fw pi-building-columns',
                         routerLink: ['/app/pages/departments']
+                    },
+                    {
+                        label: 'Lab Schedule',
+                        icon: 'pi pi-fw pi-calendar',
+                        routerLink: ['/app/pages/labschedule']
                     }
                 ]
             }
@@ -154,6 +169,21 @@ export class AppMenu implements OnInit {
                         label: 'Users',
                         icon: 'pi pi-fw pi-users',
                         routerLink: ['/app/pages/users']
+                    },
+                    {
+                        label: 'Assets',
+                        icon: 'pi pi-fw pi-pencil',
+                        routerLink: ['/app/crud']
+                    },
+                    {
+                        label: 'Request Maintenance',
+                        icon: 'pi pi-fw pi-wrench',
+                        routerLink: ['/app/requestmaintenance']
+                    },
+                    {
+                        label: 'Campuses',
+                        icon: 'pi pi-fw pi-building',
+                        routerLink: ['/app/pages/campuses']
                     },
                     {
                         label: 'Departments',
