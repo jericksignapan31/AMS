@@ -26,7 +26,7 @@ import { AssetService } from '../../service/asset.service';
                     <td style="width: 25%; min-width: 8rem;">{{ asset.category || asset.Category || 'N/A' }}</td>
                     <td style="width: 20%;">
                         <span class="inline-flex align-items-center gap-2">
-                            <span [ngClass]="{'text-green-600': asset.Status_id === '1', 'text-red-600': asset.Status_id !== '1'}">
+                            <span [ngClass]="{ 'text-green-600': asset.Status_id === '1', 'text-red-600': asset.Status_id !== '1' }">
                                 {{ asset.Status_id === '1' ? '● Active' : '● Inactive' }}
                             </span>
                         </span>

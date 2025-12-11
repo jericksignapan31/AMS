@@ -37,13 +37,7 @@ import { MaintenanceService } from '../../service/maintenance.service';
                         <p class="text-3xl font-bold">{{ totalRequests }}</p>
                     </div>
 
-                    <p-button 
-                        label="View Maintenance Report" 
-                        routerLink="/reports/maintenance"
-                        icon="pi pi-arrow-right" 
-                        iconPos="right"
-                        class="w-full"
-                        severity="warn" />
+                    <p-button label="View Maintenance Report" routerLink="/reports/maintenance" icon="pi pi-arrow-right" iconPos="right" class="w-full" severity="warn" />
                 </div>
             </p-card>
         </div>

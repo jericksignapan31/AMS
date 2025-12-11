@@ -45,25 +45,24 @@ export class RevenueStreamWidget implements OnInit {
 
     processChartData(data: any[]) {
         const monthCount: { [key: string]: number } = {
-            'January': 0,
-            'February': 0,
-            'March': 0,
-            'April': 0,
-            'May': 0,
-            'June': 0,
-            'July': 0,
-            'August': 0,
-            'September': 0,
-            'October': 0,
-            'November': 0,
-            'December': 0
+            January: 0,
+            February: 0,
+            March: 0,
+            April: 0,
+            May: 0,
+            June: 0,
+            July: 0,
+            August: 0,
+            September: 0,
+            October: 0,
+            November: 0,
+            December: 0
         };
 
         data.forEach((req: any) => {
             if (req.createdDate) {
                 const date = new Date(req.createdDate);
-                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                                   'July', 'August', 'September', 'October', 'November', 'December'];
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                 const monthName = monthNames[date.getMonth()];
                 if (monthName in monthCount) {
                     monthCount[monthName]++;
@@ -75,9 +74,8 @@ export class RevenueStreamWidget implements OnInit {
         const now = new Date();
         const months: string[] = [];
         const counts: number[] = [];
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                           'July', 'August', 'September', 'October', 'November', 'December'];
-        
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
         for (let i = 11; i >= 0; i--) {
             const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
             const monthName = monthNames[d.getMonth()];

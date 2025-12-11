@@ -58,7 +58,7 @@ export class BestSellingWidget implements OnInit {
         this.maintenanceService.getMaintenanceRequests().subscribe({
             next: (data: any[]) => {
                 const assetCount: { [key: string]: number } = {};
-                
+
                 data.forEach((req: any) => {
                     const assetName = req.assetName || 'Unknown Asset';
                     assetCount[assetName] = (assetCount[assetName] || 0) + 1;
@@ -66,14 +66,14 @@ export class BestSellingWidget implements OnInit {
 
                 const total = Object.values(assetCount).reduce((a: number, b: number) => a + b, 0);
                 const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA502', '#8E44AD', '#2ECC71'];
-                
+
                 this.topAssets = Object.entries(assetCount)
                     .sort(([, a], [, b]) => b - a)
                     .slice(0, 6)
                     .map(([asset, count], index) => ({
                         assetName: asset,
                         count: count as number,
-                        percentage: Math.round((((count as number) / total) * 100)),
+                        percentage: Math.round(((count as number) / total) * 100),
                         color: colors[index % colors.length]
                     }));
 

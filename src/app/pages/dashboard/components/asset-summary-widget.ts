@@ -37,13 +37,7 @@ import { AssetService } from '../../service/asset.service';
                         <p class="text-3xl font-bold">{{ assetCategories }}</p>
                     </div>
 
-                    <p-button 
-                        label="View Asset Report" 
-                        routerLink="/reports/assets"
-                        icon="pi pi-arrow-right" 
-                        iconPos="right"
-                        class="w-full"
-                        severity="info" />
+                    <p-button label="View Asset Report" routerLink="/reports/assets" icon="pi pi-arrow-right" iconPos="right" class="w-full" severity="info" />
                 </div>
             </p-card>
         </div>

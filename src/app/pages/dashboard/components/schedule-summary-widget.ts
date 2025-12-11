@@ -38,13 +38,7 @@ import { environment } from '../../../../environments/environment';
                         <p class="text-3xl font-bold">{{ instructorCount }}</p>
                     </div>
 
-                    <p-button 
-                        label="View Schedule Report" 
-                        routerLink="/reports/schedule"
-                        icon="pi pi-arrow-right" 
-                        iconPos="right"
-                        class="w-full"
-                        severity="success" />
+                    <p-button label="View Schedule Report" routerLink="/reports/schedule" icon="pi pi-arrow-right" iconPos="right" class="w-full" severity="success" />
                 </div>
             </p-card>
         </div>
