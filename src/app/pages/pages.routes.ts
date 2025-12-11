@@ -13,6 +13,7 @@ import { MaintenancePriorityLevelComponent } from './maintenance/priority-level/
 import { MaintenanceTypesComponent } from './maintenance/types/maintenance-types';
 import { LabScheduleComponent } from './labschedule/labschedule';
 import { LaboratoriesComponent } from './laboratories/laboratories';
+import { REPORTS_ROUTES } from './reports/reports.routes';
 
 export const pageRoutes: Routes = [
     { path: 'users', component: UsersComponent },
@@ -30,6 +31,8 @@ export const pageRoutes: Routes = [
     { path: 'labschedule', component: LabScheduleComponent },
     { path: 'laboratories', component: LaboratoriesComponent },
     { path: 'laboratory/:id', component: LaboratoriesComponent },
+    // Reports routes
+    { path: 'reports', children: REPORTS_ROUTES },
     { path: '**', redirectTo: '/notfound' }
 ];
 
