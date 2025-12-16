@@ -254,6 +254,15 @@ export class AppMenu implements OnInit {
                         label: 'Lab Schedule',
                         icon: 'pi pi-fw pi-calendar',
                         routerLink: ['/app/pages/labschedule']
+                    },
+                    {
+                        label: 'Reports',
+                        icon: 'pi pi-fw pi-calendar',
+                        items: [
+                            { label: 'Preventive', icon: 'pi pi-fw pi-list', routerLink: ['/app/pages/reports/preventive'] },
+                            { label: 'Corrective', icon: 'pi pi-fw pi-truck', routerLink: ['/app/pages/reports/corrective'] },
+                            { label: 'Calibration', icon: 'pi pi-fw pi-map-marker', routerLink: ['/app/pages/reports/calibration'] }
+                        ]
                     }
                 ]
             },

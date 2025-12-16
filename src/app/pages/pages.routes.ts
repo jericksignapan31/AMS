@@ -13,7 +13,10 @@ import { MaintenancePriorityLevelComponent } from './maintenance/priority-level/
 import { MaintenanceTypesComponent } from './maintenance/types/maintenance-types';
 import { LabScheduleComponent } from './labschedule/labschedule';
 import { LaboratoriesComponent } from './laboratories/laboratories';
-import { REPORTS_ROUTES } from './reports/reports.routes';
+import { ReportsComponent } from './reports/reports.component';
+import { PreventiveReportComponent } from './reports/preventive-report';
+import { CorrectiveReportComponent } from './reports/corrective-report';
+import { CalibrationReportComponent } from './reports/calibration-report';
 
 export const pageRoutes: Routes = [
     { path: 'users', component: UsersComponent },
@@ -31,8 +34,11 @@ export const pageRoutes: Routes = [
     { path: 'labschedule', component: LabScheduleComponent },
     { path: 'laboratories', component: LaboratoriesComponent },
     { path: 'laboratory/:id', component: LaboratoriesComponent },
-    // Reports routes
-    { path: 'reports', children: REPORTS_ROUTES },
+    // Reports
+    { path: 'reports', component: ReportsComponent },
+    { path: 'reports/preventive', component: PreventiveReportComponent },
+    { path: 'reports/corrective', component: CorrectiveReportComponent },
+    { path: 'reports/calibration', component: CalibrationReportComponent },
     { path: '**', redirectTo: '/notfound' }
 ];
 
