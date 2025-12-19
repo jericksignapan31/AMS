@@ -97,6 +97,7 @@ import { TabsModule } from 'primeng/tabs';
                                 <th pSortableColumn="maintenanceName" style="min-width:18rem">Maintenance Name <p-sortIcon field="maintenanceName" /></th>
                                 <th style="min-width:15rem">Maintenance Type</th>
                                 <th style="min-width:15rem">Service Name</th>
+                                <th style="min-width:12rem">Priority</th>
                                 <th style="min-width:12rem">Request Date</th>
                                 <th style="min-width:15rem">Requested By</th>
                                 <th style="min-width:12rem">Status</th>
@@ -110,8 +111,9 @@ import { TabsModule } from 'primeng/tabs';
                                 <td>{{ row.maintenanceName }}</td>
                                 <td>{{ row.maintenanceType?.maintenanceTypeName || 'N/A' }}</td>
                                 <td>{{ row.serviceMaintenance?.serviceName || 'N/A' }}</td>
-                                <td>{{ row.createdAt | date: 'short' }}</td>
-                                <td>{{ row.user?.firstName }} {{ row.user?.lastName }}</td>
+                                <td><p-tag [value]="row.priorityLevel?.priorityLevelName" [severity]="getPrioritySeverity(row.priorityLevel?.priorityLevelName)" /></td>
+                                <td>{{ (row.requestDate || row.createdAt) | date: 'short' }}</td>
+                                <td>{{ getFullName(row) }}</td>
                                 <td><p-tag [value]="row.maintenanceStatus?.requestStatusName" /></td>
                                 <td>
                                     <div class="flex gap-2">
@@ -130,7 +132,7 @@ import { TabsModule } from 'primeng/tabs';
                         </ng-template>
                         <ng-template pTemplate="emptymessage">
                             <tr>
-                                <td colspan="9" class="text-center py-5">No pending requests found</td>
+                                <td colspan="10" class="text-center py-5">No pending requests found</td>
                             </tr>
                         </ng-template>
                     </p-table>
@@ -386,11 +388,33 @@ export class RequestmaintenanceComponent implements OnInit {
         return user?.role?.toLowerCase() === 'labtech';
     }
 
+    getFullName(row: any): string {
+        const firstName = row.requestedBy?.firstName || '';
+        const middleName = row.requestedBy?.middleName || '';
+        const lastName = row.requestedBy?.lastName || '';
+        return [firstName, middleName, lastName].filter(name => name.trim()).join(' ');
+    }
+
+    getPrioritySeverity(priorityLevel: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
+        const level = priorityLevel?.toLowerCase() || '';
+        if (level.includes('critical') || level.includes('urgent') || level.includes('high')) {
+            return 'danger';
+        } else if (level.includes('medium') || level.includes('moderate')) {
+            return 'warn';
+        } else if (level.includes('low')) {
+            return 'success';
+        }
+        return 'secondary';
+    }
+
     loadItems() {
         this.loading = true;
         this.maintenanceService.getMaintenanceRequests?.()?.subscribe({
             next: (data: any[]) => {
                 console.log('Maintenance Requests API Response:', data);
+                if (data && data.length > 0) {
+                    console.log('First item structure:', JSON.stringify(data[0], null, 2));
+                }
                 this.items = data || [];
                 this.categorizeItems();
                 this.loadApprovals();
