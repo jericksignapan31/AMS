@@ -1,26 +1,24 @@
 import {
   BaseModelHolder
-} from "./chunk-TPNOJE6O.js";
+} from "./chunk-5NGDX53P.js";
 import {
   Fluid
-} from "./chunk-ILTXSXVV.js";
+} from "./chunk-HQP6WWBM.js";
+import {
+  PARENT_INSTANCE
+} from "./chunk-HN3FT5WE.js";
+import {
+  BaseStyle
+} from "./chunk-WXGRKYUQ.js";
+import "./chunk-AEUBHVGT.js";
+import {
+  Bind
+} from "./chunk-SSPEJKN4.js";
 import {
   NgControl
 } from "./chunk-C225D66Z.js";
-import {
-  PARENT_INSTANCE
-} from "./chunk-G3TTX4VE.js";
-import {
-  BaseStyle
-} from "./chunk-SUSYHND3.js";
-import "./chunk-VVQ6QSXN.js";
-import {
-  Bind
-} from "./chunk-246XFSKK.js";
 import "./chunk-R2OVIKVM.js";
 import "./chunk-APPCZKFW.js";
-import "./chunk-OTTARZB5.js";
-import "./chunk-U4LT4ZJN.js";
 import {
   Directive,
   EventEmitter,
@@ -46,9 +44,11 @@ import {
   ɵɵgetInheritedFactory,
   ɵɵlistener
 } from "./chunk-QWPRYKF3.js";
-import "./chunk-JRFR6BLO.js";
 import "./chunk-HWYXSU2G.js";
+import "./chunk-JRFR6BLO.js";
 import "./chunk-MARUHEWW.js";
+import "./chunk-OTTARZB5.js";
+import "./chunk-U4LT4ZJN.js";
 import "./chunk-3OV72XIM.js";
 
 // node_modules/@primeuix/styles/dist/textarea/index.mjs

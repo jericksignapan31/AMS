@@ -1,35 +1,32 @@
 import {
   BaseEditableHolder
-} from "./chunk-ZRHA6UZY.js";
-import "./chunk-TPNOJE6O.js";
+} from "./chunk-6OGXVJQK.js";
+import "./chunk-5NGDX53P.js";
 import {
   AutoFocus,
   AutoFocusModule
-} from "./chunk-RRUN4ZL6.js";
+} from "./chunk-RVGJXB7F.js";
 import {
   ConnectedOverlayScrollHandler,
   DomHandler
 } from "./chunk-P6SMTJBG.js";
 import {
-  NG_VALUE_ACCESSOR
-} from "./chunk-C225D66Z.js";
-import {
   zindexutils
 } from "./chunk-CMVOE67Z.js";
 import {
   PARENT_INSTANCE
-} from "./chunk-G3TTX4VE.js";
+} from "./chunk-HN3FT5WE.js";
 import {
   BaseStyle
-} from "./chunk-SUSYHND3.js";
+} from "./chunk-WXGRKYUQ.js";
 import {
   OverlayService,
   SharedModule,
   TranslationKeys
-} from "./chunk-VVQ6QSXN.js";
+} from "./chunk-AEUBHVGT.js";
 import {
   Bind
-} from "./chunk-246XFSKK.js";
+} from "./chunk-SSPEJKN4.js";
 import "./chunk-Y3VPSMBK.js";
 import {
   animate,
@@ -38,17 +35,14 @@ import {
   trigger
 } from "./chunk-GGMOGVES.js";
 import {
+  NG_VALUE_ACCESSOR
+} from "./chunk-C225D66Z.js";
+import {
   CommonModule,
   NgIf,
   isPlatformBrowser
 } from "./chunk-R2OVIKVM.js";
 import "./chunk-APPCZKFW.js";
-import "./chunk-OTTARZB5.js";
-import {
-  D,
-  I,
-  Yt
-} from "./chunk-U4LT4ZJN.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -95,9 +89,15 @@ import {
   ɵɵtemplate,
   ɵɵviewQuery
 } from "./chunk-QWPRYKF3.js";
-import "./chunk-JRFR6BLO.js";
 import "./chunk-HWYXSU2G.js";
+import "./chunk-JRFR6BLO.js";
 import "./chunk-MARUHEWW.js";
+import "./chunk-OTTARZB5.js";
+import {
+  D,
+  I,
+  Yt
+} from "./chunk-U4LT4ZJN.js";
 import "./chunk-3OV72XIM.js";
 
 // node_modules/@primeuix/styles/dist/colorpicker/index.mjs
