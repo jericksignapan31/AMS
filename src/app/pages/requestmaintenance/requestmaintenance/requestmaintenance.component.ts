@@ -112,7 +112,7 @@ import { TabsModule } from 'primeng/tabs';
                                 <td>{{ row.maintenanceType?.maintenanceTypeName || 'N/A' }}</td>
                                 <td>{{ row.serviceMaintenance?.serviceName || 'N/A' }}</td>
                                 <td><p-tag [value]="row.priorityLevel?.priorityLevelName" [severity]="getPrioritySeverity(row.priorityLevel?.priorityLevelName)" /></td>
-                                <td>{{ (row.requestDate || row.createdAt) | date: 'short' }}</td>
+                                <td>{{ row.requestDate || row.createdAt | date: 'short' }}</td>
                                 <td>{{ getFullName(row) }}</td>
                                 <td><p-tag [value]="row.maintenanceStatus?.requestStatusName" /></td>
                                 <td>
@@ -392,7 +392,7 @@ export class RequestmaintenanceComponent implements OnInit {
         const firstName = row.requestedBy?.firstName || '';
         const middleName = row.requestedBy?.middleName || '';
         const lastName = row.requestedBy?.lastName || '';
-        return [firstName, middleName, lastName].filter(name => name.trim()).join(' ');
+        return [firstName, middleName, lastName].filter((name) => name.trim()).join(' ');
     }
 
     getPrioritySeverity(priorityLevel: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
