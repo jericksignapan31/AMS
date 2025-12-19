@@ -301,8 +301,24 @@ import { TabsModule } from 'primeng/tabs';
         <p-dialog [(visible)]="confirmModalVisible" [header]="'Complete Maintenance Request'" [modal]="true" [style]="{ width: '50vw' }">
             <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
-                    <label class="font-semibold">Completion Remarks</label>
-                    <textarea pInputTextarea [(ngModel)]="confirmFormData.remarks" rows="5" placeholder="Enter completion remarks..."></textarea>
+                    <label class="font-semibold">Remarks</label>
+                    <textarea pInputTextarea [(ngModel)]="confirmFormData.remarks" rows="3" placeholder="Enter remarks..."></textarea>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold">Action Taken</label>
+                    <textarea pInputTextarea [(ngModel)]="confirmFormData.actionTaken" rows="3" placeholder="Describe the action taken..."></textarea>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold">Observations</label>
+                    <textarea pInputTextarea [(ngModel)]="confirmFormData.observations" rows="3" placeholder="Enter observations..."></textarea>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold">Expected Reading</label>
+                    <input pInputText [(ngModel)]="confirmFormData.expectedReading" type="text" placeholder="Enter expected reading..." />
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold">Actual Reading</label>
+                    <input pInputText [(ngModel)]="confirmFormData.actualReading" type="text" placeholder="Enter actual reading..." />
                 </div>
             </div>
             <ng-template pTemplate="footer">
@@ -328,7 +344,13 @@ export class RequestmaintenanceComponent implements OnInit {
     approveModalVisible: boolean = false;
     confirmModalVisible: boolean = false;
     approveFormData: any = { dateScheduled: null, remarks: '' };
-    confirmFormData: any = { remarks: '' };
+    confirmFormData: any = {
+        remarks: '',
+        actionTaken: '',
+        observations: '',
+        expectedReading: '',
+        actualReading: ''
+    };
     selectedItem: any = null;
 
     constructor(
@@ -632,13 +654,33 @@ export class RequestmaintenanceComponent implements OnInit {
     confirm(row: any) {
         console.log('Confirm clicked - Selected approval item:', row);
         this.selectedItem = row;
-        this.confirmFormData = { remarks: row.remarks || '' };
-        this.confirmModalVisible = true;
+        this.loading = true;
+
+        // Fetch maintenance approval details from API
+        this.maintenanceService.getMaintenanceApprovalDetails(row.maintenanceApprovalId).subscribe({
+            next: (data: any) => {
+                console.log('Maintenance approval details loaded:', data);
+                this.confirmFormData = {
+                    remarks: data.remarks || '',
+                    actionTaken: data.actionTaken || '',
+                    observations: data.observations || '',
+                    expectedReading: data.expectedReading || '',
+                    actualReading: data.actualReading || ''
+                };
+                this.confirmModalVisible = true;
+                this.loading = false;
+            },
+            error: (error: any) => {
+                console.error('Error loading maintenance approval details:', error);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load approval details' });
+                this.loading = false;
+            }
+        });
     }
 
     confirmCompletion() {
         if (!this.confirmFormData.remarks.trim()) {
-            this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Completion remarks is required' });
+            this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Remarks is required' });
             return;
         }
 
@@ -647,7 +689,11 @@ export class RequestmaintenanceComponent implements OnInit {
             remarks: this.confirmFormData.remarks.trim(),
             scheduledAt: this.selectedItem.scheduledAt || new Date(),
             isApproved: true,
-            isCompleted: true
+            isCompleted: true,
+            actionTaken: this.confirmFormData.actionTaken.trim(),
+            observations: this.confirmFormData.observations.trim(),
+            expectedReading: this.confirmFormData.expectedReading.trim(),
+            actualReading: this.confirmFormData.actualReading.trim()
         };
 
         console.log('Sending completion payload:', completionPayload);

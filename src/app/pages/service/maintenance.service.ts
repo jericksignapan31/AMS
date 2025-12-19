@@ -153,6 +153,13 @@ export class MaintenanceService {
         return this.http.get<any[]>(url);
     }
 
+    // Get Maintenance Approval Details by ID
+    getMaintenanceApprovalDetails(id: string): Observable<any> {
+        const url = `${this.baseApiUrl}/maintenance-approvals/${id}`;
+        console.log('📡 Fetching Maintenance Approval Details:', url);
+        return this.http.get<any>(url);
+    }
+
     // Get Maintenance Request by ID
     getMaintenanceRequest(id: string): Observable<any> {
         const url = `${this.baseApiUrl}/maintenance-requests/${id}`;
