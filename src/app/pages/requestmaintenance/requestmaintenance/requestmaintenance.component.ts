@@ -244,24 +244,34 @@ import { TabsModule } from 'primeng/tabs';
                         (selectionChange)="onSelectionChange($event)"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} completed approvals"
                         [showCurrentPageReport]="true"
-                        [tableStyle]="{ 'min-width': '70rem' }"
+                        [tableStyle]="{ 'min-width': '120rem' }"
                     >
                         <ng-template pTemplate="header">
                             <tr>
                                 <th style="width:3rem"><p-tableHeaderCheckbox /></th>
-                                <th style="min-width:25rem">ID</th>
-                                <th pSortableColumn="maintenanceRequest.maintenanceName" style="min-width:20rem">Maintenance Name <p-sortIcon field="maintenanceRequest.maintenanceName" /></th>
-                                <th style="min-width:15rem">Completed Date</th>
-                                <th style="min-width:15rem">Status</th>
+                                <th style="min-width:20rem">ID</th>
+                                <th pSortableColumn="maintenanceRequest.maintenanceName" style="min-width:18rem">Maintenance Name <p-sortIcon field="maintenanceRequest.maintenanceName" /></th>
+                                <th style="min-width:12rem">Scheduled Date</th>
+                                <th style="min-width:15rem">Remarks</th>
+                                <th style="min-width:15rem">Action Taken</th>
+                                <th style="min-width:15rem">Observations</th>
+                                <th style="min-width:12rem">Expected Reading</th>
+                                <th style="min-width:12rem">Actual Reading</th>
+                                <th style="min-width:10rem">Status</th>
                                 <th style="min-width:12rem">Actions</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-row>
                             <tr>
                                 <td><p-tableCheckbox [value]="row" /></td>
-                                <td>{{ row.maintenanceRequest?.requestId }}</td>
+                                <td>{{ row.maintenanceApprovalId }}</td>
                                 <td>{{ row.maintenanceRequest?.maintenanceName }}</td>
-                                <td>{{ row.approvedAt | date: 'short' }}</td>
+                                <td>{{ row.scheduledAt | date: 'short' }}</td>
+                                <td>{{ row.remarks || 'N/A' }}</td>
+                                <td>{{ row.actionTaken || 'N/A' }}</td>
+                                <td>{{ row.observations || 'N/A' }}</td>
+                                <td>{{ row.expectedReading || 'N/A' }}</td>
+                                <td>{{ row.actualReading || 'N/A' }}</td>
                                 <td><p-tag value="Completed" severity="success" /></td>
                                 <td>
                                     <div class="flex gap-2">
@@ -273,7 +283,7 @@ import { TabsModule } from 'primeng/tabs';
                         </ng-template>
                         <ng-template pTemplate="emptymessage">
                             <tr>
-                                <td colspan="6" class="text-center py-5">No completed approvals found</td>
+                                <td colspan="11" class="text-center py-5">No completed approvals found</td>
                             </tr>
                         </ng-template>
                     </p-table>
