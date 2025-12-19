@@ -88,14 +88,18 @@ import { TabsModule } from 'primeng/tabs';
                         (selectionChange)="onSelectionChange($event)"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} pending requests"
                         [showCurrentPageReport]="true"
-                        [tableStyle]="{ 'min-width': '70rem' }"
+                        [tableStyle]="{ 'min-width': '120rem' }"
                     >
                         <ng-template pTemplate="header">
                             <tr>
                                 <th style="width:3rem"><p-tableHeaderCheckbox /></th>
-                                <th style="min-width:25rem">ID</th>
-                                <th pSortableColumn="maintenanceName" style="min-width:20rem">Maintenance Name <p-sortIcon field="maintenanceName" /></th>
-                                <th style="min-width:15rem">Status</th>
+                                <th style="min-width:20rem">ID</th>
+                                <th pSortableColumn="maintenanceName" style="min-width:18rem">Maintenance Name <p-sortIcon field="maintenanceName" /></th>
+                                <th style="min-width:15rem">Maintenance Type</th>
+                                <th style="min-width:15rem">Service Name</th>
+                                <th style="min-width:12rem">Request Date</th>
+                                <th style="min-width:15rem">Requested By</th>
+                                <th style="min-width:12rem">Status</th>
                                 <th style="min-width:12rem">Actions</th>
                             </tr>
                         </ng-template>
@@ -104,6 +108,10 @@ import { TabsModule } from 'primeng/tabs';
                                 <td><p-tableCheckbox [value]="row" /></td>
                                 <td>{{ row.requestId }}</td>
                                 <td>{{ row.maintenanceName }}</td>
+                                <td>{{ row.maintenanceType?.maintenanceTypeName || 'N/A' }}</td>
+                                <td>{{ row.serviceMaintenance?.serviceName || 'N/A' }}</td>
+                                <td>{{ row.createdAt | date: 'short' }}</td>
+                                <td>{{ row.user?.firstName }} {{ row.user?.lastName }}</td>
                                 <td><p-tag [value]="row.maintenanceStatus?.requestStatusName" /></td>
                                 <td>
                                     <div class="flex gap-2">
@@ -122,7 +130,7 @@ import { TabsModule } from 'primeng/tabs';
                         </ng-template>
                         <ng-template pTemplate="emptymessage">
                             <tr>
-                                <td colspan="5" class="text-center py-5">No pending requests found</td>
+                                <td colspan="9" class="text-center py-5">No pending requests found</td>
                             </tr>
                         </ng-template>
                     </p-table>
