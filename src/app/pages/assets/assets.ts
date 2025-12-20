@@ -137,6 +137,7 @@ import Swal from 'sweetalert2';
                     <th style="min-width:20rem">ID</th>
                     <th pSortableColumn="assetName" style="min-width:18rem">Asset <p-sortIcon field="assetName" /></th>
                     <th style="min-width:14rem">Property #</th>
+                    <th style="min-width:14rem">Laboratory</th>
                     <th style="min-width:12rem">QR Code</th>
                     <th style="min-width:12rem">Actions</th>
                 </tr>
@@ -151,6 +152,7 @@ import Swal from 'sweetalert2';
                     <td>{{ item.assetId }}</td>
                     <td>{{ item.assetName }}</td>
                     <td>{{ item.propertyNumber }}</td>
+                    <td>{{ item.laboratories?.laboratoryName || 'N/A' }}</td>
                     <td>
                         <div *ngIf="item.qrCode" class="inline-block">
                             <!-- Display QR Code as image if it's base64 or URL, otherwise as text -->
@@ -234,7 +236,7 @@ import Swal from 'sweetalert2';
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="7" class="text-center py-5">No assets found</td>
+                    <td colspan="8" class="text-center py-5">No assets found</td>
                 </tr>
             </ng-template>
         </p-table>
