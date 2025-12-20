@@ -270,7 +270,7 @@ import Swal from 'sweetalert2';
                             </div>
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Category *</label>
-                                <p-select [(ngModel)]="newAsset.category" [options]="categoryOptions" placeholder="Select category" class="w-full" appendTo="body" />
+                                <p-select [(ngModel)]="newAsset.category" [options]="categoryOptions" placeholder="Select category" class="w-full" appendTo="body" (onChange)="onCategoryChange()" />
                             </div>
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Found Cluster</label>
@@ -283,10 +283,6 @@ import Swal from 'sweetalert2';
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Issued To</label>
                                 <input pInputText [(ngModel)]="newAsset.issuedTo" placeholder="Enter person/department" class="w-full" />
-                            </div>
-                            <div class="col-span-6">
-                                <label class="block font-bold mb-2">Status</label>
-                                <p-select [(ngModel)]="newAsset.status" [options]="statuses" optionLabel="statusName" optionValue="statusId" placeholder="Select status" class="w-full" appendTo="body" />
                             </div>
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Program</label>
@@ -332,15 +328,15 @@ import Swal from 'sweetalert2';
                             </div>
                             <div class="col-span-4">
                                 <label class="block font-bold mb-2">Height</label>
-                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.height" [useGrouping]="false" placeholder="Height" class="w-full" />
+                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.height" [useGrouping]="false" placeholder="Height" class="w-full" [disabled]="isSoftwareCategory()" />
                             </div>
                             <div class="col-span-4">
                                 <label class="block font-bold mb-2">Width</label>
-                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.width" [useGrouping]="false" placeholder="Width" class="w-full" />
+                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.width" [useGrouping]="false" placeholder="Width" class="w-full" [disabled]="isSoftwareCategory()" />
                             </div>
                             <div class="col-span-4">
                                 <label class="block font-bold mb-2">Length</label>
-                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.length" [useGrouping]="false" placeholder="Length" class="w-full" />
+                                <p-inputNumber [(ngModel)]="newAsset.inventoryCustodianSlip.length" [useGrouping]="false" placeholder="Length" class="w-full" [disabled]="isSoftwareCategory()" />
                             </div>
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Package</label>
@@ -348,7 +344,7 @@ import Swal from 'sweetalert2';
                             </div>
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Material</label>
-                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.material" placeholder="Material" class="w-full" />
+                                <input pInputText [(ngModel)]="newAsset.inventoryCustodianSlip.material" placeholder="Material" class="w-full" [disabled]="isSoftwareCategory()" />
                             </div>
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Serial Number</label>
@@ -368,7 +364,16 @@ import Swal from 'sweetalert2';
                             </div>
                             <div class="col-span-6">
                                 <label class="block font-bold mb-2">Color</label>
-                                <p-select [(ngModel)]="newAsset.inventoryCustodianSlip.color" [options]="colors" optionLabel="colorName" optionValue="colorId" placeholder="Select color" class="w-full" appendTo="body" />
+                                <p-select
+                                    [(ngModel)]="newAsset.inventoryCustodianSlip.color"
+                                    [options]="colors"
+                                    optionLabel="colorName"
+                                    optionValue="colorId"
+                                    placeholder="Select color"
+                                    class="w-full"
+                                    appendTo="body"
+                                    [disabled]="isSoftwareCategory()"
+                                />
                             </div>
                             <div class="col-span-12">
                                 <label class="block font-bold mb-2">QR Code Image *</label>
@@ -498,7 +503,6 @@ export class AssetsComponent implements OnInit {
             qrCode: '',
             qrCodeImage: null,
             program: '',
-            status: '',
             supplier: '',
             laboratories: '',
             inventoryCustodianSlip: {
@@ -777,6 +781,25 @@ export class AssetsComponent implements OnInit {
         this.assetDialog = true;
         this.currentStep = 0;
         this.newAsset = this.getEmptyAsset();
+    }
+
+    isSoftwareCategory(): boolean {
+        return this.newAsset.category === 'Software';
+    }
+
+    onCategoryChange(): void {
+        if (this.isSoftwareCategory()) {
+            // Clear values of disabled inputs when category is Software
+            this.newAsset.inventoryCustodianSlip.height = null;
+            this.newAsset.inventoryCustodianSlip.width = null;
+            this.newAsset.inventoryCustodianSlip.length = null;
+            this.newAsset.inventoryCustodianSlip.material = '';
+            // Set default color for Software category
+            this.newAsset.inventoryCustodianSlip.color = '968afd8c-be83-48c8-b21b-f1ab29f15b2d';
+        } else {
+            // Clear color when switching back to Hardware
+            this.newAsset.inventoryCustodianSlip.color = '';
+        }
     }
 
     onQRCodeSelect(event: any) {

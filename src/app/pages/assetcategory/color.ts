@@ -121,8 +121,7 @@ export class ColorComponent implements OnInit {
         this.filteredItems = this.items.filter((item) => item.colorName?.toLowerCase().includes(this.searchValue.toLowerCase()));
     }
 
-    onSelectionChange(event: any) {
-    }
+    onSelectionChange(event: any) {}
 
     openNewDialog() {
         Swal.fire({
@@ -141,13 +140,19 @@ export class ColorComponent implements OnInit {
             }
         }).then((result) => {
             if (result.isConfirmed && result.value) {
+                console.log('Creating color with data:', result.value);
                 this.assetService.createColor(result.value).subscribe({
                     next: (created) => {
+                        console.log('Color created successfully:', created);
                         this.items.push(created);
                         this.filteredItems = [...this.items];
                         this.messageService.add({ severity: 'success', summary: 'Created', detail: 'Color created' });
                     },
-                    error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Create failed' })
+                    error: (error) => {
+                        console.error('Error creating color:', error);
+                        const errorMsg = error?.error?.message || error?.message || 'Create failed';
+                        this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMsg });
+                    }
                 });
             }
         });
