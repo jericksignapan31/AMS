@@ -20,7 +20,7 @@ import { TableModule } from 'primeng/table';
 
                 .master-plan-split {
                     display: flex;
-                    gap: 20px;
+                    gap: 8px;
                     height: calc(100vh - 300px);
                     min-height: 600px;
                 }
