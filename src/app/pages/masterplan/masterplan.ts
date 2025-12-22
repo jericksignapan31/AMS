@@ -105,6 +105,10 @@ import { TableModule } from 'primeng/table';
                     z-index: 10;
                 }
 
+                .particulars-table thead tr:nth-child(2) th {
+                    top: 37px;
+                }
+
                 .particulars-table th:first-child {
                     min-width: 250px;
                     text-align: left;
