@@ -316,10 +316,13 @@ export class AppMenu implements OnInit {
     }
 
     getLaboratoryMenuItems(): MenuItem[] {
-        return (this.laboratories || []).map((lab) => ({
+        console.log('🏢 getLaboratoryMenuItems called, laboratories:', this.laboratories);
+        const items = (this.laboratories || []).map((lab) => ({
             label: lab.laboratoryName,
             icon: 'pi pi-fw pi-flask',
             routerLink: ['/app/pages/laboratory', lab.laboratoryId]
         }));
+        console.log('📋 Mapped menu items:', items);
+        return items;
     }
 }
