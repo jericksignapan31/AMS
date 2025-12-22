@@ -17,6 +17,7 @@ import { ReportsComponent } from './reports/reports.component';
 import { PreventiveReportComponent } from './reports/preventive-report';
 import { CorrectiveReportComponent } from './reports/corrective-report';
 import { CalibrationReportComponent } from './reports/calibration-report';
+import { MasterPlanComponent } from './masterplan/masterplan';
 
 export const pageRoutes: Routes = [
     { path: 'users', component: UsersComponent },
@@ -34,6 +35,7 @@ export const pageRoutes: Routes = [
     { path: 'labschedule', component: LabScheduleComponent },
     { path: 'laboratories', component: LaboratoriesComponent },
     { path: 'laboratory/:id', component: LaboratoriesComponent },
+    { path: 'masterplan', component: MasterPlanComponent },
     // Reports
     { path: 'reports', component: ReportsComponent },
     { path: 'reports/preventive', component: PreventiveReportComponent },
