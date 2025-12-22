@@ -43,8 +43,8 @@ import { TableModule } from 'primeng/table';
                 }
 
                 .section-header {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
+                    background: var(--primary-color);
+                    color: var(--primary-contrast-color);
                     padding: 16px 24px;
                     font-size: 1.25rem;
                     font-weight: 600;
@@ -97,9 +97,9 @@ import { TableModule } from 'primeng/table';
                 }
 
                 .particulars-table th {
-                    background: linear-gradient(180deg, #ffc7ce 0%, #ffb3bc 100%);
+                    background: var(--primary-color);
                     font-weight: 600;
-                    color: #2d3748;
+                    color: var(--primary-contrast-color);
                     position: sticky;
                     top: 0;
                     z-index: 10;
@@ -168,19 +168,19 @@ import { TableModule } from 'primeng/table';
                 }
 
                 .maintenance-table .inventory-header {
-                    background: linear-gradient(180deg, #805ad5 0%, #6b46c1 100%);
+                    background: var(--primary-color);
                 }
 
                 .maintenance-table .preventive-header {
-                    background: linear-gradient(180deg, #48bb78 0%, #38a169 100%);
+                    background: var(--primary-color);
                 }
 
                 .maintenance-table .corrective-header {
-                    background: linear-gradient(180deg, #f56565 0%, #e53e3e 100%);
+                    background: var(--primary-color);
                 }
 
                 .maintenance-table .calibration-header {
-                    background: linear-gradient(180deg, #4299e1 0%, #3182ce 100%);
+                    background: var(--primary-color);
                 }
 
                 .maintenance-table tbody td {
