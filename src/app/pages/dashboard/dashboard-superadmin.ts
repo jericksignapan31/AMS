@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { UIChart } from 'primeng/chart';
 
 @Component({
     selector: 'app-dashboard-superadmin',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, UIChart],
     template: `
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -62,6 +63,14 @@ import { environment } from '../../../environments/environment';
                     </div>
                 </div>
             </div>
+
+            <!-- Assets by Campus Chart -->
+            <div class="mt-6">
+                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6" style="width: 50%;">
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Assets by Campus</h3>
+                    <p-chart type="bar" [data]="assetsByCampusChartData" [options]="chartOptions"></p-chart>
+                </div>
+            </div>
         </div>
     `,
     styles: [
@@ -77,6 +86,8 @@ export class DashboardSuperAdmin implements OnInit {
     userCount: number = 0;
     assetCount: number = 0;
     laboratoryCount: number = 0;
+    assetsByCampusChartData: any;
+    chartOptions: any;
 
     constructor(private http: HttpClient) {}
 
@@ -85,6 +96,8 @@ export class DashboardSuperAdmin implements OnInit {
         this.loadUserCount();
         this.loadAssetCount();
         this.loadLaboratoryCount();
+        this.loadAssetsByCampus();
+        this.initChartOptions();
     }
 
     loadCampusCount() {
@@ -137,5 +150,74 @@ export class DashboardSuperAdmin implements OnInit {
                 console.error('Error loading laboratory count:', error);
             }
         });
+    }
+
+    loadAssetsByCampus() {
+        const apiUrl = `${environment.apiUrl}/campuses/count/assets/by-campus`;
+        this.http.get<any[]>(apiUrl).subscribe({
+            next: (data) => {
+                console.log('Assets by Campus:', data);
+                const labels = data.map((item) => item.campusName || item.campus);
+                const counts = data.map((item) => item.assetCount || item.count);
+
+                this.assetsByCampusChartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Assets Count',
+                            data: counts,
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgb(59, 130, 246)',
+                            borderWidth: 1
+                        }
+                    ]
+                };
+            },
+            error: (error) => {
+                console.error('Error loading assets by campus:', error);
+            }
+        });
+    }
+
+    initChartOptions() {
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
+        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+        this.chartOptions = {
+            maintainAspectRatio: false,
+            aspectRatio: 0.8,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: textColor
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: textColorSecondary,
+                        font: {
+                            weight: 500
+                        }
+                    },
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: textColorSecondary
+                    },
+                    grid: {
+                        color: surfaceBorder,
+                        drawBorder: false
+                    }
+                }
+            }
+        };
     }
 }
