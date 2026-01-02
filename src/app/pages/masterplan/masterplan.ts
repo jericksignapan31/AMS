@@ -701,19 +701,19 @@ import { environment } from '../../../environments/environment';
                                 @if (masterPlanData && equipmentList.length > 0) {
                                     @for (equipment of equipmentList; track equipment.equipment.assetId) {
                                         <tr>
-                                            <!-- INVENTORY Section - 6 columns -->
-                                            @for (month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track month) {
-                                                <td></td>
+                                            <!-- INVENTORY Section - 9 months (APR-DEC: 4-12) -->
+                                            @for (month of [4, 5, 6, 7, 8, 9, 10, 11, 12]; track month) {
+                                                <td>{{ getMaintenanceMark(equipment, month, 'inventory') }}</td>
                                             }
-                                            <!-- PREVENTIVE Section - 12 columns -->
-                                            @for (month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track month) {
+                                            <!-- PREVENTIVE Section - 9 months (APR-DEC: 4-12) -->
+                                            @for (month of [4, 5, 6, 7, 8, 9, 10, 11, 12]; track month) {
                                                 <td>{{ getMaintenanceMark(equipment, month, 'preventive') }}</td>
                                             }
-                                            <!-- CORRECTIVE Section - 6 columns -->
+                                            <!-- CORRECTIVE Section - 12 months (JAN-DEC: 1-12) -->
                                             @for (month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track month) {
                                                 <td>{{ getMaintenanceMark(equipment, month, 'corrective') }}</td>
                                             }
-                                            <!-- CALIBRATION Section - 12 columns -->
+                                            <!-- CALIBRATION Section - 12 months (JAN-DEC: 1-12) -->
                                             @for (month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track month) {
                                                 <td>{{ getMaintenanceMark(equipment, month, 'calibration') }}</td>
                                             }
@@ -2122,7 +2122,7 @@ export class MasterPlanComponent implements OnInit {
         console.log('📅 Available years:', this.years);
     }
 
-    getMaintenanceMark(equipment: any, month: number, type: 'preventive' | 'calibration' | 'corrective'): string {
+    getMaintenanceMark(equipment: any, month: number, type: 'preventive' | 'calibration' | 'corrective' | 'inventory'): string {
         if (!equipment || !equipment.monthlyData) return '';
         const monthData = equipment.monthlyData.find((m: any) => m.month === month);
         if (!monthData || !monthData.maintenance) return '';
