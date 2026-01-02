@@ -4,11 +4,15 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-masterplan',
     standalone: true,
-    imports: [CommonModule, ToolbarModule, ButtonModule, RippleModule, TableModule],
+    imports: [CommonModule, ToolbarModule, ButtonModule, RippleModule, TableModule, InputTextModule, FormsModule],
     styles: [
         `
             :host ::ng-deep {
@@ -258,9 +262,24 @@ import { TableModule } from 'primeng/table';
                 </div>
             </ng-template>
             <ng-template #end>
-                <div class="flex items-center gap-2">
-                    <p-button label="Print" icon="pi pi-print" severity="secondary" [outlined]="true" />
-                    <p-button label="Export" icon="pi pi-upload" severity="success" [outlined]="true" />
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label class="font-semibold">Year:</label>
+                        <input type="text" pInputText [(ngModel)]="selectedYear" (ngModelChange)="onFilterChange()" placeholder="e.g., 2024" class="p-inputtext-sm" style="width: 100px;" />
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="font-semibold">Laboratory:</label>
+                        <select [(ngModel)]="selectedLaboratory" (ngModelChange)="onFilterChange()" class="p-inputtext" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="">Select Laboratory</option>
+                            <option *ngFor="let lab of laboratories" [value]="lab.laboratoryId">
+                                {{ lab.laboratoryName }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <p-button label="Print" icon="pi pi-print" severity="secondary" [outlined]="true" />
+                        <p-button label="Export" icon="pi pi-upload" severity="success" [outlined]="true" />
+                    </div>
                 </div>
             </ng-template>
         </p-toolbar>
@@ -1988,5 +2007,40 @@ import { TableModule } from 'primeng/table';
     `
 })
 export class MasterPlanComponent implements OnInit {
-    ngOnInit() {}
+    selectedYear: string = '';
+    selectedLaboratory: string = '';
+    laboratories: any[] = [];
+
+    constructor(private http: HttpClient) {}
+
+    ngOnInit() {
+        this.loadLaboratories();
+    }
+
+    onFilterChange() {
+        console.log('🔍 Filter Changed');
+        console.log('📅 Selected Year:', this.selectedYear || 'ALL');
+        console.log('🏢 Selected Laboratory:', this.selectedLaboratory || 'ALL');
+        console.log('📊 Filtered Data:', {
+            year: this.selectedYear,
+            laboratory: this.selectedLaboratory,
+            timestamp: new Date().toLocaleTimeString()
+        });
+    }
+
+    loadLaboratories() {
+        const apiUrl = `${environment.apiUrl}/laboratories`;
+        console.log('📡 Fetching laboratories from:', apiUrl);
+
+        this.http.get<any[]>(apiUrl).subscribe({
+            next: (data) => {
+                console.log('✅ Laboratories loaded:', data);
+                this.laboratories = data || [];
+                console.log('📊 Total laboratories:', this.laboratories.length);
+            },
+            error: (error) => {
+                console.error('❌ Error loading laboratories:', error);
+            }
+        });
+    }
 }
