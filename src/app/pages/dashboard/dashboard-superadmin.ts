@@ -64,11 +64,18 @@ import { UIChart } from 'primeng/chart';
                 </div>
             </div>
 
-            <!-- Assets by Campus Chart -->
-            <div class="mt-6">
-                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6" style="width: 50%;">
+            <!-- Charts Row -->
+            <div class="flex gap-6 mt-6">
+                <!-- Assets by Campus Chart -->
+                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 flex-1">
                     <h3 class="text-xl font-semibold mb-4 dark:text-white">Assets by Campus</h3>
                     <p-chart type="bar" [data]="assetsByCampusChartData" [options]="chartOptions"></p-chart>
+                </div>
+
+                <!-- Maintenance Requests by Campus Chart -->
+                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 flex-1">
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Maintenance Requests by Campus</h3>
+                    <p-chart type="bar" [data]="maintenanceRequestsChartData" [options]="chartOptions"></p-chart>
                 </div>
             </div>
         </div>
@@ -87,6 +94,7 @@ export class DashboardSuperAdmin implements OnInit {
     assetCount: number = 0;
     laboratoryCount: number = 0;
     assetsByCampusChartData: any;
+    maintenanceRequestsChartData: any;
     chartOptions: any;
 
     constructor(private http: HttpClient) {}
@@ -97,6 +105,7 @@ export class DashboardSuperAdmin implements OnInit {
         this.loadAssetCount();
         this.loadLaboratoryCount();
         this.loadAssetsByCampus();
+        this.loadMaintenanceRequestsByCampus();
         this.initChartOptions();
     }
 
@@ -175,6 +184,33 @@ export class DashboardSuperAdmin implements OnInit {
             },
             error: (error) => {
                 console.error('Error loading assets by campus:', error);
+            }
+        });
+    }
+
+    loadMaintenanceRequestsByCampus() {
+        const apiUrl = `${environment.apiUrl}/assets/maintenance-requests-by-campus`;
+        this.http.get<any[]>(apiUrl).subscribe({
+            next: (data) => {
+                console.log('Maintenance Requests by Campus:', data);
+                const labels = data.map((item) => item.campusName);
+                const counts = data.map((item) => item.pendingRequests);
+
+                this.maintenanceRequestsChartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Maintenance Requests',
+                            data: counts,
+                            backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                            borderColor: 'rgb(34, 197, 94)',
+                            borderWidth: 1
+                        }
+                    ]
+                };
+            },
+            error: (error) => {
+                console.error('Error loading maintenance requests by campus:', error);
             }
         });
     }
