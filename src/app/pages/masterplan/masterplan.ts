@@ -282,6 +282,15 @@ import { environment } from '../../../environments/environment';
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
+                        <label class="font-semibold">Category:</label>
+                        <select [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()" class="p-inputtext" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="">All Categories</option>
+                            <option *ngFor="let category of categories" [value]="category">
+                                {{ category }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
                         <p-button label="Print" icon="pi pi-print" severity="secondary" [outlined]="true" />
                         <p-button label="Export" icon="pi pi-upload" severity="success" [outlined]="true" />
                     </div>
@@ -2080,8 +2089,10 @@ import { environment } from '../../../environments/environment';
 export class MasterPlanComponent implements OnInit {
     selectedYear: string = '';
     selectedLaboratory: string = '';
+    selectedCategory: string = '';
     laboratories: any[] = [];
     years: string[] = [];
+    categories: string[] = ['Software', 'Hardware'];
     masterPlanData: any = null;
     equipmentList: any[] = [];
     groupedEquipment: any[] = [];
@@ -2115,6 +2126,7 @@ export class MasterPlanComponent implements OnInit {
         console.log('🔍 Filter Changed');
         console.log('📅 Selected Year:', this.selectedYear || 'ALL');
         console.log('🏢 Selected Laboratory:', this.selectedLaboratory || 'ALL');
+        console.log('📂 Selected Category:', this.selectedCategory || 'ALL');
 
         // Only call API if both filters are selected
         if (this.selectedYear && this.selectedLaboratory) {
@@ -2126,7 +2138,7 @@ export class MasterPlanComponent implements OnInit {
 
     fetchMasterPlanData() {
         const apiUrl = `${environment.apiUrl}/reports/master-plan/annual`;
-        const params = {
+        const params: any = {
             year: this.selectedYear,
             laboratoryId: this.selectedLaboratory
         };
@@ -2140,7 +2152,16 @@ export class MasterPlanComponent implements OnInit {
                 console.table(data);
 
                 this.masterPlanData = data;
-                this.equipmentList = data.equipmentMaintenances || [];
+                let allEquipment = data.equipmentMaintenances || [];
+
+                // Filter by category if selected
+                if (this.selectedCategory) {
+                    this.equipmentList = allEquipment.filter((item: any) => item.equipment?.category === this.selectedCategory);
+                    console.log(`🔍 Filtered by category "${this.selectedCategory}":`, this.equipmentList.length, 'items');
+                } else {
+                    this.equipmentList = allEquipment;
+                }
+
                 this.groupEquipment();
 
                 console.log('📦 Equipment List:', this.equipmentList);
