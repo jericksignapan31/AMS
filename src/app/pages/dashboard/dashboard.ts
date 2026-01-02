@@ -1,25 +1,39 @@
-import { Component } from '@angular/core';
-import { NotificationsWidget } from './components/notificationswidget';
-import { StatsWidget } from './components/statswidget';
-import { RecentSalesWidget } from './components/recentsaleswidget';
-import { BestSellingWidget } from './components/bestsellingwidget';
-import { RevenueStreamWidget } from './components/revenuestreamwidget';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DashboardSuperAdmin } from './dashboard-superadmin';
+import { DashboardCampusAdmin } from './dashboard-campusadmin';
+import { DashboardFaculty } from './dashboard-faculty';
+import { DashboardStudent } from './dashboard-student';
 
 @Component({
     selector: 'app-dashboard',
-    imports: [StatsWidget, RecentSalesWidget, BestSellingWidget, RevenueStreamWidget, NotificationsWidget],
+    standalone: true,
+    imports: [CommonModule, DashboardSuperAdmin, DashboardCampusAdmin, DashboardFaculty, DashboardStudent],
     template: `
-        <div class="grid grid-cols-12 gap-8">
-            <app-stats-widget class="contents" />
-            <div class="col-span-12 xl:col-span-6">
-                <app-recent-sales-widget />
-                <app-best-selling-widget />
+        @if (userRole === 'SuperAdmin') {
+            <app-dashboard-superadmin />
+        } @else if (userRole === 'CampusAdmin') {
+            <app-dashboard-campusadmin />
+        } @else if (userRole === 'Faculty') {
+            <app-dashboard-faculty />
+        } @else if (userRole === 'Student') {
+            <app-dashboard-student />
+        } @else {
+            <div class="p-6">
+                <h1 class="text-3xl font-bold">Dashboard</h1>
+                <p class="text-gray-600 mt-4">Please contact administrator for access.</p>
             </div>
-            <div class="col-span-12 xl:col-span-6">
-                <app-revenue-stream-widget />
-                <app-notifications-widget />
-            </div>
-        </div>
+        }
     `
 })
-export class Dashboard {}
+export class Dashboard implements OnInit {
+    userRole: string = '';
+
+    ngOnInit() {
+        // Get user role from localStorage or auth service
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        this.userRole = user.role || '';
+        console.log('User Role:', this.userRole);
+        console.log('User Data:', user);
+    }
+}
