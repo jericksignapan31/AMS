@@ -250,9 +250,7 @@ export class DashboardSuperAdmin implements OnInit {
             aspectRatio: 0.8,
             plugins: {
                 legend: {
-                    labels: {
-                        color: textColor
-                    }
+                    display: false
                 }
             },
             scales: {
@@ -292,9 +290,7 @@ export class DashboardSuperAdmin implements OnInit {
             aspectRatio: 0.8,
             plugins: {
                 legend: {
-                    labels: {
-                        color: textColor
-                    }
+                    display: false
                 }
             },
             scales: {
