@@ -332,15 +332,19 @@ import { environment } from '../../../environments/environment';
                                             ><br /><small style="color: #718096; font-size: 0.85em;">{{ masterPlanData.laboratoryLocation || 'N/A' }}</small>
                                         </td>
                                         <td>
-                                            <strong>{{ equipmentList.length }}</strong>
+                                            <strong>{{ masterPlanData.totalEquipment || equipmentList.length }}</strong>
                                         </td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
-                                        <td style="color: #2f855a; font-weight: 600;">-</td>
-                                        <td><span style="background: #c6f6d5; color: #276749; padding: 4px 12px; border-radius: 12px; font-weight: 600;">-</span></td>
-                                        <td><span style="background: #fed7d7; color: #c53030; padding: 4px 12px; border-radius: 12px; font-weight: 600;">-</span></td>
+                                        <td style="color: #2f855a; font-weight: 600;">{{ getTotalPrice() | number: '1.2-2' }}</td>
+                                        <td>
+                                            <span style="background: #c6f6d5; color: #276749; padding: 4px 12px; border-radius: 12px; font-weight: 600;">{{ getFunctionalCount() }}</span>
+                                        </td>
+                                        <td>
+                                            <span style="background: #fed7d7; color: #c53030; padding: 4px 12px; border-radius: 12px; font-weight: 600;">{{ masterPlanData.underRepair || 0 }}</span>
+                                        </td>
                                     </tr>
                                     @for (group of groupedEquipment; track group.displayName) {
                                         @for (equipment of group.equipment; track equipment.equipment.assetId; let i = $index) {
@@ -2192,6 +2196,20 @@ export class MasterPlanComponent implements OnInit {
             displayName: key,
             equipment: items
         }));
+    }
+
+    getTotalPrice(): number {
+        return this.equipmentList.reduce((total, item) => {
+            const price = parseFloat(item.equipment?.price) || 0;
+            return total + price;
+        }, 0);
+    }
+
+    getFunctionalCount(): number {
+        if (!this.masterPlanData) return 0;
+        const total = this.masterPlanData.totalEquipment || 0;
+        const underRepair = this.masterPlanData.underRepair || 0;
+        return total - underRepair;
     }
 
     loadLaboratories() {
