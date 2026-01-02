@@ -327,14 +327,17 @@ import { environment } from '../../../environments/environment';
                             <tbody>
                                 @if (masterPlanData && groupedEquipment.length > 0) {
                                     <tr class="item-row">
-                                        <td style="text-align: left; padding-left: 16px;">{{ masterPlanData.laboratoryName }}</td>
+                                        <td style="text-align: left; padding-left: 16px;">
+                                            <strong>{{ masterPlanData.laboratoryName }}</strong
+                                            ><br /><small style="color: #718096; font-size: 0.85em;">{{ masterPlanData.laboratoryLocation || 'N/A' }}</small>
+                                        </td>
                                         <td>
                                             <strong>{{ equipmentList.length }}</strong>
                                         </td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
-                                        <td>{{ masterPlanData.laboratoryLocation || 'N/A' }}</td>
+                                        <td>-</td>
                                         <td style="color: #2f855a; font-weight: 600;">-</td>
                                         <td><span style="background: #c6f6d5; color: #276749; padding: 4px 12px; border-radius: 12px; font-weight: 600;">-</span></td>
                                         <td><span style="background: #fed7d7; color: #c53030; padding: 4px 12px; border-radius: 12px; font-weight: 600;">-</span></td>
@@ -359,7 +362,7 @@ import { environment } from '../../../environments/environment';
                                                     <td>{{ equipment.equipment.serialNumber }}</td>
                                                     <td></td>
                                                 }
-                                                <td></td>
+                                                <td>{{ equipment.equipment.location || 'N/A' }}</td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
