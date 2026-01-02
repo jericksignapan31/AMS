@@ -123,7 +123,6 @@ import { TabsModule } from 'primeng/tabs';
                                         </ng-container>
                                         <ng-container *ngIf="!isLabTech()">
                                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />
-                                            <p-button icon="pi pi-pencil" severity="secondary" [rounded]="true" [text]="true" (onClick)="edit(row)" />
                                             <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (onClick)="delete(row)" />
                                         </ng-container>
                                     </div>
@@ -178,7 +177,6 @@ import { TabsModule } from 'primeng/tabs';
                                         </ng-container>
                                         <ng-container *ngIf="!isLabTech()">
                                             <p-button icon="pi pi-eye" severity="info" [rounded]="true" [text]="true" (onClick)="view(row)" />
-                                            <p-button icon="pi pi-pencil" severity="secondary" [rounded]="true" [text]="true" (onClick)="edit(row)" />
                                             <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (onClick)="delete(row)" />
                                         </ng-container>
                                     </div>
@@ -662,24 +660,38 @@ export class RequestmaintenanceComponent implements OnInit {
     }
 
     delete(item: any) {
-        const requestId = item.maintenanceRequestId || item.id;
+        const requestId = item.requestId || item.maintenanceRequestId || item.id;
         const requestName = item.maintenanceName || 'Maintenance Request';
+        console.log('🗑️ Delete clicked - Item:', item);
+        console.log('Using requestId:', requestId);
+
         Swal.fire({
             title: 'Delete Maintenance Request',
             text: `Delete "${requestName}"?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Delete'
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
                 this.maintenanceService.deleteMaintenanceRequest(requestId).subscribe({
                     next: () => {
-                        this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Maintenance request deleted successfully' });
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Maintenance request has been deleted successfully.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
                         this.loadItems();
                     },
                     error: (err) => {
                         console.error('Error deleting maintenance request:', err);
-                        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete maintenance request' });
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to delete maintenance request.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
                     }
                 });
             }
