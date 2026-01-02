@@ -625,30 +625,18 @@ export class AssetsComponent implements OnInit {
         this.maintenanceService.getMaintenanceTypes().subscribe({
             next: (types) => {
                 this.maintenanceTypesOptions = (types || []).map((t: any) => ({ label: t.maintenanceTypeName, value: t.maintenanceTypeId }));
-            },
-            error: (error) => {
-                console.error('Failed to load maintenance types:', error);
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load maintenance types' });
             }
         });
         // Service Maintenances
         this.maintenanceService.getServiceMaintenances().subscribe({
             next: (services) => {
                 this.serviceMaintenancesOptions = (services || []).map((s: any) => ({ label: s.serviceName, value: s.serviceMaintenanceId }));
-            },
-            error: (error) => {
-                console.error('Failed to load service maintenances:', error);
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load service maintenances' });
             }
         });
         // Priority Levels
         this.maintenanceService.getPriorityLevels().subscribe({
             next: (levels) => {
                 this.priorityLevelsOptions = (levels || []).map((p: any) => ({ label: p.priorityLevelName, value: p.priorityLevelId }));
-            },
-            error: (error) => {
-                console.error('Failed to load priority levels:', error);
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load priority levels' });
             }
         });
     }

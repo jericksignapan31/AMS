@@ -576,8 +576,13 @@ export class RequestmaintenanceComponent implements OnInit {
     }
 
     view(item: any) {
+        console.log('👁️ View clicked - Item data:', item);
+        console.log('Has maintenanceApprovalId?', !!item.maintenanceApprovalId);
+        console.log('Request ID:', item.maintenanceRequestId || item.id || item.requestId);
+
         // Check if it's an approval item (has maintenanceApprovalId) or a request item
         if (item.maintenanceApprovalId) {
+            console.log('📋 Showing approval details');
             // It's a completed approval - show approval details
             const html = `
                 <div style="text-align: left;">
@@ -592,25 +597,25 @@ export class RequestmaintenanceComponent implements OnInit {
             `;
             Swal.fire({ title: 'Maintenance Approval Details', html, icon: 'info' });
         } else {
+            console.log('📋 Fetching request details from API');
             // It's a request item - fetch from API
             const requestId = item.maintenanceRequestId || item.id || item.requestId;
+            console.log('Using requestId:', requestId);
             this.maintenanceService.getMaintenanceRequest(requestId).subscribe({
                 next: (data: any) => {
+                    console.log('✅ Request data fetched:', data);
                     const html = `
                         <div style="text-align: left;">
                             <p><strong>Name:</strong> ${data.maintenanceName || 'N/A'}</p>
-                            <p><strong>Type:</strong> ${data.maintenanceTypeName || 'N/A'}</p>
-                            <p><strong>Service:</strong> ${data.serviceMaintenanceName || 'N/A'}</p>
-                            <p><strong>Asset:</strong> ${data.assetName || 'N/A'}</p>
-                            <p><strong>Priority:</strong> ${data.priorityLevelName || 'N/A'}</p>
+                            <p><strong>Type:</strong> ${data.maintenanceType?.maintenanceTypeName || 'N/A'}</p>
+                            <p><strong>Service:</strong> ${data.serviceMaintenance?.serviceName || 'N/A'}</p>
+                            <p><strong>Asset:</strong> ${data.asset?.assetName || 'N/A'}</p>
+                            <p><strong>Priority:</strong> ${data.priorityLevel?.priorityLevelName || 'N/A'}</p>
+                            <p><strong>Status:</strong> ${data.maintenanceStatus?.requestStatusName || 'N/A'}</p>
                             <p><strong>Description:</strong> ${data.description || 'N/A'}</p>
                         </div>
                     `;
                     Swal.fire({ title: 'Maintenance Request Details', html, icon: 'info' });
-                },
-                error: (err) => {
-                    console.error('Error fetching maintenance request:', err);
-                    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load maintenance request details' });
                 }
             });
         }
