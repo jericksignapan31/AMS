@@ -678,7 +678,7 @@ export class UsersComponent implements OnInit {
                 const password = passwordElement ? passwordElement.value.trim() : '';
                 const middleName = middleNameElement ? middleNameElement.value.trim() : '';
                 const contactNumber = contactNumberElement ? contactNumberElement.value.trim() : '';
-                
+
                 // Get department - from hidden input for SuperAdmin, from select for CampusAdmin
                 let department = '';
                 if (isCampusAdmin) {
@@ -687,7 +687,7 @@ export class UsersComponent implements OnInit {
                     // SuperAdmin - use hidden input
                     department = departmentIdElement ? departmentIdElement.value : '813e7dd9-345f-40dd-a37b-ec08c2575119';
                 }
-                
+
                 const campusInput = document.getElementById('newCampus') as HTMLInputElement | HTMLSelectElement;
                 const campusHiddenInput = document.getElementById('newCampusHidden') as HTMLInputElement;
 
