@@ -30,7 +30,6 @@ import { ActivatedRoute } from '@angular/router';
 
         <!-- Laboratory Details View (when viewing specific lab via route param) -->
         <div *ngIf="selectedLaboratoryId && selectedLaboratoryData" class="mb-4">
-            
             <p-toolbar styleClass="mb-4 mt-4">
                 <ng-template #start>
                     <div class="flex items-center gap-2">
@@ -195,8 +194,8 @@ import { ActivatedRoute } from '@angular/router';
                         <p-inputNumber [(ngModel)]="newLab.capacity" placeholder="Enter capacity" class="w-full" />
                     </div>
                     <div class="col-span-12">
-                        <label class="block font-bold mb-2">Description</label>
-                        <textarea pTextarea [(ngModel)]="newLab.description" placeholder="Enter description" rows="3" class="w-full"></textarea>
+                        <label class="block font-bold mb-2">Laboratory Location *</label>
+                        <input pInputText [(ngModel)]="newLab.laboratoryLocation" placeholder="Enter laboratory location" class="w-full" />
                     </div>
                 </div>
             </ng-template>
@@ -252,7 +251,7 @@ export class LaboratoriesComponent implements OnInit {
             laboratoryId: '',
             laboratoryName: '',
             capacity: 0,
-            description: '',
+            laboratoryLocation: '',
             campus: null
         };
     }
@@ -329,24 +328,43 @@ export class LaboratoriesComponent implements OnInit {
     }
 
     saveLab() {
-        if (!this.newLab.laboratoryName || !this.newLab.capacity) {
+        if (!this.newLab.laboratoryName || !this.newLab.capacity || !this.newLab.laboratoryLocation) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Validation',
-                detail: 'Laboratory Name and Capacity are required'
+                detail: 'Laboratory Name, Capacity, and Location are required'
             });
             return;
         }
 
-        console.log('📤 Saving laboratory:', this.newLab);
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Laboratory saved successfully'
-        });
+        const payload = {
+            laboratoryName: this.newLab.laboratoryName,
+            capacity: this.newLab.capacity,
+            laboratoryLocation: this.newLab.laboratoryLocation
+        };
 
-        this.closeDialog();
-        this.loadLaboratories();
+        console.log('📤 Creating laboratory with payload:', payload);
+
+        this.http.post<any>(this.apiUrl, payload).subscribe({
+            next: (response) => {
+                console.log('✅ Laboratory created:', response);
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Laboratory created successfully'
+                });
+                this.closeDialog();
+                this.loadLaboratories();
+            },
+            error: (error) => {
+                console.error('❌ Error creating laboratory:', error);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to create laboratory: ' + (error?.error?.message || error?.message)
+                });
+            }
+        });
     }
 
     view(lab: any) {

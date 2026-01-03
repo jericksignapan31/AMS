@@ -251,6 +251,11 @@ export class AppMenu implements OnInit {
                         routerLink: ['/app/requestmaintenance']
                     },
                     {
+                        label: 'Laboratories',
+                        icon: 'pi pi-fw pi-flask',
+                        routerLink: ['/app/pages/laboratories']
+                    },
+                    {
                         label: 'Lab Schedule',
                         icon: 'pi pi-fw pi-calendar',
                         routerLink: ['/app/pages/labschedule']
