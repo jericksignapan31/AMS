@@ -523,10 +523,9 @@ export class UsersComponent implements OnInit {
                             ? `
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
                         <div>
-                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Department * <span style="color: #999; font-size: 11px;" id="deptLockStatus">(Select Campus First)</span></label>
-                            <select id="newDepartment" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #ccc; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; color: #999; cursor: not-allowed;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'" disabled>
-                                <option value="">-- Select Department --</option>
-                            </select>
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Department * <span style="color: #999; font-size: 11px;">(Auto)</span></label>
+                            <input id="newDepartment" type="text" value="Default Department" placeholder="Department" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #ccc; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; color: #999; cursor: not-allowed;" disabled />
+                            <input id="newDepartmentId" type="hidden" value="813e7dd9-345f-40dd-a37b-ec08c2575119" />
                         </div>
                         <div>
                             <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Campus *</label>
@@ -536,17 +535,8 @@ export class UsersComponent implements OnInit {
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Role * ${this.currentUserRole === 'SuperAdmin' ? '<span style="color: #999; font-size: 11px;">(Auto)</span>' : ''}</label>
-                            ${
-                                this.currentUserRole === 'SuperAdmin'
-                                    ? `<input id="newRole" type="text" value="CampusAdmin" placeholder="Role" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #ccc; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; color: #999; cursor: not-allowed;" disabled />`
-                                    : `<select id="newRole" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #e0e0e0; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent;" onfocus="this.style.borderBottomColor='#667eea'" onblur="this.style.borderBottomColor='#e0e0e0'">
-                                    <option value="Faculty">Faculty</option>
-                                    <option value="LabTech">LabTech</option>
-                                    <option value="CampusAdmin" selected>CampusAdmin</option>
-                                    <option value="SuperAdmin">SuperAdmin</option>
-                                </select>`
-                            }
+                            <label style="display: block; font-weight: 500; margin-bottom: 6px; color: #555; font-size: 13px;">Role * <span style="color: #999; font-size: 11px;">(Auto)</span></label>
+                            <input id="newRole" type="text" value="CampusAdmin" placeholder="Role" style="width: 100%; padding: 8px 10px; border: none; border-bottom: 1.5px solid #ccc; border-radius: 0; font-size: 13px; box-sizing: border-box; background: transparent; color: #999; cursor: not-allowed;" disabled />
                         </div>
                     </div>
                     `
@@ -678,7 +668,8 @@ export class UsersComponent implements OnInit {
                 const passwordElement = document.getElementById('newPassword') as HTMLInputElement;
                 const middleNameElement = document.getElementById('newMiddleName') as HTMLInputElement;
                 const contactNumberElement = document.getElementById('newContactNumber') as HTMLInputElement;
-                const departmentElement = document.getElementById('newDepartment') as HTMLSelectElement;
+                const departmentElement = document.getElementById('newDepartment') as HTMLSelectElement | HTMLInputElement;
+                const departmentIdElement = document.getElementById('newDepartmentId') as HTMLInputElement;
 
                 const firstName = firstNameElement ? firstNameElement.value.trim() : '';
                 const lastName = lastNameElement ? lastNameElement.value.trim() : '';
@@ -687,7 +678,16 @@ export class UsersComponent implements OnInit {
                 const password = passwordElement ? passwordElement.value.trim() : '';
                 const middleName = middleNameElement ? middleNameElement.value.trim() : '';
                 const contactNumber = contactNumberElement ? contactNumberElement.value.trim() : '';
-                const department = departmentElement ? departmentElement.value : '';
+                
+                // Get department - from hidden input for SuperAdmin, from select for CampusAdmin
+                let department = '';
+                if (isCampusAdmin) {
+                    department = departmentElement ? departmentElement.value : '';
+                } else {
+                    // SuperAdmin - use hidden input
+                    department = departmentIdElement ? departmentIdElement.value : '813e7dd9-345f-40dd-a37b-ec08c2575119';
+                }
+                
                 const campusInput = document.getElementById('newCampus') as HTMLInputElement | HTMLSelectElement;
                 const campusHiddenInput = document.getElementById('newCampusHidden') as HTMLInputElement;
 
