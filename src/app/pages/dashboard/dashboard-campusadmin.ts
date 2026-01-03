@@ -10,55 +10,75 @@ import { UIChart } from 'primeng/chart';
     imports: [CommonModule, UIChart],
     template: `
         <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Total Departments Card -->
-                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Departments</p>
-                            <h3 class="text-4xl font-bold text-primary dark:text-primary mt-2">{{ departmentCount }}</h3>
+            <!-- Top Section: Cards and Donut Chart -->
+            <div class="flex gap-6">
+                <!-- Left Side: Cards in 2 columns -->
+                <div class="w-1/2">
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Total Departments Card -->
+                        <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Departments</p>
+                                    <h3 class="text-4xl font-bold text-primary dark:text-primary mt-2">{{ departmentCount }}</h3>
+                                </div>
+                                <div class="bg-primary bg-opacity-10 dark:bg-opacity-20 p-4 rounded-full">
+                                    <i class="pi pi-sitemap text-2xl text-primary"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-primary bg-opacity-10 dark:bg-opacity-20 p-4 rounded-full">
-                            <i class="pi pi-sitemap text-2xl text-primary"></i>
+
+                        <!-- Total Users Card -->
+                        <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Users</p>
+                                    <h3 class="text-4xl font-bold text-green-600 dark:text-green-500 mt-2">{{ userCount }}</h3>
+                                </div>
+                                <div class="bg-green-500 bg-opacity-10 dark:bg-opacity-20 p-4 rounded-full">
+                                    <i class="pi pi-users text-2xl text-green-600 dark:text-green-500"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Laboratories Card -->
+                        <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Laboratories</p>
+                                    <h3 class="text-4xl font-bold text-blue-600 dark:text-blue-500 mt-2">{{ laboratoryCount }}</h3>
+                                </div>
+                                <div class="bg-blue-500 bg-opacity-10 dark:bg-opacity-20 p-4 rounded-full">
+                                    <i class="pi pi-desktop text-2xl text-blue-600 dark:text-blue-500"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Assets Card -->
+                        <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Assets</p>
+                                    <h3 class="text-4xl font-bold text-orange-600 dark:text-orange-500 mt-2">{{ assetCount }}</h3>
+                                </div>
+                                <div class="bg-orange-500 bg-opacity-10 dark:bg-opacity-20 p-4 rounded-full">
+                                    <i class="pi pi-box text-2xl text-orange-600 dark:text-orange-500"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Total Users Card -->
-                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Users</p>
-                            <h3 class="text-4xl font-bold text-green-600 dark:text-green-500 mt-2">{{ userCount }}</h3>
-                        </div>
-                        <div class="bg-green-500 bg-opacity-10 dark:bg-opacity-20 p-4 rounded-full">
-                            <i class="pi pi-users text-2xl text-green-600 dark:text-green-500"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Laboratories Card -->
-                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Laboratories</p>
-                            <h3 class="text-4xl font-bold text-blue-600 dark:text-blue-500 mt-2">{{ laboratoryCount }}</h3>
-                        </div>
-                        <div class="bg-blue-500 bg-opacity-10 dark:bg-opacity-20 p-4 rounded-full">
-                            <i class="pi pi-desktop text-2xl text-blue-600 dark:text-blue-500"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Assets Card -->
-                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Assets</p>
-                            <h3 class="text-4xl font-bold text-orange-600 dark:text-orange-500 mt-2">{{ assetCount }}</h3>
-                        </div>
-                        <div class="bg-orange-500 bg-opacity-10 dark:bg-opacity-20 p-4 rounded-full">
-                            <i class="pi pi-box text-2xl text-orange-600 dark:text-orange-500"></i>
+                <!-- Right Side: Donut Chart -->
+                <div
+                    class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 w-1/2 h-85
+                "
+                >
+                    <div class="flex flex-col items-center justify-center h-full">
+                       
+                        <div class="w-90">
+                             
+                            <p-chart type="doughnut" [data]="maintenanceStatusChartData" [options]="donutChartOptions"></p-chart>
                         </div>
                     </div>
                 </div>
@@ -77,12 +97,6 @@ import { UIChart } from 'primeng/chart';
                     <h3 class="text-xl font-semibold mb-4 dark:text-white">Maintenance Requests by Laboratory</h3>
                     <p-chart type="bar" [data]="maintenanceRequestsChartData" [options]="getHorizontalChartOptions()"></p-chart>
                 </div>
-            </div>
-
-            <!-- Maintenance Request Status Chart (Donut) -->
-            <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 mt-6 w-1/2">
-                <h3 class="text-xl font-semibold mb-4 dark:text-white">Maintenance Request Status</h3>
-                <p-chart type="doughnut" [data]="maintenanceStatusChartData" [options]="donutChartOptions"></p-chart>
             </div>
         </div>
     `,
@@ -365,14 +379,24 @@ export class DashboardCampusAdmin implements OnInit {
 
         this.donutChartOptions = {
             maintainAspectRatio: false,
-            aspectRatio: 0.8,
+            aspectRatio: 1,
             plugins: {
                 legend: {
-                    position: 'bottom',
+                    position: 'right',
                     labels: {
                         color: textColor,
                         usePointStyle: true,
-                        padding: 15
+                        padding: 20,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context: any) {
+                            return context.label + ': ' + context.parsed;
+                        }
                     }
                 }
             }
