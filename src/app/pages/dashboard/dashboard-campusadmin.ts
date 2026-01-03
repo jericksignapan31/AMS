@@ -64,10 +64,25 @@ import { UIChart } from 'primeng/chart';
                 </div>
             </div>
 
-            <!-- Assets by Laboratory Chart -->
+            <!-- Charts Row -->
+            <div class="flex gap-6 mt-6">
+                <!-- Assets by Laboratory Chart -->
+                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 w-1/2">
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Assets by Laboratory</h3>
+                    <p-chart type="bar" [data]="assetsByLaboratoryChartData" [options]="chartOptions"></p-chart>
+                </div>
+
+                <!-- Maintenance Requests by Laboratory Chart -->
+                <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 w-1/2">
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Maintenance Requests by Laboratory</h3>
+                    <p-chart type="bar" [data]="maintenanceRequestsChartData" [options]="getHorizontalChartOptions()"></p-chart>
+                </div>
+            </div>
+
+            <!-- Maintenance Request Status Chart (Donut) -->
             <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 mt-6 w-1/2">
-                <h3 class="text-xl font-semibold mb-4 dark:text-white">Assets by Laboratory</h3>
-                <p-chart type="bar" [data]="assetsByLaboratoryChartData" [options]="chartOptions"></p-chart>
+                <h3 class="text-xl font-semibold mb-4 dark:text-white">Maintenance Request Status</h3>
+                <p-chart type="doughnut" [data]="maintenanceStatusChartData" [options]="donutChartOptions"></p-chart>
             </div>
         </div>
     `,
@@ -85,7 +100,10 @@ export class DashboardCampusAdmin implements OnInit {
     laboratoryCount: number = 0;
     assetCount: number = 0;
     assetsByLaboratoryChartData: any;
+    maintenanceRequestsChartData: any;
+    maintenanceStatusChartData: any;
     chartOptions: any;
+    donutChartOptions: any;
 
     constructor(private http: HttpClient) {}
 
@@ -95,7 +113,10 @@ export class DashboardCampusAdmin implements OnInit {
         this.loadLaboratoryCount();
         this.loadAssetCount();
         this.loadAssetsByLaboratory();
+        this.loadMaintenanceRequestsByLaboratory();
+        this.loadMaintenanceStatus();
         this.initChartOptions();
+        this.initDonutChartOptions();
     }
 
     loadDepartmentCount() {
@@ -233,6 +254,125 @@ export class DashboardCampusAdmin implements OnInit {
                     grid: {
                         color: surfaceBorder,
                         drawBorder: false
+                    }
+                }
+            }
+        };
+    }
+
+    loadMaintenanceRequestsByLaboratory() {
+        const apiUrl = `${environment.apiUrl}/assets/maintenance-requests-by-laboratory`;
+        this.http.get<any[]>(apiUrl).subscribe({
+            next: (data) => {
+                console.log('Maintenance Requests by Laboratory:', data);
+                const labels = data.map((item) => item.laboratoryName);
+                const counts = data.map((item) => item.requestCount);
+                const colors = this.generateColors(data.length);
+
+                this.maintenanceRequestsChartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Maintenance Requests',
+                            data: counts,
+                            backgroundColor: colors.map((c) => c.bg),
+                            borderColor: colors.map((c) => c.border),
+                            borderWidth: 1
+                        }
+                    ]
+                };
+            },
+            error: (error) => {
+                console.error('Error loading maintenance requests by laboratory:', error);
+            }
+        });
+    }
+
+    getHorizontalChartOptions() {
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
+        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+        return {
+            indexAxis: 'y',
+            maintainAspectRatio: false,
+            aspectRatio: 0.8,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: textColorSecondary,
+                        font: {
+                            weight: 500
+                        }
+                    },
+                    grid: {
+                        color: surfaceBorder,
+                        drawBorder: false
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: textColorSecondary
+                    },
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    }
+                }
+            }
+        };
+    }
+
+    loadMaintenanceStatus() {
+        const apiUrl = `${environment.apiUrl}/assets/maintenance-requests-by-status`;
+        this.http.get<any[]>(apiUrl).subscribe({
+            next: (data) => {
+                console.log('Maintenance Status:', data);
+                const labels = data.map((item) => item.status);
+                const counts = data.map((item) => item.count);
+                const colors = [
+                    'rgba(239, 68, 68, 0.8)', // Red for Pending
+                    'rgba(34, 197, 94, 0.8)' // Green for Approved
+                ];
+
+                this.maintenanceStatusChartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            data: counts,
+                            backgroundColor: colors,
+                            borderColor: ['rgb(239, 68, 68)', 'rgb(34, 197, 94)'],
+                            borderWidth: 1
+                        }
+                    ]
+                };
+            },
+            error: (error) => {
+                console.error('Error loading maintenance status:', error);
+            }
+        });
+    }
+
+    initDonutChartOptions() {
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
+
+        this.donutChartOptions = {
+            maintainAspectRatio: false,
+            aspectRatio: 0.8,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: textColor,
+                        usePointStyle: true,
+                        padding: 15
                     }
                 }
             }
