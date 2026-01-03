@@ -71,13 +71,12 @@ import { UIChart } from 'primeng/chart';
 
                 <!-- Right Side: Donut Chart -->
                 <div
-                    class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 w-1/2 h-85
+                    class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 w-1/2 h-85 relative
                 "
                 >
+                    <p class="text-xl font-semibold dark:text-white absolute top-2 left-1/2 transform -translate-x-1/2">Maintenance Requests Status</p>
                     <div class="flex flex-col items-center justify-center h-full">
-                       
                         <div class="w-90">
-                             
                             <p-chart type="doughnut" [data]="maintenanceStatusChartData" [options]="donutChartOptions"></p-chart>
                         </div>
                     </div>
