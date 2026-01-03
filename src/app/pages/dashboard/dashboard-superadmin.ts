@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { UIChart } from 'primeng/chart';
+import { TableModule } from 'primeng/table';
 
 @Component({
     selector: 'app-dashboard-superadmin',
     standalone: true,
-    imports: [CommonModule, UIChart],
+    imports: [CommonModule, UIChart, TableModule],
     template: `
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -78,6 +79,47 @@ import { UIChart } from 'primeng/chart';
                     <p-chart type="bar" [data]="maintenanceRequestsChartData" [options]="getHorizontalChartOptions()"></p-chart>
                 </div>
             </div>
+
+            <!-- Recent Activity Table -->
+            <div class="bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 mt-6">
+                <h3 class="text-xl font-semibold mb-4 dark:text-white">Recent Activity</h3>
+                <p-table
+                    [value]="activities"
+                    [rows]="5"
+                    [paginator]="true"
+                    [rowsPerPageOptions]="[5, 10, 20, 30]"
+                    [rowHover]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} activities"
+                    [showCurrentPageReport]="true"
+                    [tableStyle]="{ 'min-width': '100%' }"
+                >
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="min-width:15rem">Action Type</th>
+                            <th style="min-width:20rem">Target Name</th>
+                            <th style="min-width:18rem">Actor</th>
+                            <th style="min-width:18rem">Timestamp</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-activity>
+                        <tr>
+                            <td>
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="getActionTypeClass(activity.actionType)">
+                                    {{ activity.actionType }}
+                                </span>
+                            </td>
+                            <td class="dark:text-white">{{ activity.targetName }}</td>
+                            <td class="dark:text-white">{{ activity.actor?.firstName }} {{ activity.actor?.lastName }}</td>
+                            <td class="dark:text-gray-400">{{ activity.timestamp | date: 'short' }}</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="4" class="text-center py-5 dark:text-gray-400">No activities found</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
         </div>
     `,
     styles: [
@@ -96,6 +138,7 @@ export class DashboardSuperAdmin implements OnInit {
     assetsByCampusChartData: any;
     maintenanceRequestsChartData: any;
     chartOptions: any;
+    activities: any[] = [];
 
     constructor(private http: HttpClient) {}
 
@@ -106,6 +149,7 @@ export class DashboardSuperAdmin implements OnInit {
         this.loadLaboratoryCount();
         this.loadAssetsByCampus();
         this.loadMaintenanceRequestsByCampus();
+        this.loadActivities();
         this.initChartOptions();
     }
 
@@ -217,6 +261,65 @@ export class DashboardSuperAdmin implements OnInit {
         });
     }
 
+    loadActivities() {
+        // Hardcoded data for now - will replace with API endpoint later
+        this.activities = [
+            {
+                activityId: '6d3e5068-5fbf-49b7-9d8d-eb192a622953',
+                actionType: 'ASSET_CREATED',
+                entityType: 'ASSET',
+                targetName: 'sadasd',
+                targetId: 'ce0b0908-98b2-40cf-8d9a-05959419d7b9',
+                description: 'Created asset: sadasd (asdasd)',
+                timestamp: '2026-01-03T02:18:06.406Z',
+                actor: {
+                    userId: '5bc27660-e5f8-49f8-9c2b-1946c042f0c9',
+                    userName: 'lab123',
+                    firstName: 'balubal',
+                    lastName: 'labtech',
+                    role: 'LabTech'
+                }
+            },
+            {
+                activityId: 'fc0d136d-e4f8-41ea-aebe-5bfc2711e0b3',
+                actionType: 'ASSET_CREATED',
+                entityType: 'ASSET',
+                targetName: 'dsad123',
+                targetId: '887b87fa-7184-459d-ac56-4d7f2ed7b484',
+                description: 'Created asset: dsad123 (d123)',
+                timestamp: '2026-01-03T02:09:11.967Z',
+                actor: {
+                    userId: 'cdfb5032-7a79-40b4-b763-ccf4f45fed38',
+                    userName: 'labtech_villa1',
+                    firstName: 'Mike',
+                    lastName: 'Johnson',
+                    role: 'LabTech'
+                }
+            },
+            {
+                activityId: '654a1ec3-1e00-43b3-b415-2e9886a4291d',
+                actionType: 'USER_REGISTERED',
+                entityType: 'USER',
+                targetName: 'balubal labtech',
+                targetId: '5bc27660-e5f8-49f8-9c2b-1946c042f0c9',
+                description: 'Registered new user: balubal labtech (balubal.labtech@gmail.com) with role LabTech',
+                timestamp: '2026-01-03T02:05:25.223Z',
+                actor: {
+                    userId: 'd94d52cf-7504-4be2-b964-fdb57d757730',
+                    userName: 'balubal123',
+                    firstName: 'balubal',
+                    lastName: 'admin',
+                    role: 'CampusAdmin'
+                }
+            }
+        ];
+
+        // Sort by timestamp descending (newest first)
+        this.activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+        console.log('✅ Activities loaded and sorted:', this.activities);
+    }
+
     generateColors(count: number): Array<{ bg: string; border: string }> {
         const colorPalette = [
             { bg: 'rgba(59, 130, 246, 0.6)', border: 'rgb(59, 130, 246)' }, // Blue
@@ -317,5 +420,17 @@ export class DashboardSuperAdmin implements OnInit {
                 }
             }
         };
+    }
+
+    getActionTypeClass(actionType: string): string {
+        const classes: { [key: string]: string } = {
+            ASSET_CREATED: 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300',
+            ASSET_UPDATED: 'bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300',
+            ASSET_DELETED: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
+            USER_REGISTERED: 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300',
+            USER_UPDATED: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300',
+            USER_DELETED: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+        };
+        return classes[actionType] || 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
     }
 }
