@@ -262,62 +262,21 @@ export class DashboardSuperAdmin implements OnInit {
     }
 
     loadActivities() {
-        // Hardcoded data for now - will replace with API endpoint later
-        this.activities = [
-            {
-                activityId: '6d3e5068-5fbf-49b7-9d8d-eb192a622953',
-                actionType: 'ASSET_CREATED',
-                entityType: 'ASSET',
-                targetName: 'sadasd',
-                targetId: 'ce0b0908-98b2-40cf-8d9a-05959419d7b9',
-                description: 'Created asset: sadasd (asdasd)',
-                timestamp: '2026-01-03T02:18:06.406Z',
-                actor: {
-                    userId: '5bc27660-e5f8-49f8-9c2b-1946c042f0c9',
-                    userName: 'lab123',
-                    firstName: 'balubal',
-                    lastName: 'labtech',
-                    role: 'LabTech'
-                }
+        const apiUrl = `${environment.apiUrl}/activities`;
+        this.http.get<any>(apiUrl).subscribe({
+            next: (data) => {
+                // Handle both array and object with activities property
+                this.activities = Array.isArray(data) ? data : data?.activities || [];
+
+                // Sort by timestamp descending (newest first)
+                this.activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+                console.log('✅ Activities loaded and sorted:', this.activities);
             },
-            {
-                activityId: 'fc0d136d-e4f8-41ea-aebe-5bfc2711e0b3',
-                actionType: 'ASSET_CREATED',
-                entityType: 'ASSET',
-                targetName: 'dsad123',
-                targetId: '887b87fa-7184-459d-ac56-4d7f2ed7b484',
-                description: 'Created asset: dsad123 (d123)',
-                timestamp: '2026-01-03T02:09:11.967Z',
-                actor: {
-                    userId: 'cdfb5032-7a79-40b4-b763-ccf4f45fed38',
-                    userName: 'labtech_villa1',
-                    firstName: 'Mike',
-                    lastName: 'Johnson',
-                    role: 'LabTech'
-                }
-            },
-            {
-                activityId: '654a1ec3-1e00-43b3-b415-2e9886a4291d',
-                actionType: 'USER_REGISTERED',
-                entityType: 'USER',
-                targetName: 'balubal labtech',
-                targetId: '5bc27660-e5f8-49f8-9c2b-1946c042f0c9',
-                description: 'Registered new user: balubal labtech (balubal.labtech@gmail.com) with role LabTech',
-                timestamp: '2026-01-03T02:05:25.223Z',
-                actor: {
-                    userId: 'd94d52cf-7504-4be2-b964-fdb57d757730',
-                    userName: 'balubal123',
-                    firstName: 'balubal',
-                    lastName: 'admin',
-                    role: 'CampusAdmin'
-                }
+            error: (error) => {
+                console.error('Error loading activities:', error);
             }
-        ];
-
-        // Sort by timestamp descending (newest first)
-        this.activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-        console.log('✅ Activities loaded and sorted:', this.activities);
+        });
     }
 
     generateColors(count: number): Array<{ bg: string; border: string }> {
