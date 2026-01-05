@@ -118,7 +118,10 @@ import { environment } from '../../../environments/environment';
                     </div>
                     <div class="col-span-6">
                         <label class="block font-bold mb-2">Subject *</label>
-                        <p-select [(ngModel)]="newSchedule.activity" [options]="subjects" optionLabel="subjectName" optionValue="subjectId" placeholder="Select subject" class="w-full" appendTo="body" />
+                        <div class="flex gap-2">
+                            <p-select [(ngModel)]="newSchedule.activity" [options]="subjects" optionLabel="subjectName" optionValue="subjectId" placeholder="Select subject" class="flex-1" appendTo="body" />
+                            <p-button icon="pi pi-plus" severity="secondary" (click)="openCreateSubjectDialog()" pTooltip="Create new subject" tooltipPosition="top" />
+                        </div>
                     </div>
                     <div class="col-span-6">
                         <label class="block font-bold mb-2">Time *</label>
@@ -134,6 +137,34 @@ import { environment } from '../../../environments/environment';
                 <div class="flex justify-end gap-2 w-full">
                     <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (click)="closeDialog()" />
                     <p-button label="Save" icon="pi pi-check" (click)="saveSchedule()" />
+                </div>
+            </ng-template>
+        </p-dialog>
+
+        <!-- Create Subject Dialog -->
+        <p-dialog [(visible)]="subjectDialog" [header]="'Create New Subject'" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '90vw' }" [closable]="true">
+            <div class="grid grid-cols-12 gap-4 mb-4">
+                <div class="col-span-12">
+                    <label class="block font-bold mb-2">Subject Name *</label>
+                    <input pInputText [(ngModel)]="newSubject.subjectName" type="text" placeholder="Enter subject name" class="w-full" />
+                </div>
+                <div class="col-span-6">
+                    <label class="block font-bold mb-2">Subject Code *</label>
+                    <input pInputText [(ngModel)]="newSubject.subjectCode" type="text" placeholder="e.g., CS101" class="w-full" />
+                </div>
+                <div class="col-span-6">
+                    <label class="block font-bold mb-2">Units *</label>
+                    <input pInputText [(ngModel)]="newSubject.units" type="text" placeholder="e.g., 3" class="w-full" />
+                </div>
+                <div class="col-span-12">
+                    <label class="block font-bold mb-2">Number of Students</label>
+                    <p-inputNumber [(ngModel)]="newSubject.numberOfStudents" [min]="0" placeholder="Enter number of students" class="w-full" />
+                </div>
+            </div>
+            <ng-template #footer>
+                <div class="flex justify-end gap-2 w-full">
+                    <p-button label="Cancel" icon="pi pi-times" severity="secondary" text (click)="closeSubjectDialog()" />
+                    <p-button label="Create" icon="pi pi-check" (click)="saveSubject()" />
                 </div>
             </ng-template>
         </p-dialog>
@@ -154,6 +185,8 @@ export class LabScheduleComponent implements OnInit {
     // Dialog state
     scheduleDialog: boolean = false;
     newSchedule: any = this.getEmptySchedule();
+    subjectDialog: boolean = false;
+    newSubject: any = this.getEmptySubject();
 
     private apiUrl = `${environment.apiUrl}/laboratories`;
 
@@ -198,6 +231,15 @@ export class LabScheduleComponent implements OnInit {
             activity: '',
             instructor: '',
             color: '#1f2937'
+        };
+    }
+
+    getEmptySubject() {
+        return {
+            subjectName: '',
+            subjectCode: '',
+            numberOfStudents: 0,
+            units: ''
         };
     }
 
@@ -353,6 +395,61 @@ export class LabScheduleComponent implements OnInit {
     closeDialog() {
         this.scheduleDialog = false;
         this.newSchedule = this.getEmptySchedule();
+    }
+
+    openCreateSubjectDialog() {
+        this.newSubject = this.getEmptySubject();
+        this.subjectDialog = true;
+    }
+
+    closeSubjectDialog() {
+        this.subjectDialog = false;
+        this.newSubject = this.getEmptySubject();
+    }
+
+    saveSubject() {
+        if (!this.newSubject.subjectName || !this.newSubject.subjectCode || !this.newSubject.units) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Validation',
+                detail: 'Subject Name, Code, and Units are required'
+            });
+            return;
+        }
+
+        const payload = {
+            subjectName: this.newSubject.subjectName,
+            subjectCode: this.newSubject.subjectCode,
+            numberOfStudents: this.newSubject.numberOfStudents || 0,
+            units: this.newSubject.units
+        };
+
+        const subjectsUrl = `${environment.apiUrl}/subjects`;
+        console.log('📡 Posting new subject to:', subjectsUrl, payload);
+
+        this.http.post<any>(subjectsUrl, payload).subscribe({
+            next: (response: any) => {
+                console.log('✅ Subject created successfully:', response);
+
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: `Subject "${this.newSubject.subjectName}" created successfully`
+                });
+
+                this.closeSubjectDialog();
+                this.loadSubjects(); // Reload subjects to include the new one
+            },
+            error: (error: any) => {
+                console.error('❌ Error creating subject:', error);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to create subject: ' + (error?.error?.message || error?.message)
+                });
+            }
+        });
     }
 
     saveSchedule() {

@@ -45,6 +45,33 @@ import { UIChart } from 'primeng/chart';
                     </div>
                 </div>
             </div>
+
+            <!-- Lab Schedule Section -->
+            <div class="flex flex-col md:flex-row gap-6 mt-6">
+                <!-- Today's Schedule -->
+                <div class="w-full md:w-1/2 bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Today's Schedule</h3>
+                    <div class="space-y-3">
+                        <div *ngFor="let schedule of todaySchedules" class="border-l-4 border-blue-500 pl-4 py-2 dark:border-blue-400">
+                            <div class="font-semibold dark:text-white">{{ schedule.subject }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ schedule.time }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ schedule.laboratory }} • {{ schedule.students }} students</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Schedules -->
+                <div class="w-full md:w-1/2 bg-white dark:bg-surface-800 rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Upcoming Schedules</h3>
+                    <div class="space-y-3 max-h-80 overflow-y-auto">
+                        <div *ngFor="let schedule of upcomingSchedules" class="border-l-4 border-green-500 pl-4 py-2 dark:border-green-400">
+                            <div class="font-semibold dark:text-white">{{ schedule.subject }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ schedule.date }} @ {{ schedule.time }}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ schedule.laboratory }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     `
 })
@@ -53,6 +80,8 @@ export class DashboardFaculty implements OnInit {
     pendingCount: number = 0;
     statusChartData: any;
     donutOptions: any;
+    todaySchedules: any[] = [];
+    upcomingSchedules: any[] = [];
 
     constructor(private http: HttpClient) {}
 
@@ -61,6 +90,7 @@ export class DashboardFaculty implements OnInit {
         this.loadPending();
         this.loadByStatus();
         this.initDonutOptions();
+        this.initMockScheduleData();
     }
 
     loadTotalSubmitted() {
@@ -149,5 +179,63 @@ export class DashboardFaculty implements OnInit {
             colors.push(palette[i % palette.length]);
         }
         return colors;
+    }
+
+    initMockScheduleData() {
+        // Mock Today's Schedule
+        this.todaySchedules = [
+            {
+                time: '08:00 AM - 10:00 AM',
+                subject: 'Chemistry Lab',
+                laboratory: 'Chem Lab 1',
+                students: 25
+            },
+            {
+                time: '10:30 AM - 12:30 PM',
+                subject: 'Advanced Physics',
+                laboratory: 'Physics Lab 2',
+                students: 18
+            },
+            {
+                time: '1:00 PM - 3:00 PM',
+                subject: 'Organic Chemistry',
+                laboratory: 'Chem Lab 2',
+                students: 22
+            }
+        ];
+
+        // Mock Upcoming Schedules (next 5 sessions)
+        this.upcomingSchedules = [
+            {
+                date: 'Jan 6, 2026',
+                time: '09:00 AM',
+                subject: 'Biology Lab',
+                laboratory: 'Bio Lab 1'
+            },
+            {
+                date: 'Jan 7, 2026',
+                time: '10:00 AM',
+                subject: 'Physics Lab',
+                laboratory: 'Physics Lab 1'
+            },
+            {
+                date: 'Jan 8, 2026',
+                time: '2:00 PM',
+                subject: 'Chemistry Lab',
+                laboratory: 'Chem Lab 1'
+            },
+            {
+                date: 'Jan 9, 2026',
+                time: '11:00 AM',
+                subject: 'Advanced Physics',
+                laboratory: 'Physics Lab 2'
+            },
+            {
+                date: 'Jan 10, 2026',
+                time: '3:00 PM',
+                subject: 'Organic Chemistry',
+                laboratory: 'Chem Lab 2'
+            }
+        ];
     }
 }

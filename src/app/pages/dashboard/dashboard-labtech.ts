@@ -58,6 +58,19 @@ import { UIChart } from 'primeng/chart';
                     <p-chart type="bar" [data]="assetsByBrandChartData" [options]="horizontalChartOptions"></p-chart>
                 </div>
             </div>
+
+            <!-- Lab schedule mock charts row -->
+            <div class="flex flex-col md:flex-row gap-6 mt-6">
+                <div class="w-full md:w-1/2 bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 h-96">
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Schedules by Day (Mock)</h3>
+                    <p-chart type="bar" [data]="scheduleByDayChartData" [options]="barChartOptions"></p-chart>
+                </div>
+
+                <div class="w-full md:w-1/2 bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 h-96">
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Schedules by Laboratory (Mock)</h3>
+                    <p-chart type="bar" [data]="scheduleByLabChartData" [options]="horizontalChartOptions"></p-chart>
+                </div>
+            </div>
         </div>
     `
 })
@@ -70,6 +83,8 @@ export class DashboardLabTech implements OnInit {
     assetsByBrandChartData: any;
     barChartOptions: any;
     horizontalChartOptions: any;
+    scheduleByDayChartData: any;
+    scheduleByLabChartData: any;
 
     constructor(private http: HttpClient) {}
 
@@ -82,6 +97,7 @@ export class DashboardLabTech implements OnInit {
         this.loadAssetsByBrand();
         this.initBarOptions();
         this.initHorizontalBarOptions();
+        this.initMockScheduleCharts();
     }
 
     loadOverdueApprovalsCount() {
@@ -271,6 +287,42 @@ export class DashboardLabTech implements OnInit {
                     grid: { display: false, drawBorder: false }
                 }
             }
+        };
+    }
+
+    initMockScheduleCharts() {
+        const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const dayCounts = [6, 8, 7, 5, 9, 3];
+        const dayColors = this.generateColors(dayLabels.length);
+
+        this.scheduleByDayChartData = {
+            labels: dayLabels,
+            datasets: [
+                {
+                    label: 'Schedules',
+                    data: dayCounts,
+                    backgroundColor: dayColors.map((c) => c.bg),
+                    borderColor: dayColors.map((c) => c.border),
+                    borderWidth: 1
+                }
+            ]
+        };
+
+        const labLabels = ['Chem Lab', 'Physics Lab', 'CS Lab', 'Bio Lab'];
+        const labCounts = [10, 7, 12, 5];
+        const labColors = this.generateColors(labLabels.length);
+
+        this.scheduleByLabChartData = {
+            labels: labLabels,
+            datasets: [
+                {
+                    label: 'Schedules',
+                    data: labCounts,
+                    backgroundColor: labColors.map((c) => c.bg),
+                    borderColor: labColors.map((c) => c.border),
+                    borderWidth: 1
+                }
+            ]
         };
     }
 
