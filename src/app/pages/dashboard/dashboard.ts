@@ -4,16 +4,19 @@ import { DashboardSuperAdmin } from './dashboard-superadmin';
 import { DashboardCampusAdmin } from './dashboard-campusadmin';
 import { DashboardFaculty } from './dashboard-faculty';
 import { DashboardStudent } from './dashboard-student';
+import { DashboardLabTech } from './dashboard-labtech';
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, DashboardSuperAdmin, DashboardCampusAdmin, DashboardFaculty, DashboardStudent],
+    imports: [CommonModule, DashboardSuperAdmin, DashboardCampusAdmin, DashboardFaculty, DashboardStudent, DashboardLabTech],
     template: `
         @if (userRole === 'SuperAdmin') {
             <app-dashboard-superadmin />
         } @else if (userRole === 'CampusAdmin') {
             <app-dashboard-campusadmin />
+        } @else if (userRole === 'LabTech') {
+            <app-dashboard-labtech />
         } @else if (userRole === 'Faculty') {
             <app-dashboard-faculty />
         } @else if (userRole === 'Student') {
