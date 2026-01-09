@@ -1,0 +1,103 @@
+// Asset Category Pages Styles
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    p-button {
+        margin: 0;
+    }
+}
+
+// Table styling
+p-table {
+    ::ng-deep {
+        .p-datatable {
+            .p-datatable-thead > tr > th {
+                padding: 1rem;
+                background-color: var(--primary-color);
+                color: var(--primary-contrast-color);
+                font-weight: 600;
+            }
+
+            .p-datatable-tbody > tr {
+                &:hover {
+                    background-color: var(--surface-hover);
+                }
+
+                > td {
+                    padding: 1rem;
+                    vertical-align: middle;
+                }
+            }
+
+            .p-datatable-emptymessage > tr > td {
+                padding: 2rem;
+                text-align: center;
+                color: var(--text-color-secondary);
+            }
+        }
+
+        .p-paginator {
+            padding: 1rem;
+            background-color: var(--surface-overlay);
+            border: 1px solid var(--surface-border);
+        }
+    }
+}
+
+// Toolbar styling
+p-toolbar {
+    ::ng-deep {
+        .p-toolbar {
+            padding: 1rem;
+            background-color: var(--surface-overlay);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--content-border-radius);
+            margin-bottom: 1.5rem;
+
+            .p-toolbar-group-start,
+            .p-toolbar-group-end {
+                display: flex;
+                gap: 0.5rem;
+                align-items: center;
+            }
+        }
+    }
+}
+
+// Tooltip styling
+p-tooltip {
+    ::ng-deep {
+        .p-tooltip {
+            background-color: var(--surface-overlay);
+            color: var(--text-color);
+            border: 1px solid var(--surface-border);
+        }
+    }
+}
+
+// Input field styling
+p-iconfield {
+    ::ng-deep {
+        input {
+            width: 250px;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--surface-border);
+            border-radius: var(--content-border-radius);
+            background-color: var(--surface-card);
+            color: var(--text-color);
+            transition: border-color var(--element-transition-duration);
+
+            &:focus {
+                border-color: var(--primary-color);
+                outline: none;
+            }
+
+            &::placeholder {
+                color: var(--text-color-secondary);
+            }
+        }
+    }
+}

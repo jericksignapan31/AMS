@@ -1,0 +1,206 @@
+.users-container {
+    width: 100%;
+}
+
+.users-table {
+    .p-datatable {
+        .p-datatable-thead > tr > th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            padding: 1rem;
+
+            &:hover {
+                background-color: #f1f3f5;
+            }
+        }
+
+        .p-datatable-tbody > tr {
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: var(--highlight-bg) !important;
+                cursor: pointer;
+            }
+
+            td {
+                padding: 1rem;
+                color: #212529;
+                vertical-align: middle;
+            }
+
+            &.row-selected {
+                background-color: var(--primary-color-text) !important;
+                color: var(--primary-color) !important;
+                border-left: 3px solid var(--primary-color) !important;
+
+                td {
+                    color: var(--primary-color) !important;
+                }
+            }
+        }
+
+        .p-datatable-emptymessage > tr > td {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            background-color: #f8f9fa;
+        }
+    }
+
+    .p-paginator {
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        padding: 1rem;
+
+        .p-paginator-left-content,
+        .p-paginator-right-content {
+            color: #495057;
+        }
+    }
+}
+
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0;
+
+    h5 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+            color: #667eea;
+        }
+    }
+}
+
+.users-search-bar {
+    margin-bottom: 1.5rem;
+
+    .p-input-icon-left {
+        width: 100%;
+    }
+
+    input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 2px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+
+        &:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background-color: #f8f9ff;
+        }
+
+        &::placeholder {
+            color: #adb5bd;
+        }
+    }
+
+    i {
+        color: #adb5bd;
+        left: 0.75rem;
+    }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+
+    p-button {
+        ::ng-deep .p-button {
+            &.p-button-rounded {
+                width: 2.5rem;
+                height: 2.5rem;
+
+                &:hover {
+                    transform: scale(1.05);
+                }
+            }
+
+            &.p-button-info {
+                background-color: #17a2b8;
+                border-color: #17a2b8;
+
+                &:hover {
+                    background-color: #138496;
+                }
+            }
+
+            &.p-button-warning {
+                background-color: #ffc107;
+                border-color: #ffc107;
+                color: #000;
+
+                &:hover {
+                    background-color: #e0a800;
+                }
+            }
+
+            &.p-button-danger {
+                background-color: #dc3545;
+                border-color: #dc3545;
+
+                &:hover {
+                    background-color: #c82333;
+                }
+            }
+        }
+    }
+}
+
+.card {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    .card-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        background-color: #fff;
+
+        h5 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .users-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .users-table .p-datatable {
+        .p-datatable-thead > tr > th {
+            font-size: 0.875rem;
+            padding: 0.75rem;
+        }
+
+        .p-datatable-tbody > tr > td {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+    }
+}
