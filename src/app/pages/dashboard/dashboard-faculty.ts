@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { UIChart } from 'primeng/chart';
 
 @Component({
@@ -94,7 +95,7 @@ export class DashboardFaculty implements OnInit {
     }
 
     loadTotalSubmitted() {
-        const apiUrl = 'http://localhost:3000/api/maintenance-requests/count-total-submitted';
+        const apiUrl = `${environment.apiUrl}/maintenance-requests/count-total-submitted`;
         this.http.get<number>(apiUrl).subscribe({
             next: (count) => (this.totalSubmitted = count || 0),
             error: (error) => console.error('Error loading total submitted:', error)
@@ -102,7 +103,7 @@ export class DashboardFaculty implements OnInit {
     }
 
     loadPending() {
-        const apiUrl = 'http://localhost:3000/api/maintenance-requests/count-pending';
+        const apiUrl = `${environment.apiUrl}/maintenance-requests/count-pending`;
         this.http.get<number>(apiUrl).subscribe({
             next: (count) => (this.pendingCount = count || 0),
             error: (error) => console.error('Error loading pending count:', error)
@@ -110,7 +111,7 @@ export class DashboardFaculty implements OnInit {
     }
 
     loadByStatus() {
-        const apiUrl = 'http://localhost:3000/api/maintenance-requests/count-by-status';
+        const apiUrl = `${environment.apiUrl}/maintenance-requests/count-by-status`;
         this.http.get<any[]>(apiUrl).subscribe({
             next: (data) => {
                 const labels = data.map((item) => item.status || 'Unknown');
