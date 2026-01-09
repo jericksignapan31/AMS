@@ -59,15 +59,15 @@ import { UIChart } from 'primeng/chart';
                 </div>
             </div>
 
-            <!-- Lab schedule mock charts row -->
+            <!-- Lab schedule charts row -->
             <div class="flex flex-col md:flex-row gap-6 mt-6">
                 <div class="w-full md:w-1/2 bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 h-96">
-                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Schedules by Day (Mock)</h3>
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Schedules by Day</h3>
                     <p-chart type="bar" [data]="scheduleByDayChartData" [options]="barChartOptions"></p-chart>
                 </div>
 
                 <div class="w-full md:w-1/2 bg-white dark:bg-surface-800 rounded-lg shadow-md p-6 h-96">
-                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Schedules by Laboratory (Mock)</h3>
+                    <h3 class="text-xl font-semibold mb-4 dark:text-white">Schedules by Laboratory</h3>
                     <p-chart type="bar" [data]="scheduleByLabChartData" [options]="horizontalChartOptions"></p-chart>
                 </div>
             </div>
@@ -97,7 +97,8 @@ export class DashboardLabTech implements OnInit {
         this.loadAssetsByBrand();
         this.initBarOptions();
         this.initHorizontalBarOptions();
-        this.initMockScheduleCharts();
+        this.loadSchedulesByDay();
+        this.loadSchedulesByLaboratory();
     }
 
     loadOverdueApprovalsCount() {
@@ -290,40 +291,60 @@ export class DashboardLabTech implements OnInit {
         };
     }
 
-    initMockScheduleCharts() {
-        const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const dayCounts = [6, 8, 7, 5, 9, 3];
-        const dayColors = this.generateColors(dayLabels.length);
+    loadSchedulesByDay() {
+        const apiUrl = `${environment.apiUrl}/labtech-schedules/by-day`;
+        this.http.get<Array<{ day: string; count: number }>>(apiUrl).subscribe({
+            next: (data) => {
+                const labels = data.map((d) => d.day);
+                const counts = data.map((d) => d.count ?? 0);
+                const colors = this.generateColors(labels.length);
 
-        this.scheduleByDayChartData = {
-            labels: dayLabels,
-            datasets: [
-                {
-                    label: 'Schedules',
-                    data: dayCounts,
-                    backgroundColor: dayColors.map((c) => c.bg),
-                    borderColor: dayColors.map((c) => c.border),
-                    borderWidth: 1
-                }
-            ]
-        };
+                this.scheduleByDayChartData = {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Schedules',
+                            data: counts,
+                            backgroundColor: colors.map((c) => c.bg),
+                            borderColor: colors.map((c) => c.border),
+                            borderWidth: 1
+                        }
+                    ]
+                };
+            },
+            error: (error) => {
+                console.error('Error loading schedules by day:', error);
+                this.scheduleByDayChartData = { labels: [], datasets: [{ label: 'Schedules', data: [] }] };
+            }
+        });
+    }
 
-        const labLabels = ['Chem Lab', 'Physics Lab', 'CS Lab', 'Bio Lab'];
-        const labCounts = [10, 7, 12, 5];
-        const labColors = this.generateColors(labLabels.length);
+    loadSchedulesByLaboratory() {
+        const apiUrl = `${environment.apiUrl}/labtech-schedules/by-laboratory`;
+        this.http.get<Array<{ laboratoryName: string; count: number }>>(apiUrl).subscribe({
+            next: (data) => {
+                const labels = data.map((d) => d.laboratoryName || 'Unknown');
+                const counts = data.map((d) => d.count ?? 0);
+                const colors = this.generateColors(labels.length);
 
-        this.scheduleByLabChartData = {
-            labels: labLabels,
-            datasets: [
-                {
-                    label: 'Schedules',
-                    data: labCounts,
-                    backgroundColor: labColors.map((c) => c.bg),
-                    borderColor: labColors.map((c) => c.border),
-                    borderWidth: 1
-                }
-            ]
-        };
+                this.scheduleByLabChartData = {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Schedules',
+                            data: counts,
+                            backgroundColor: colors.map((c) => c.bg),
+                            borderColor: colors.map((c) => c.border),
+                            borderWidth: 1
+                        }
+                    ]
+                };
+            },
+            error: (error) => {
+                console.error('Error loading schedules by laboratory:', error);
+                this.scheduleByLabChartData = { labels: [], datasets: [{ label: 'Schedules', data: [] }] };
+            }
+        });
     }
 
     generateColors(count: number): Array<{ bg: string; border: string }> {
