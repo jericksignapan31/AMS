@@ -91,7 +91,8 @@ export class DashboardFaculty implements OnInit {
         this.loadPending();
         this.loadByStatus();
         this.initDonutOptions();
-        this.initMockScheduleData();
+        this.loadCurrentSchedules();
+        this.loadUpcomingSchedules();
     }
 
     loadTotalSubmitted() {
@@ -183,60 +184,66 @@ export class DashboardFaculty implements OnInit {
     }
 
     initMockScheduleData() {
-        // Mock Today's Schedule
-        this.todaySchedules = [
-            {
-                time: '08:00 AM - 10:00 AM',
-                subject: 'Chemistry Lab',
-                laboratory: 'Chem Lab 1',
-                students: 25
-            },
-            {
-                time: '10:30 AM - 12:30 PM',
-                subject: 'Advanced Physics',
-                laboratory: 'Physics Lab 2',
-                students: 18
-            },
-            {
-                time: '1:00 PM - 3:00 PM',
-                subject: 'Organic Chemistry',
-                laboratory: 'Chem Lab 2',
-                students: 22
-            }
-        ];
+        // Replaced with real API calls: loadCurrentSchedules() and loadUpcomingSchedules()
+    }
 
-        // Mock Upcoming Schedules (next 5 sessions)
-        this.upcomingSchedules = [
-            {
-                date: 'Jan 6, 2026',
-                time: '09:00 AM',
-                subject: 'Biology Lab',
-                laboratory: 'Bio Lab 1'
+    loadCurrentSchedules() {
+        const apiUrl = `${environment.apiUrl}/faculty-schedules/current`;
+        this.http.get<any[]>(apiUrl).subscribe({
+            next: (data) => {
+                this.todaySchedules = data.map((schedule) => ({
+                    time: `${this.formatTime(schedule.startTime)} - ${this.formatTime(schedule.endTime)}`,
+                    subject: schedule.subject?.subjectName || 'Unknown',
+                    laboratory: schedule.laboratory?.laboratoryName || 'Unknown',
+                    students: schedule.subject?.numberOfStudents || 0
+                }));
             },
-            {
-                date: 'Jan 7, 2026',
-                time: '10:00 AM',
-                subject: 'Physics Lab',
-                laboratory: 'Physics Lab 1'
-            },
-            {
-                date: 'Jan 8, 2026',
-                time: '2:00 PM',
-                subject: 'Chemistry Lab',
-                laboratory: 'Chem Lab 1'
-            },
-            {
-                date: 'Jan 9, 2026',
-                time: '11:00 AM',
-                subject: 'Advanced Physics',
-                laboratory: 'Physics Lab 2'
-            },
-            {
-                date: 'Jan 10, 2026',
-                time: '3:00 PM',
-                subject: 'Organic Chemistry',
-                laboratory: 'Chem Lab 2'
+            error: (error) => {
+                console.error('Error loading current schedules:', error);
+                // Keep empty array on error
+                this.todaySchedules = [];
             }
-        ];
+        });
+    }
+
+    loadUpcomingSchedules() {
+        const apiUrl = `${environment.apiUrl}/faculty-schedules/upcoming`;
+        this.http.get<any[]>(apiUrl).subscribe({
+            next: (data) => {
+                this.upcomingSchedules = data.map((schedule) => ({
+                    date: this.formatDate(schedule.dayOfWeek),
+                    time: this.formatTime(schedule.startTime),
+                    subject: schedule.subject?.subjectName || 'Unknown',
+                    laboratory: schedule.laboratory?.laboratoryName || 'Unknown'
+                }));
+            },
+            error: (error) => {
+                console.error('Error loading upcoming schedules:', error);
+                // Keep empty array on error
+                this.upcomingSchedules = [];
+            }
+        });
+    }
+
+    formatTime(time: string): string {
+        if (!time) return '';
+        // Convert "06:00:00" to "06:00 AM"
+        const parts = time.split(':');
+        if (parts.length < 2) return time;
+
+        let hours = parseInt(parts[0]);
+        const minutes = parts[1];
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 becomes 12
+
+        return `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+    }
+
+    formatDate(dayOfWeek: string): string {
+        // For now, just return the day of week
+        // You can enhance this to show actual dates based on upcoming weeks
+        return dayOfWeek;
     }
 }
